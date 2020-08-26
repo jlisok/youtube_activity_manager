@@ -1,8 +1,8 @@
 plugins {
-	id 'org.springframework.boot' version '2.3.1.RELEASE'
-	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
-	id 'java'
-	id 'org.liquibase.gradle' version '2.0.4'
+    id 'org.springframework.boot' version '2.3.1.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'java'
+    id 'org.liquibase.gradle' version '2.0.4'
 }
 
 group = 'com.jlisok'
@@ -10,70 +10,77 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '14'
 
 repositories {
-	mavenCentral()
-}
-
-configurations {
-	liquibaseRuntime.extendsFrom runtime
+    mavenCentral()
+    jcenter()
 }
 
 ext {
-	springStarterVersion = '2.3.2.RELEASE'
+    liquibaseVersion = '3.10.2'
+    mockitoVersion = '3.5.6'
+    logbackVersion = '1.2.3'
+    springStarterVersion = '2.3.2.RELEASE'
 }
 
 
 dependencies {
-	developmentOnly group: 'org.springframework.boot', name: 'spring-boot-devtools', version: "${springStarterVersion}"
+    developmentOnly group: 'org.springframework.boot', name: 'spring-boot-devtools', version: "${springStarterVersion}"
 
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: "${springStarterVersion}"
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: "${springStarterVersion}"
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: "${springStarterVersion}"
-	implementation group: 'org.springframework.boot', name:  'spring-boot-starter-security', version: "${springStarterVersion}"
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: "${springStarterVersion}"
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: "${springStarterVersion}"
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: "${springStarterVersion}"
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: "${springStarterVersion}"
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: "${springStarterVersion}"
 
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
 
-	testImplementation('org.springframework.boot:spring-boot-starter-test') {
-		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-	}
+    implementation group: 'com.auth0', name: 'java-jwt', version: '3.4.0'
 
-	implementation group: 'com.auth0', name: 'java-jwt', version : '3.4.0'
-
-	implementation group: 'com.thetransactioncompany', name: 'cors-filter', version: '2.9'
-
-
-	implementation 'org.liquibase:liquibase-core:4.0.0'
-	liquibaseRuntime 'org.liquibase:liquibase-groovy-dsl:2.1.2'
-
-	//while using Java 9+
-	liquibaseRuntime group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-	liquibaseRuntime group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
-
-	runtimeOnly 'org.postgresql:postgresql'
-
-	implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.4.18.Final'
-	implementation group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.4.18.Final'
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.16'
 
 
-	implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
+    implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.4.18.Final'
+    implementation group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.4.18.Final'
 
-	implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
 
-	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
+    implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
 
+    implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
+
+    //
+    // To run mockito with junit5
+    //
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: "${mockitoVersion}"
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.5.6'
+
+    implementation group: 'org.apache.maven.plugins', name: 'maven-surefire-plugin', version: '3.0.0-M5'
+
+
+    //
+    // Liquibase plugin
+    //
+    liquibaseRuntime group: 'org.liquibase', name: 'liquibase-core', version: "${liquibaseVersion}"
+    liquibaseRuntime group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+    liquibaseRuntime group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
+    liquibaseRuntime group: 'ch.qos.logback', name: 'logback-core', version: "${logbackVersion}"
+    liquibaseRuntime group: 'ch.qos.logback', name: 'logback-classic', version: "${logbackVersion}"
 }
 
 test {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
 
 liquibase {
-	activities {
-		main {
-			changeLogFile 'db/changelog/changelog-master.xml'
-			url 'jdbc:postgresql://localhost:5432/youtube_activity_manager'
-			username 'postgres'
-			password 'postgres'
-		}
-	}
-	runList = 'main'
+    activities {
+        main {
+            changeLogFile 'src/main/resources/db/changelog/changelog-master.xml'
+            url 'jdbc:postgresql://localhost:5432/youtube_activity_manager'
+            username 'postgres'
+            password 'postgres'
+        }
+    }
+    runList = 'main'
 }

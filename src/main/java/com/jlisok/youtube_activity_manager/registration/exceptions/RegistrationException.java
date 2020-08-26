@@ -1,9 +1,6 @@
 package com.jlisok.youtube_activity_manager.registration.exceptions;
 
-import com.jlisok.youtube_activity_manager.domain.exceptions.CustomException;
-
-public class RegistrationException extends CustomException {
-
+public class RegistrationException extends Exception {
 
     public RegistrationException(String message) {
         super(message);

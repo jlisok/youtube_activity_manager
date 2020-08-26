@@ -1,5 +1,7 @@
 package com.jlisok.youtube_activity_manager.registration.controllers;
 
+import com.jlisok.youtube_activity_manager.domain.exceptions.CustomErrorResponse;
+import com.jlisok.youtube_activity_manager.domain.exceptions.ResponseCode;
 import com.jlisok.youtube_activity_manager.registration.exceptions.BadRegistrationRequestException;
 import com.jlisok.youtube_activity_manager.registration.exceptions.PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationDataProcessingException;
@@ -11,42 +13,43 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
+
 @ControllerAdvice
 public class RegistrationControllerAdvice {
 
-    Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @ExceptionHandler({PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException.class})
     public ResponseEntity<Object> handlePrefixAndPhoneNumberMustBeBothEitherNullOrFilledException(PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException e) {
-        logger.info(e.getExceptionMessage().toString());
+        CustomErrorResponse customErrorResponse = new CustomErrorResponse(ResponseCode.REGISTRATION_FAILED_PREFIX_PHONE_NUMBER_MUST_BE_FILLED_IN_OR_NULL);
+        logger.info(e.getMessage(), customErrorResponse, e);
         return ResponseEntity
-                .badRequest()
-                .body(e.getExceptionMessage());
+                .status(customErrorResponse.getHttpStatus())
+                .body(customErrorResponse);
     }
 
 
     @ExceptionHandler({BadRegistrationRequestException.class})
     public ResponseEntity<Object> handleBadRegistrationRequestException(BadRegistrationRequestException e) {
-        if (e.getThrowable().getMessage() != null) {
-            logger.info(e.getExceptionMessage().getMessage(), e.getThrowable());
+        if (e.getCustomErrorResponse().getHttpStatus().is5xxServerError()) {
+            logger.error(e.getMessage(), e);
         } else {
-            logger.info(e.getExceptionMessage().toString());
+            logger.info(e.getMessage(), e);
         }
         return ResponseEntity
-                .badRequest()
-                .body(e.getExceptionMessage());
+                .status(e.getCustomErrorResponse().getHttpStatus())
+                .body(e.getCustomErrorResponse());
+
     }
+
 
     @ExceptionHandler({RegistrationDataProcessingException.class})
     public ResponseEntity<Object> handleBadRegistrationRequestException(RegistrationDataProcessingException e) {
-        if (e.getThrowable().getMessage() != null) {
-            logger.info(e.getExceptionMessage().getMessage(), e.getThrowable());
-        } else {
-            logger.info(e.getExceptionMessage().toString());
-        }
+        CustomErrorResponse customErrorResponse = new CustomErrorResponse(ResponseCode.REGISTRATION_FAILED_SOME_PARAMETERS_NULL, INTERNAL_SERVER_ERROR);
+        logger.info(e.getMessage(), customErrorResponse, e);
         return ResponseEntity
-                .status(INTERNAL_SERVER_ERROR)
-                .body(e.getExceptionMessage());
+                .status(customErrorResponse.getHttpStatus())
+                .body(customErrorResponse);
     }
 
 }

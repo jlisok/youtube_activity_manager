@@ -1,26 +1,23 @@
 package com.jlisok.youtube_activity_manager.aboutus.configurations;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 
-@ConfigurationProperties(prefix = "aboutus")
+@Configuration
 public class AboutUsServiceConfiguration {
 
+    @Value("${aboutus.version}")
     private String version;
+
+    @Value("${aboutus.email}")
     private String email;
 
     public String getVersion() {
         return version;
     }
 
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
 }

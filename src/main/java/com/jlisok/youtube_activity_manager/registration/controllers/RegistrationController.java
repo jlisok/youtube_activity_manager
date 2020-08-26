@@ -10,8 +10,6 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/registration")
-@CrossOrigin
-
 public class RegistrationController {
 
     private final RegistrationService registrationService;

@@ -4,6 +4,7 @@ import com.jlisok.youtube_activity_manager.registration.dto.RegistrationRequestD
 import com.jlisok.youtube_activity_manager.registration.exceptions.BadRegistrationRequestException;
 import com.jlisok.youtube_activity_manager.registration.exceptions.PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationDataProcessingException;
+import com.jlisok.youtube_activity_manager.registration.utils.CustomExceptionBuilder;
 import com.jlisok.youtube_activity_manager.registration.utils.DtoToUserTranslator;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
@@ -14,7 +15,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.invoke.MethodHandles;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -23,7 +23,7 @@ public class RegistrationService {
 
     private final UserRepository userRepository;
     private final DtoToUserTranslator dtoToUserTranslator;
-    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
     @Autowired
@@ -41,7 +41,7 @@ public class RegistrationService {
         try {
             saveUser(user);
         } catch (DataIntegrityViolationException e) {
-            throw new BadRegistrationRequestException(e.getMostSpecificCause().getMessage(), e.getMostSpecificCause());
+            CustomExceptionBuilder.handleHibernateExceptionFromNestedStack(e);
         }
         logger.info("Registration service - success.");
     }

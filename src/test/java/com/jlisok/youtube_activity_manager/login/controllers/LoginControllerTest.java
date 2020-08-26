@@ -1,12 +1,11 @@
 package com.jlisok.youtube_activity_manager.login.controllers;
 
+import com.auth0.jwt.JWTVerifier;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jlisok.youtube_activity_manager.domain.exceptions.ResponseCode;
 import com.jlisok.youtube_activity_manager.login.dto.LoginRequestDto;
-import com.jlisok.youtube_activity_manager.registration.dto.RegistrationRequestDto;
-import com.jlisok.youtube_activity_manager.testutils.RandomRegistrationDto;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
-import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +26,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import javax.security.auth.login.FailedLoginException;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -39,21 +39,22 @@ class LoginControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private UserRepository userRepository;
+    private ObjectMapper objectMapper;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private JWTVerifier jwtVerifier;
+
+    @Autowired
+    private UserUtils userUtils;
 
 
     private String userEmail;
     private String userPassword;
-    private RegistrationRequestDto validRegistrationRequest;
 
     @BeforeEach
     void createRandomUser() {
-        userEmail = UserUtils.createRandomEmail();
-        userPassword = UserUtils.createRandomPassword();
-        validRegistrationRequest = RandomRegistrationDto.createValidRegistrationDto(userEmail, userPassword);
+        userEmail = userUtils.createRandomEmail();
+        userPassword = userUtils.createRandomPassword();
     }
 
 
@@ -61,12 +62,8 @@ class LoginControllerTest {
     @Transactional
     void authenticateUser_whenUserExistsAndRequestIsValid() throws Exception {
         //given
-        User user = UserUtils.createUserInDatabase(validRegistrationRequest);
+        User user = userUtils.createUserInDatabase(userEmail, userPassword);
         LoginRequestDto validLoginRequestDto = new LoginRequestDto(userPassword, userEmail);
-
-        assertTrue(userRepository
-                .findByEmail(user.getEmail())
-                .isPresent());
 
 
         //when //then
@@ -76,7 +73,16 @@ class LoginControllerTest {
                         .content(objectMapper.writeValueAsString(validLoginRequestDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(Assertions::assertNotNull);
+                .andExpect(Assertions::assertNotNull)
+                .andExpect(result ->
+                        assertEquals(user.getId().toString(), jwtVerifier
+                                .verify(result
+                                        .getResponse()
+                                        .getContentAsString()
+                                )
+                                .getSubject()
+                        )
+                );
     }
 
 
@@ -93,7 +99,18 @@ class LoginControllerTest {
                         .content(objectMapper.writeValueAsString(loginRequestDtoNotExistingUser))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof FailedLoginException));
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof FailedLoginException))
+                .andExpect(result ->
+                        assertTrue(result
+                                .getResponse()
+                                .getContentAsString()
+                                .contains(
+                                        ResponseCode
+                                                .LOGIN_FAILED_PARAMETERS_DO_NOT_MATCH_DATABASE
+                                                .toString()
+                                )
+                        )
+                );
     }
 
 
@@ -101,12 +118,9 @@ class LoginControllerTest {
     @Transactional
     void authenticateUser_whenUserSendsBadPassword() throws Exception {
         //given
-        User user = UserUtils.createUserInDatabase(validRegistrationRequest);
+        userUtils.createUserInDatabase(userEmail, userPassword);
         LoginRequestDto loginRequestDtoBadPassword = new LoginRequestDto("some_other_password", userEmail);
 
-        assertTrue(userRepository
-                .findByEmail(user.getEmail())
-                .isPresent());
 
         //when //then
         mockMvc.perform(
@@ -115,7 +129,18 @@ class LoginControllerTest {
                         .content(objectMapper.writeValueAsString(loginRequestDtoBadPassword))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof FailedLoginException));
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof FailedLoginException))
+                .andExpect(result ->
+                        assertTrue(result
+                                .getResponse()
+                                .getContentAsString()
+                                .contains(
+                                        ResponseCode
+                                                .LOGIN_FAILED_PARAMETERS_DO_NOT_MATCH_DATABASE
+                                                .toString()
+                                )
+                        )
+                );
     }
 
 

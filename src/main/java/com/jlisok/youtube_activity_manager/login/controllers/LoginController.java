@@ -10,11 +10,9 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("api/v1/login")
-@CrossOrigin
 public class LoginController {
 
     private final LoginService loginService;
-
 
     @Autowired
     public LoginController(LoginService loginService) {

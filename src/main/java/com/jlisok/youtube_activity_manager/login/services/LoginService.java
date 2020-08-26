@@ -3,7 +3,6 @@ package com.jlisok.youtube_activity_manager.login.services;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.jlisok.youtube_activity_manager.login.dto.LoginRequestDto;
 import com.jlisok.youtube_activity_manager.login.utils.TokenCreator;
-import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.FailedLoginException;
-import java.lang.invoke.MethodHandles;
 import java.time.Instant;
+import java.util.UUID;
 
 @Service
 public class LoginService {
@@ -22,8 +21,7 @@ public class LoginService {
     private final PasswordEncoder passwordEncoder;
     private final Algorithm jwtAlgorithm;
     private final TokenCreator tokenCreator;
-    private final User dummyUser;
-    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
     @Autowired
@@ -33,28 +31,51 @@ public class LoginService {
         this.passwordEncoder = passwordEncoder;
         this.jwtAlgorithm = jwtAlgorithm;
         this.tokenCreator = tokenCreator;
-        this.dummyUser = new User();
-        this.dummyUser.setPassword("");
     }
+
 
     public String authenticateUser(LoginRequestDto loginRequestDto) throws FailedLoginException {
 
-        User user = userRepository
-                    .findByEmail(loginRequestDto.getEmail())
-                    .orElse(dummyUser);
+        UserLoginDetails userLoginDetails = userRepository
+                .findByEmail(loginRequestDto.getEmail())
+                .map(u -> new UserLoginDetails(u.getId(), u.getPassword()))
+                .orElse(new UserLoginDetails(UUID.randomUUID(), ""));
 
-        logger.debug("Login Service - fetching user from database - success.");
+        logger.debug("Login Service - fetching user email: " + loginRequestDto.getEmail() + "from database - success.");
+        return createTokenIfAuthorized(loginRequestDto, userLoginDetails.getId(), userLoginDetails.getPassword());
 
-        if (passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
+    }
+
+
+    private String createTokenIfAuthorized(LoginRequestDto dto, UUID userId, String userPassword) throws FailedLoginException {
+        if (passwordEncoder.matches(dto.getPassword(), userPassword)) {
             Instant now = Instant.now();
-            String token = tokenCreator.create(user.getId().toString(), jwtAlgorithm, now);
+            String token = tokenCreator.create(userId.toString(), jwtAlgorithm, now);
             logger.info("Login Service - success.");
             return token;
         } else {
-            logger.info("Login Service - failed to authenticate user id {}. Password or login does not match.", user.getId());
-            throw new FailedLoginException("User id " + user.getId() + " login failed. Password or login does not match.");
+            throw new FailedLoginException("User id " + dto.getEmail() + " login failed. Password or login does not match.");
+        }
+    }
+
+
+    private class UserLoginDetails {
+
+        private final UUID id;
+        private final String password;
+
+        UserLoginDetails(UUID id, String password) {
+            this.id = id;
+            this.password = password;
         }
 
+        UUID getId() {
+            return id;
+        }
+
+        String getPassword() {
+            return password;
+        }
     }
 
 }

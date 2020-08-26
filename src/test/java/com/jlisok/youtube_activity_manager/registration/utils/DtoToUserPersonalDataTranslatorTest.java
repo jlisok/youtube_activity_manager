@@ -2,7 +2,6 @@ package com.jlisok.youtube_activity_manager.registration.utils;
 
 import com.jlisok.youtube_activity_manager.registration.dto.RegistrationRequestDto;
 import com.jlisok.youtube_activity_manager.registration.exceptions.PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException;
-import com.jlisok.youtube_activity_manager.testutils.RandomRegistrationDto;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.userPersonalData.enums.Sex;
 import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalData;
@@ -12,22 +11,29 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Instant;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+@SpringBootTest
 class DtoToUserPersonalDataTranslatorTest {
 
+    @Autowired
+    private UserUtils userUtils;
+
     private static String userEmail;
-    private static RegistrationRequestDto dto;
-    private static Instant now;
-    private static UUID id;
-    private static DtoToUserPersonalDataTranslator translator;
+    private RegistrationRequestDto dto;
+    private Instant now;
+    private UUID id;
+    private DtoToUserPersonalDataTranslator translator;
+
 
     @BeforeEach
     void createRandomUser() {
-        userEmail = UserUtils.createRandomEmail();
+        userEmail = userUtils.createRandomEmail();
         dto = new RegistrationRequestDto(
                 "1111",
                 userEmail,

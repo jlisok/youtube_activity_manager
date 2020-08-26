@@ -3,7 +3,6 @@ package com.jlisok.youtube_activity_manager.registration.utils;
 import com.jlisok.youtube_activity_manager.registration.dto.RegistrationRequestDto;
 import com.jlisok.youtube_activity_manager.registration.exceptions.PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationDataProcessingException;
-import com.jlisok.youtube_activity_manager.testutils.RandomRegistrationDto;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.userPersonalData.enums.Sex;
 import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalData;
@@ -11,6 +10,7 @@ import com.jlisok.youtube_activity_manager.users.models.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,26 +19,28 @@ import java.time.Instant;
 import java.util.UUID;
 
 @SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DtoToUserTranslatorTest {
 
 
     @Autowired
     private DtoToUserTranslator translator;
 
-
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private UserUtils userUtils;
 
-    private static String userEmail;
-    private static RegistrationRequestDto dto;
-    private static Instant now;
-    private static UUID id;
+
+    private RegistrationRequestDto dto;
+    private Instant now;
+    private UUID id;
 
 
     @BeforeAll
-    static void createInitialVariables() {
-        userEmail = UserUtils.createRandomEmail();
+    void createInitialVariables() {
+        String userEmail = userUtils.createRandomEmail();
         dto = new RegistrationRequestDto(
                 "1111",
                 userEmail,
@@ -80,7 +82,7 @@ class DtoToUserTranslatorTest {
         User actual = translator.translate(dto, now, id);
 
         //then
-        UserUtils.assertUsersAreEqualWhenIgnoringPassword(expected, actual);
+        userUtils.assertUsersAreEqualWhenIgnoringPassword(expected, actual);
     }
 
     @Test

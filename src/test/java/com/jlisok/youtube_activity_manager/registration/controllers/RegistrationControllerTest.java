@@ -1,6 +1,7 @@
 package com.jlisok.youtube_activity_manager.registration.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jlisok.youtube_activity_manager.domain.exceptions.ResponseCode;
 import com.jlisok.youtube_activity_manager.registration.dto.RegistrationRequestDto;
 import com.jlisok.youtube_activity_manager.registration.exceptions.BadRegistrationRequestException;
 import com.jlisok.youtube_activity_manager.testutils.RandomRegistrationDto;
@@ -43,12 +44,14 @@ class RegistrationControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private String userEmail;
+    @Autowired
+    private UserUtils userUtils;
+
     private RegistrationRequestDto dto;
 
     @BeforeEach
     void createRandomUser() {
-        userEmail = UserUtils.createRandomEmail();
+        String userEmail = userUtils.createRandomEmail();
         dto = RandomRegistrationDto.createValidRegistrationDto(userEmail);
     }
 
@@ -65,16 +68,16 @@ class RegistrationControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        Optional<User> optionalUser = userRepository.findByEmail(dto.getEmail());
-        assertTrue(optionalUser.isPresent());
+        Optional<User> user = userRepository.findByEmail(dto.getEmail());
+        assertTrue(user.isPresent());
     }
+
 
     @Test
     @Transactional
     void addUser_whenUserExistsInDatabase() throws Exception {
         //given
-        User user = UserUtils.createUserInDatabase(dto);
-        assertTrue(userRepository.findByEmail(user.getEmail()).isPresent());
+        userUtils.createUserInDatabase(dto);
 
         //when //then
         mockMvc.perform(
@@ -83,7 +86,18 @@ class RegistrationControllerTest {
                         .content(objectMapper.writeValueAsString(dto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof BadRegistrationRequestException));
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof BadRegistrationRequestException))
+                .andExpect(result ->
+                        assertTrue(result
+                                .getResponse()
+                                .getContentAsString()
+                                .contains(
+                                        ResponseCode
+                                                .REGISTRATION_FAILED_VIOLATED_FIELD_EMAIL
+                                                .toString()
+                                )
+                        )
+                );
     }
 
 
@@ -106,7 +120,7 @@ class RegistrationControllerTest {
 
         RegistrationRequestDto validUserRequest = new RegistrationRequestDto(
                 "1111111111111111111111",
-                UserUtils.createRandomEmail(),
+                userUtils.createRandomEmail(),
                 Sex.FEMALE,
                 2000,
                 "Poland",
