@@ -30,7 +30,9 @@ ext {
     surefireVersion = '3.0.0-M5'
     apacheCommonsVersion = '3.11'
     jaxbVersion = '2.3.1'
+    googleApiVersion = '1.30.10'
 }
+
 
 dependencies {
     developmentOnly group: 'org.springframework.boot', name: 'spring-boot-devtools', version: "${springStarterVersion}"
@@ -57,6 +59,9 @@ dependencies {
 
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: "${apacheCommonsVersion}"
 
+    implementation group: 'com.google.api-client', name: 'google-api-client', version: "${googleApiVersion}"
+
+
     //
     // To run mockito with junit5
     //
@@ -81,7 +86,7 @@ bootRun {
                 def pos = it.indexOf("=")
                 def key = it.substring(0, pos)
                 def value = it.substring(pos + 1)
-                if(System.getenv(key) == null) {
+                if (System.getenv(key) == null) {
                     environment(key, value)
                 }
             }
@@ -92,7 +97,7 @@ bootRun {
             def pos = it.indexOf("=")
             def key = it.substring(0, pos)
             def value = it.substring(pos + 1)
-            if(System.getenv(key) == null) {
+            if (System.getenv(key) == null) {
                 environment(key, value)
             }
         }
@@ -106,7 +111,7 @@ test {
                 def pos = it.indexOf("=")
                 def key = it.substring(0, pos)
                 def value = it.substring(pos + 1)
-                if(System.getenv(key) == null) {
+                if (System.getenv(key) == null) {
                     environment(key, value)
                 }
             }
@@ -117,7 +122,7 @@ test {
             def pos = it.indexOf("=")
             def key = it.substring(0, pos)
             def value = it.substring(pos + 1)
-            if(System.getenv(key) == null) {
+            if (System.getenv(key) == null) {
                 environment(key, value)
             }
         }
@@ -166,6 +171,5 @@ liquibase {
             password "$dbPassword"
         }
     }
-
     runList = 'main'
 }

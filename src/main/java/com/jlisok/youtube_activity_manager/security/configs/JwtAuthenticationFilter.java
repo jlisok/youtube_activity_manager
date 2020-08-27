@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.UUID;
 
+import static com.jlisok.youtube_activity_manager.security.configs.JwtAuthenticationContext.setAuthenticationInContext;
 import static com.jlisok.youtube_activity_manager.security.configs.JwtSecurityConstants.HEADER_START_SCHEMA;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
@@ -36,9 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String token = authHeader.substring(HEADER_START_SCHEMA.length());
                 DecodedJWT decodedToken = jwtVerifier.verify(token);
                 UUID userId = UUID.fromString(decodedToken.getSubject());
-                JwtAuthentication jwtAuthentication = new JwtAuthentication(token, userId);
-                jwtAuthentication.setAuthenticated(true);
-                SecurityContextHolder.getContext().setAuthentication(jwtAuthentication);
+                setAuthenticationInContext(token, userId);
             } catch (Exception e) {
                 SecurityContextHolder.clearContext();
             }

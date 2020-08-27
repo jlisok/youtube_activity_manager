@@ -21,6 +21,12 @@ public final class User {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "google_id_token")
+    private String googleIdToken;
+
+    @Column(name = "google_id")
+    private String googleId;
+
     @Column(name = "created_at")
     private Instant createdAt;
 
@@ -34,10 +40,13 @@ public final class User {
     public User() {
     }
 
-    public User(UUID id, String password, String email, Instant createdAt, Instant modifiedAt, UserPersonalData userPersonalData) {
+    // builder
+    User(UUID id, String email, String password, String googleId, String googleIdToken, Instant createdAt, Instant modifiedAt, UserPersonalData userPersonalData) {
         this.id = id;
-        this.password = password;
         this.email = email;
+        this.password = password;
+        this.googleId = googleId;
+        this.googleIdToken = googleIdToken;
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
         this.userPersonalData = userPersonalData;
@@ -91,11 +100,21 @@ public final class User {
         this.modifiedAt = modifiedAt;
     }
 
-    //TODO
-    public UUID getGoogleId() {
-        return null;
+    public String getGoogleIdToken() {
+        return googleIdToken;
     }
 
+    public String getGoogleId() {
+        return googleId;
+    }
+
+    public void setGoogleIdToken(String googleIdToken) {
+        this.googleIdToken = googleIdToken;
+    }
+
+    public void setGoogleId(String googleId) {
+        this.googleId = googleId;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -103,8 +122,9 @@ public final class User {
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
         return id.equals(user.id) &&
-                password.equals(user.password) &&
+                Objects.equals(password, user.password) &&
                 email.equals(user.email) &&
+                Objects.equals(googleId, user.googleId) &&
                 createdAt.equals(user.createdAt) &&
                 modifiedAt.equals(user.modifiedAt) &&
                 userPersonalData.equals(user.userPersonalData);
@@ -112,6 +132,6 @@ public final class User {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, password, email, createdAt, modifiedAt);
+        return Objects.hash(id, password, email, googleId, createdAt, modifiedAt, userPersonalData);
     }
 }

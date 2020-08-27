@@ -1,7 +1,6 @@
 package com.jlisok.youtube_activity_manager.login.utils;
 
 import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -16,9 +15,6 @@ import java.util.UUID;
 
 @SpringBootTest
 class TokenCreatorTest {
-
-    @Autowired
-    private Algorithm jwtAlgorithm;
 
     @Autowired
     private JWTVerifier jwtVerifier;
@@ -40,7 +36,7 @@ class TokenCreatorTest {
         Instant expectedExpirationTime = expectedIssuedAt.plus(duration);
 
         //when
-        String token = tokenCreator.create(expectedUserId, jwtAlgorithm, expectedIssuedAt);
+        String token = tokenCreator.create(expectedUserId, expectedIssuedAt);
         DecodedJWT decodedJWT = jwtVerifier.verify(token);
 
         //then

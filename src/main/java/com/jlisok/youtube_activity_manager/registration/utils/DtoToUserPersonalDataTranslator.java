@@ -3,6 +3,7 @@ package com.jlisok.youtube_activity_manager.registration.utils;
 import com.jlisok.youtube_activity_manager.registration.dto.RegistrationRequestDto;
 import com.jlisok.youtube_activity_manager.registration.exceptions.PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException;
 import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalData;
+import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalDataBuilder;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -14,15 +15,7 @@ public class DtoToUserPersonalDataTranslator {
 
     public UserPersonalData translate(RegistrationRequestDto registrationRequestDto, Instant now, UUID id) throws PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException {
         checkIfWholePhoneNumberIsNullOrFilledIn(registrationRequestDto.getPhonePrefix(), registrationRequestDto.getPhoneNumber());
-        return new UserPersonalData(id,
-                registrationRequestDto.getGender(),
-                registrationRequestDto.getBirthYear(),
-                registrationRequestDto.getCountry(),
-                registrationRequestDto.getPhonePrefix(),
-                registrationRequestDto.getPhoneNumber(),
-                registrationRequestDto.getFirstName(),
-                now,
-                now);
+        return new UserPersonalDataBuilder().setId(id).setGender(registrationRequestDto.getGender()).setBirthYear(registrationRequestDto.getBirthYear()).setCountry(registrationRequestDto.getCountry()).setPhonePrefix(registrationRequestDto.getPhonePrefix()).setPhoneNumber(registrationRequestDto.getPhoneNumber()).setFirstName(registrationRequestDto.getFirstName()).setCreatedAt(now).setModifiedAt(now).createUserPersonalData();
     }
 
     private void checkIfWholePhoneNumberIsNullOrFilledIn(String phonePrefix, String phoneNumber) throws PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException {

@@ -45,7 +45,7 @@ public class UserPersonalData {
     public UserPersonalData() {
     }
 
-    public UserPersonalData(UUID id, Sex gender, Integer birthYear, String country, String phonePrefix, String phoneNumber, String firstName, Instant createdAt, Instant modifiedAt) {
+    UserPersonalData(UUID id, Sex gender, Integer birthYear, String country, String phonePrefix, String phoneNumber, String firstName, Instant createdAt, Instant modifiedAt) {
         this.id = id;
         this.gender = gender;
         this.birthYear = birthYear;
@@ -55,7 +55,6 @@ public class UserPersonalData {
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
     }
-
 
     public UUID getId() {
         return id;
