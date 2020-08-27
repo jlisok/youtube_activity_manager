@@ -81,8 +81,8 @@ class LoginControllerTest {
     @Transactional
     void authenticateUser_whenUserNotPresentInDatabase() throws Exception {
         //given
-        ResponseCode expected = ResponseCode.LOGIN_FAILED_PARAMETERS_DO_NOT_MATCH_DATABASE;
         LoginRequestDto loginRequestDtoNotExistingUser = new LoginRequestDto(userPassword, userEmail);
+        ResponseCode expected = ResponseCode.LOGIN_FAILED_PARAMETERS_DO_NOT_MATCH_DATABASE;
 
         //when //then
         mockMvc.perform(

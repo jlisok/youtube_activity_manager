@@ -22,7 +22,7 @@ public class LoginService {
     private final Algorithm jwtAlgorithm;
     private final TokenCreator tokenCreator;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final UserLoginDetails dummyUser;
+    private final UserLoginDetails dummyUser = new UserLoginDetails(UUID.randomUUID(), "");
 
 
     @Autowired
@@ -32,7 +32,6 @@ public class LoginService {
         this.passwordEncoder = passwordEncoder;
         this.jwtAlgorithm = jwtAlgorithm;
         this.tokenCreator = tokenCreator;
-        this.dummyUser = new UserLoginDetails(UUID.randomUUID(), "");
     }
 
 

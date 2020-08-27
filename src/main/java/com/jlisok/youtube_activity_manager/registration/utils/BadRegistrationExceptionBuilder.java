@@ -10,18 +10,14 @@ public class BadRegistrationExceptionBuilder {
 
     public static void handleHibernateExceptionFromNestedStack(DataIntegrityViolationException e) throws BadRegistrationRequestException {
 
-        String detailedMessage = "";
-
         if (e.getMostSpecificCause() instanceof PSQLException) {
             PSQLException mostSpecificCause = (PSQLException) e.getMostSpecificCause();
-            String psqlState = mostSpecificCause.getSQLState();
             String message = mostSpecificCause.getMessage();
-            detailedMessage = "PSQLState: " + psqlState;
-            if (message.contains("email")) {
-                throw new FieldViolationBadRegistrationRequestException("Registration failed", e, detailedMessage);
+            if (message.contains("ERROR: duplicate key value violates unique constraint \"users_email_key\"")) {
+                throw new FieldViolationBadRegistrationRequestException("Registration failed", e);
             }
         }
-        throw new UnexpectedErrorBadRegistrationRequestException("Registration failed", e, detailedMessage);
+        throw new UnexpectedErrorBadRegistrationRequestException("Registration failed", e);
     }
 
 }

@@ -5,7 +5,6 @@ import com.jlisok.youtube_activity_manager.domain.exceptions.ResponseCode;
 import com.jlisok.youtube_activity_manager.registration.exceptions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,37 +23,37 @@ public class RegistrationControllerAdvice {
         CustomErrorResponse customErrorResponse = new CustomErrorResponse(ResponseCode.REGISTRATION_FAILED_PREFIX_PHONE_NUMBER_MUST_BE_FILLED_IN_OR_NULL);
         logger.info(loggerMessage, customErrorResponse.getId(), e);
         return ResponseEntity
-                .status(customErrorResponse.getHttpStatus())
+                .badRequest()
                 .body(customErrorResponse);
     }
 
 
     @ExceptionHandler({FieldViolationBadRegistrationRequestException.class})
     public ResponseEntity<Object> handleBadRegistrationRequestException(BadRegistrationRequestException e) {
-        CustomErrorResponse customErrorResponse = new CustomErrorResponse(ResponseCode.REGISTRATION_FAILED_VIOLATED_FIELD_EMAIL, HttpStatus.BAD_REQUEST, e.getUserDetailedMessage());
+        CustomErrorResponse customErrorResponse = new CustomErrorResponse(ResponseCode.REGISTRATION_FAILED_VIOLATED_FIELD_EMAIL);
         logger.info(loggerMessage, customErrorResponse.getId(), e);
         return ResponseEntity
-                .status(customErrorResponse.getHttpStatus())
+                .badRequest()
                 .body(customErrorResponse);
     }
 
 
     @ExceptionHandler({UnexpectedErrorBadRegistrationRequestException.class})
     public ResponseEntity<Object> handleUnexpectedErrorRegistrationRequestException(UnexpectedErrorBadRegistrationRequestException e) {
-        CustomErrorResponse customErrorResponse = new CustomErrorResponse(ResponseCode.REGISTRATION_FAILED_UNEXPECTED_ERROR, INTERNAL_SERVER_ERROR, e.getUserDetailedMessage());
+        CustomErrorResponse customErrorResponse = new CustomErrorResponse(ResponseCode.REGISTRATION_FAILED_UNEXPECTED_ERROR);
         logger.error(loggerMessage, customErrorResponse.getId(), e);
         return ResponseEntity
-                .status(customErrorResponse.getHttpStatus())
+                .status(INTERNAL_SERVER_ERROR)
                 .body(customErrorResponse);
     }
 
 
     @ExceptionHandler({RegistrationDataProcessingException.class})
     public ResponseEntity<Object> handleBadRegistrationRequestException(RegistrationDataProcessingException e) {
-        CustomErrorResponse customErrorResponse = new CustomErrorResponse(ResponseCode.REGISTRATION_FAILED_SOME_PARAMETERS_NULL, INTERNAL_SERVER_ERROR);
+        CustomErrorResponse customErrorResponse = new CustomErrorResponse(ResponseCode.REGISTRATION_FAILED_SOME_PARAMETERS_NULL);
         logger.info(loggerMessage, customErrorResponse.getId(), e);
         return ResponseEntity
-                .status(customErrorResponse.getHttpStatus())
+                .status(INTERNAL_SERVER_ERROR)
                 .body(customErrorResponse);
     }
 
