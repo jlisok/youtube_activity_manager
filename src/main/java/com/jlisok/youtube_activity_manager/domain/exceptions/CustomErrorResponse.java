@@ -1,8 +1,5 @@
 package com.jlisok.youtube_activity_manager.domain.exceptions;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.Objects;
 import java.util.UUID;
 
@@ -18,10 +15,8 @@ public class CustomErrorResponse {
         this.responseCode = responseCode;
     }
 
-
-    @JsonCreator
-    public CustomErrorResponse(@JsonProperty("ResponseCode") ResponseCode responseCode,
-                               @JsonProperty("id") UUID id) {
+    // for deserialization
+    public CustomErrorResponse(ResponseCode responseCode, UUID id) {
         this.id = id;
         this.responseCode = responseCode;
     }
@@ -34,17 +29,17 @@ public class CustomErrorResponse {
         return responseCode;
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CustomErrorResponse that = (CustomErrorResponse) o;
-        return Objects.equals(responseCode, that.responseCode);
+        return id.equals(that.id) &&
+                responseCode == that.responseCode;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(responseCode);
+        return Objects.hash(id, responseCode);
     }
 }

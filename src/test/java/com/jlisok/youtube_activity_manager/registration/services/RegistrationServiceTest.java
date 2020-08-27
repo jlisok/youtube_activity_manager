@@ -60,7 +60,7 @@ class RegistrationServiceTest {
     void registerUser_whenUserEmailAlreadyExistsInDatabase() {
         //given
         when(userRepository.saveAndFlush(any(User.class)))
-                .thenThrow(new DataIntegrityViolationException("User already exists in database", new PSQLException("email", PSQLState.UNIQUE_VIOLATION)));
+                .thenThrow(new DataIntegrityViolationException("User already exists in database", new PSQLException("ERROR: duplicate key value violates unique constraint \"users_email_key\"", PSQLState.UNIQUE_VIOLATION)));
 
         // when //then
         assertThrows(FieldViolationBadRegistrationRequestException.class, () -> registrationService.addUserToDatabase(dto));
