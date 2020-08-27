@@ -1,7 +1,6 @@
 package com.jlisok.youtube_activity_manager.testutils;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.jlisok.youtube_activity_manager.registration.dto.RegistrationRequestDto;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
 import com.jlisok.youtube_activity_manager.registration.utils.DtoToUserTranslator;
@@ -47,7 +46,6 @@ public class UserUtils {
         repository.saveAndFlush(user);
 
         assertTrue(repository.existsByEmail(user.getEmail()));
-
     }
 
 
@@ -56,7 +54,6 @@ public class UserUtils {
         repository.saveAndFlush(user);
 
         assertTrue(repository.existsByEmail(user.getEmail()));
-
         return user;
     }
 
@@ -69,17 +66,13 @@ public class UserUtils {
     }
 
 
-    public User createUser(String token, GoogleIdToken googleIdToken) {
+    public User createUserNoFirstName(String token, GoogleIdToken googleIdToken) {
         UUID userId = UUID.randomUUID();
         Instant now = Instant.now();
-        Payload userData = googleIdToken.getPayload();
-        String fistName = userData
-                .get("given_name")
-                .toString();
+        GoogleIdToken.Payload userData = googleIdToken.getPayload();
         String googleId = userData.getSubject();
         UserPersonalData userPersonalData = new UserPersonalDataBuilder()
                 .setId(userId)
-                .setFirstName(fistName)
                 .setCreatedAt(now)
                 .setModifiedAt(now)
                 .createUserPersonalData();
@@ -95,13 +88,32 @@ public class UserUtils {
     }
 
 
+    public User createUser(UUID userId, String token, String accessToken) {
+        Instant now = Instant.now();
+        String googleId = UUID.randomUUID().toString();
+        UserPersonalData userPersonalData = new UserPersonalDataBuilder()
+                .setId(userId)
+                .setCreatedAt(now)
+                .setModifiedAt(now)
+                .createUserPersonalData();
+        return new UserBuilder()
+                .setId(userId)
+                .setEmail(createRandomEmail())
+                .setGoogleId(googleId)
+                .setGoogleIdToken(token)
+                .setAccessToken(accessToken)
+                .setCreatedAt(now)
+                .setModifiedAt(now)
+                .setUserPersonalData(userPersonalData)
+                .createUser();
+    }
+
     public void insertUserInDatabaseSameGoogleIdDifferentEmail(String token, GoogleIdToken googleIdToken) {
         User user = createUser(token, googleIdToken);
         user.setEmail(createRandomEmail());
         repository.saveAndFlush(user);
 
         assertTrue(repository.existsByEmail(user.getEmail()));
-
     }
 
 
@@ -128,6 +140,32 @@ public class UserUtils {
     }
 
 
+    public User createUser(String token, GoogleIdToken googleIdToken) {
+        UUID userId = UUID.randomUUID();
+        Instant now = Instant.now();
+        GoogleIdToken.Payload userData = googleIdToken.getPayload();
+        String fistName = userData
+                .get("given_name")
+                .toString();
+        String googleId = userData.getSubject();
+        UserPersonalData userPersonalData = new UserPersonalDataBuilder()
+                .setId(userId)
+                .setFirstName(fistName)
+                .setCreatedAt(now)
+                .setModifiedAt(now)
+                .createUserPersonalData();
+        return new UserBuilder()
+                .setId(userId)
+                .setEmail(userData.getEmail())
+                .setGoogleId(googleId)
+                .setGoogleIdToken(token)
+                .setCreatedAt(now)
+                .setModifiedAt(now)
+                .setUserPersonalData(userPersonalData)
+                .createUser();
+    }
+
+
     public String createRandomEmail() {
         Instant now = Instant.now();
         return now.toEpochMilli() + "@gmail.com";
@@ -137,4 +175,6 @@ public class UserUtils {
     public String createRandomPassword() {
         return RandomStringUtils.randomAlphanumeric(20);
     }
+
+
 }

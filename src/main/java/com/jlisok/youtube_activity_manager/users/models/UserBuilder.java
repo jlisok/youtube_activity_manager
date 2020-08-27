@@ -15,6 +15,7 @@ public class UserBuilder {
     private UserPersonalData userPersonalData;
     private String googleId;
     private String googleIdToken;
+    private String accessToken;
 
     public UserBuilder setId(UUID id) {
         this.id = id;
@@ -56,7 +57,12 @@ public class UserBuilder {
         return this;
     }
 
+    public UserBuilder setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+        return this;
+    }
+
     public User createUser() {
-        return new User(id, email, password, googleId, googleIdToken, createdAt, modifiedAt, userPersonalData);
+        return new User(id, email, password, googleId, googleIdToken, accessToken, createdAt, modifiedAt, userPersonalData);
     }
 }

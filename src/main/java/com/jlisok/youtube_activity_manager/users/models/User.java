@@ -24,6 +24,9 @@ public final class User {
     @Column(name = "google_id_token")
     private String googleIdToken;
 
+    @Column(name = "access_token")
+    private String accessToken;
+
     @Column(name = "google_id")
     private String googleId;
 
@@ -41,12 +44,13 @@ public final class User {
     }
 
     // builder
-    User(UUID id, String email, String password, String googleId, String googleIdToken, Instant createdAt, Instant modifiedAt, UserPersonalData userPersonalData) {
+    User(UUID id, String email, String password, String googleId, String googleIdToken, String accessToken, Instant createdAt, Instant modifiedAt, UserPersonalData userPersonalData) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.googleId = googleId;
         this.googleIdToken = googleIdToken;
+        this.accessToken = accessToken;
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
         this.userPersonalData = userPersonalData;
@@ -114,6 +118,14 @@ public final class User {
 
     public void setGoogleId(String googleId) {
         this.googleId = googleId;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
     }
 
     @Override

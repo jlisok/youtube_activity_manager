@@ -23,12 +23,11 @@ public class MvcResponseVerifier {
     public void assertEqualsResponseCode(ResponseCode expected, MvcResult result) throws Exception {
         ResponseCode actual = objectMapper
                 .readValue(result
-                        .getResponse()
-                        .getContentAsString(), CustomErrorResponse.class)
+                                   .getResponse()
+                                   .getContentAsString(), CustomErrorResponse.class)
                 .getResponseCode();
 
         assertEquals(expected, actual);
     }
-
 
 }
