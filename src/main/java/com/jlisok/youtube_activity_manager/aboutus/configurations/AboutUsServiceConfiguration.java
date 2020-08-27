@@ -1,15 +1,12 @@
 package com.jlisok.youtube_activity_manager.aboutus.configurations;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@Configuration
+@ConfigurationProperties(prefix = "aboutus")
 public class AboutUsServiceConfiguration {
 
-    @Value("${aboutus.version}")
     private String version;
 
-    @Value("${aboutus.email}")
     private String email;
 
     public String getVersion() {
@@ -20,4 +17,11 @@ public class AboutUsServiceConfiguration {
         return email;
     }
 
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }

@@ -4,7 +4,7 @@ import com.jlisok.youtube_activity_manager.registration.dto.RegistrationRequestD
 import com.jlisok.youtube_activity_manager.registration.exceptions.BadRegistrationRequestException;
 import com.jlisok.youtube_activity_manager.registration.exceptions.PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationDataProcessingException;
-import com.jlisok.youtube_activity_manager.registration.utils.CustomExceptionBuilder;
+import com.jlisok.youtube_activity_manager.registration.utils.BadRegistrationExceptionBuilder;
 import com.jlisok.youtube_activity_manager.registration.utils.DtoToUserTranslator;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
@@ -41,7 +41,7 @@ public class RegistrationService {
         try {
             saveUser(user);
         } catch (DataIntegrityViolationException e) {
-            CustomExceptionBuilder.handleHibernateExceptionFromNestedStack(e);
+            BadRegistrationExceptionBuilder.handleHibernateExceptionFromNestedStack(e);
         }
         logger.info("Registration service - success.");
     }

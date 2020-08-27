@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jlisok.youtube_activity_manager.domain.exceptions.ResponseCode;
 import com.jlisok.youtube_activity_manager.registration.dto.RegistrationRequestDto;
 import com.jlisok.youtube_activity_manager.registration.exceptions.BadRegistrationRequestException;
+import com.jlisok.youtube_activity_manager.testutils.MockMvcResultTester;
 import com.jlisok.youtube_activity_manager.testutils.RandomRegistrationDto;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.userPersonalData.enums.Sex;
@@ -47,6 +48,9 @@ class RegistrationControllerTest {
     @Autowired
     private UserUtils userUtils;
 
+    @Autowired
+    private MockMvcResultTester mockMvcResultTester;
+
     private RegistrationRequestDto dto;
 
     @BeforeEach
@@ -78,6 +82,7 @@ class RegistrationControllerTest {
     void addUser_whenUserExistsInDatabase() throws Exception {
         //given
         userUtils.createUserInDatabase(dto);
+        ResponseCode expected = ResponseCode.REGISTRATION_FAILED_VIOLATED_FIELD_EMAIL;
 
         //when //then
         mockMvc.perform(
@@ -87,17 +92,7 @@ class RegistrationControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof BadRegistrationRequestException))
-                .andExpect(result ->
-                        assertTrue(result
-                                .getResponse()
-                                .getContentAsString()
-                                .contains(
-                                        ResponseCode
-                                                .REGISTRATION_FAILED_VIOLATED_FIELD_EMAIL
-                                                .toString()
-                                )
-                        )
-                );
+                .andExpect(result -> mockMvcResultTester.assertEqualsResponseCode(expected, result));
     }
 
 

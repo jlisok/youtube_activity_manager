@@ -1,20 +1,18 @@
 package com.jlisok.youtube_activity_manager.registration.exceptions;
 
-import com.jlisok.youtube_activity_manager.domain.exceptions.CustomErrorResponse;
-
 public class BadRegistrationRequestException extends RegistrationException {
 
-    private final CustomErrorResponse customErrorResponse;
+    private final String userDetailedMessage;
 
 
-    public BadRegistrationRequestException(String message, Throwable throwable, CustomErrorResponse customErrorResponse) {
+    public BadRegistrationRequestException(String message, Throwable throwable, String userDetailedMessage) {
         super(message, throwable);
-        this.customErrorResponse = customErrorResponse;
+        this.userDetailedMessage = userDetailedMessage;
     }
 
 
-    public CustomErrorResponse getCustomErrorResponse() {
-        return customErrorResponse;
+    public String getUserDetailedMessage() {
+        return userDetailedMessage;
     }
 
 }

@@ -22,6 +22,7 @@ public class LoginService {
     private final Algorithm jwtAlgorithm;
     private final TokenCreator tokenCreator;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final UserLoginDetails dummyUser;
 
 
     @Autowired
@@ -31,6 +32,7 @@ public class LoginService {
         this.passwordEncoder = passwordEncoder;
         this.jwtAlgorithm = jwtAlgorithm;
         this.tokenCreator = tokenCreator;
+        this.dummyUser = new UserLoginDetails(UUID.randomUUID(), "");
     }
 
 
@@ -39,9 +41,9 @@ public class LoginService {
         UserLoginDetails userLoginDetails = userRepository
                 .findByEmail(loginRequestDto.getEmail())
                 .map(u -> new UserLoginDetails(u.getId(), u.getPassword()))
-                .orElse(new UserLoginDetails(UUID.randomUUID(), ""));
+                .orElse(dummyUser);
 
-        logger.debug("Login Service - fetching user email: " + loginRequestDto.getEmail() + "from database - success.");
+        logger.debug("Login Service - fetching user: " + loginRequestDto.getEmail() + " from database - success.");
         return createTokenIfAuthorized(loginRequestDto, userLoginDetails.getId(), userLoginDetails.getPassword());
 
     }
@@ -54,12 +56,12 @@ public class LoginService {
             logger.info("Login Service - success.");
             return token;
         } else {
-            throw new FailedLoginException("User id " + dto.getEmail() + " login failed. Password or login does not match.");
+            throw new FailedLoginException("User: " + dto.getEmail() + " login failed. Password or login does not match.");
         }
     }
 
 
-    private class UserLoginDetails {
+    private static class UserLoginDetails {
 
         private final UUID id;
         private final String password;

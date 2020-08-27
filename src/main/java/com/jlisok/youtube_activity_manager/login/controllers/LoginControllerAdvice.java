@@ -14,11 +14,12 @@ import javax.security.auth.login.FailedLoginException;
 public class LoginControllerAdvice {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final String loggerMessage = "{} Login failed.";
 
     @ExceptionHandler({FailedLoginException.class})
     public ResponseEntity<Object> handleFailedLoginException(FailedLoginException failedLoginException) {
         CustomErrorResponse customErrorResponse = new CustomErrorResponse(ResponseCode.LOGIN_FAILED_PARAMETERS_DO_NOT_MATCH_DATABASE);
-        logger.info(failedLoginException.getMessage(), customErrorResponse, failedLoginException);
+        logger.info(loggerMessage, customErrorResponse.getId(), failedLoginException);
         return ResponseEntity
                 .badRequest()
                 .body(customErrorResponse);

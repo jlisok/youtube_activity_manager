@@ -1,9 +1,9 @@
 package com.jlisok.youtube_activity_manager.login.controllers;
 
-import com.auth0.jwt.JWTVerifier;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jlisok.youtube_activity_manager.domain.exceptions.ResponseCode;
 import com.jlisok.youtube_activity_manager.login.dto.LoginRequestDto;
+import com.jlisok.youtube_activity_manager.testutils.MockMvcResultTester;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import org.junit.jupiter.api.Assertions;
@@ -26,7 +26,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import javax.security.auth.login.FailedLoginException;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -42,10 +41,10 @@ class LoginControllerTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private JWTVerifier jwtVerifier;
+    private UserUtils userUtils;
 
     @Autowired
-    private UserUtils userUtils;
+    MockMvcResultTester mvcResultTester;
 
 
     private String userEmail;
@@ -64,7 +63,7 @@ class LoginControllerTest {
         //given
         User user = userUtils.createUserInDatabase(userEmail, userPassword);
         LoginRequestDto validLoginRequestDto = new LoginRequestDto(userPassword, userEmail);
-
+        String expectedTokenSubject = user.getId().toString();
 
         //when //then
         mockMvc.perform(
@@ -74,15 +73,7 @@ class LoginControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(Assertions::assertNotNull)
-                .andExpect(result ->
-                        assertEquals(user.getId().toString(), jwtVerifier
-                                .verify(result
-                                        .getResponse()
-                                        .getContentAsString()
-                                )
-                                .getSubject()
-                        )
-                );
+                .andExpect(result -> mvcResultTester.assertEqualsTokenSubject(expectedTokenSubject, result));
     }
 
 
@@ -90,6 +81,7 @@ class LoginControllerTest {
     @Transactional
     void authenticateUser_whenUserNotPresentInDatabase() throws Exception {
         //given
+        ResponseCode expected = ResponseCode.LOGIN_FAILED_PARAMETERS_DO_NOT_MATCH_DATABASE;
         LoginRequestDto loginRequestDtoNotExistingUser = new LoginRequestDto(userPassword, userEmail);
 
         //when //then
@@ -100,17 +92,7 @@ class LoginControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof FailedLoginException))
-                .andExpect(result ->
-                        assertTrue(result
-                                .getResponse()
-                                .getContentAsString()
-                                .contains(
-                                        ResponseCode
-                                                .LOGIN_FAILED_PARAMETERS_DO_NOT_MATCH_DATABASE
-                                                .toString()
-                                )
-                        )
-                );
+                .andExpect(result -> mvcResultTester.assertEqualsResponseCode(expected, result));
     }
 
 
@@ -120,6 +102,7 @@ class LoginControllerTest {
         //given
         userUtils.createUserInDatabase(userEmail, userPassword);
         LoginRequestDto loginRequestDtoBadPassword = new LoginRequestDto("some_other_password", userEmail);
+        ResponseCode expected = ResponseCode.LOGIN_FAILED_PARAMETERS_DO_NOT_MATCH_DATABASE;
 
 
         //when //then
@@ -130,17 +113,7 @@ class LoginControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof FailedLoginException))
-                .andExpect(result ->
-                        assertTrue(result
-                                .getResponse()
-                                .getContentAsString()
-                                .contains(
-                                        ResponseCode
-                                                .LOGIN_FAILED_PARAMETERS_DO_NOT_MATCH_DATABASE
-                                                .toString()
-                                )
-                        )
-                );
+                .andExpect(result -> mvcResultTester.assertEqualsResponseCode(expected, result));
     }
 
 

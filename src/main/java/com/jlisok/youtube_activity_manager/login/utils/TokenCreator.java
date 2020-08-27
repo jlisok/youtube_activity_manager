@@ -10,7 +10,6 @@ import java.time.Instant;
 import java.util.Date;
 
 @Component
-
 public class TokenCreator {
 
     @Value("${security.config.constants.token.duration}")

@@ -15,10 +15,18 @@ repositories {
 }
 
 ext {
+    auth0Version = '3.4.0'
+    hibernateVersion = '5.4.18.Final'
+    javaxPersistenceVersion = '2.2'
+    javaxValidationVersion = '2.0.1.Final'
     liquibaseVersion = '3.10.2'
-    mockitoVersion = '3.5.6'
     logbackVersion = '1.2.3'
+    mockitoVersion = '3.5.7'
+    postgresVersion = '42.2.16'
     springStarterVersion = '2.3.2.RELEASE'
+    surefireVersion = '3.0.0-M5'
+    apacheCommonsVersion = '3.11'
+    jaxbVersion = '2.3.1'
 }
 
 
@@ -34,37 +42,31 @@ dependencies {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
 
-    implementation group: 'com.auth0', name: 'java-jwt', version: '3.4.0'
+    implementation group: 'com.auth0', name: 'java-jwt', version: "${auth0Version}"
 
-    runtimeOnly 'org.postgresql:postgresql'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.16'
+    implementation group: 'org.postgresql', name: 'postgresql', version: "${postgresVersion}"
 
+    implementation group: 'org.hibernate', name: 'hibernate-core', version: "${hibernateVersion}"
+    implementation group: 'org.hibernate', name: 'hibernate-entitymanager', version: "${hibernateVersion}"
 
-    implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.4.18.Final'
-    implementation group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.4.18.Final'
+    implementation group: 'javax.persistence', name: 'javax.persistence-api', version: "${javaxPersistenceVersion}"
 
+    implementation group: 'javax.validation', name: 'validation-api', version: "${javaxValidationVersion}"
 
-    implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
-
-    implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
-
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: "${apacheCommonsVersion}"
 
     //
     // To run mockito with junit5
     //
     testImplementation group: 'org.mockito', name: 'mockito-core', version: "${mockitoVersion}"
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.5.6'
-
-    implementation group: 'org.apache.maven.plugins', name: 'maven-surefire-plugin', version: '3.0.0-M5'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: "${mockitoVersion}"
 
 
     //
     // Liquibase plugin
     //
     liquibaseRuntime group: 'org.liquibase', name: 'liquibase-core', version: "${liquibaseVersion}"
-    liquibaseRuntime group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-    liquibaseRuntime group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
+    liquibaseRuntime group: 'javax.xml.bind', name: 'jaxb-api', version: "${jaxbVersion}"
     liquibaseRuntime group: 'ch.qos.logback', name: 'logback-core', version: "${logbackVersion}"
     liquibaseRuntime group: 'ch.qos.logback', name: 'logback-classic', version: "${logbackVersion}"
 }
