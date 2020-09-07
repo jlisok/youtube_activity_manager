@@ -44,8 +44,7 @@ class LoginControllerTest {
     private UserUtils userUtils;
 
     @Autowired
-    MockMvcResultTester mvcResultTester;
-
+    private MockMvcResultTester mvcResultTester;
 
     private String userEmail;
     private String userPassword;
@@ -59,7 +58,7 @@ class LoginControllerTest {
 
     @Test
     @Transactional
-    void authenticateUser_whenUserExistsAndRequestIsValid() throws Exception {
+    void authenticateUserTraditionally_whenUserExistsAndRequestIsValid() throws Exception {
         //given
         User user = userUtils.createUserInDatabase(userEmail, userPassword);
         LoginRequestDto validLoginRequestDto = new LoginRequestDto(userPassword, userEmail);
@@ -79,7 +78,7 @@ class LoginControllerTest {
 
     @Test
     @Transactional
-    void authenticateUser_whenUserNotPresentInDatabase() throws Exception {
+    void authenticateUserTraditionally_whenUserNotPresentInDatabase() throws Exception {
         //given
         LoginRequestDto loginRequestDtoNotExistingUser = new LoginRequestDto(userPassword, userEmail);
         ResponseCode expected = ResponseCode.LOGIN_FAILED_PARAMETERS_DO_NOT_MATCH_DATABASE;
@@ -98,7 +97,7 @@ class LoginControllerTest {
 
     @Test
     @Transactional
-    void authenticateUser_whenUserSendsBadPassword() throws Exception {
+    void authenticateUserTraditionally_whenUserSendsBadPassword() throws Exception {
         //given
         userUtils.createUserInDatabase(userEmail, userPassword);
         LoginRequestDto loginRequestDtoBadPassword = new LoginRequestDto("some_other_password", userEmail);
@@ -119,7 +118,7 @@ class LoginControllerTest {
 
     @Test
     @Transactional
-    void addUser_whenUserRequestIsNull() throws Exception {
+    void authenticateUserTraditionally_whenUserRequestIsNull() throws Exception {
         //given //when //then
         mockMvc.perform(
                 MockMvcRequestBuilders
@@ -134,7 +133,7 @@ class LoginControllerTest {
     @ParameterizedTest
     @MethodSource("authenticateUser_whenUserFailsValidationTestData")
     @Transactional
-    void addUser_whenUserFailsValidation(LoginRequestDto loginRequestDto) throws Exception {
+    void authenticateUserTraditionally_whenUserFailsValidation(LoginRequestDto loginRequestDto) throws Exception {
         //given //when //then
         mockMvc.perform(
                 MockMvcRequestBuilders
@@ -157,4 +156,9 @@ class LoginControllerTest {
                 Arguments.arguments(new LoginRequestDto(userPassword, "something_without_at"))
         );
     }
+
+
+
+
+
 }

@@ -20,7 +20,7 @@ import java.util.UUID;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class DtoToUserTranslatorTest {
+class RequestDtoToUserTranslatorTest {
 
 
     @Autowired

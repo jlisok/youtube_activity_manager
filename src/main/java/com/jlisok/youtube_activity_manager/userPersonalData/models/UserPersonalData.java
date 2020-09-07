@@ -45,6 +45,7 @@ public class UserPersonalData {
     public UserPersonalData() {
     }
 
+    // traditional registration
     public UserPersonalData(UUID id, Sex gender, Integer birthYear, String country, String phonePrefix, String phoneNumber, String firstName, Instant createdAt, Instant modifiedAt) {
         this.id = id;
         this.gender = gender;
@@ -55,6 +56,17 @@ public class UserPersonalData {
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
     }
+
+    // google registration
+    public UserPersonalData(UUID id, String firstName, Instant createdAt, Instant modifiedAt) {
+        this.id = id;
+        this.gender = Sex.NOT_APPLICABLE;
+        this.firstName = firstName;
+        this.createdAt = createdAt;
+        this.modifiedAt = modifiedAt;
+    }
+
+
 
 
     public UUID getId() {

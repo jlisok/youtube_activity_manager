@@ -21,7 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class LoginServiceTest {
+class TraditionalLoginServiceTest {
 
     @Autowired
     private JWTVerifier jwtVerifier;
@@ -33,7 +33,7 @@ class LoginServiceTest {
     private UserRepository userRepository;
 
     @Autowired
-    private LoginService loginService;
+    private TraditionalLoginServiceImplementation traditionalLoginService;
 
     private String userEmail;
     private String userPassword;
@@ -57,7 +57,7 @@ class LoginServiceTest {
                 .thenReturn(Optional.of(user));
 
         //when
-        String token = loginService.authenticateUser(dto);
+        String token = traditionalLoginService.authenticateUser(dto);
         DecodedJWT decodedJWT = jwtVerifier.verify(token);
 
         //then
@@ -67,17 +67,13 @@ class LoginServiceTest {
 
 
 
-
-
     @Test
     void authenticateUser_whenUserIsNotPresentInDatabase() {
         //given
 
         //when //then
-        Assertions.assertThrows(FailedLoginException.class, () -> loginService.authenticateUser(dto));
+        Assertions.assertThrows(FailedLoginException.class, () -> traditionalLoginService.authenticateUser(dto));
     }
-
-
 
 
 
@@ -92,7 +88,7 @@ class LoginServiceTest {
         LoginRequestDto loginRequestDtoBadPassword = new LoginRequestDto("some_other_password", userEmail);
 
         //when //then
-        Assertions.assertThrows(FailedLoginException.class, () -> loginService.authenticateUser(loginRequestDtoBadPassword));
+        Assertions.assertThrows(FailedLoginException.class, () -> traditionalLoginService.authenticateUser(loginRequestDtoBadPassword));
     }
 
 

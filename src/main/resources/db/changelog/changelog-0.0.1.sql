@@ -58,3 +58,4 @@ ALTER TABLE public.users
 
 
 --rollback ALTER TABLE public.users DROP CONSTRAINT users_id_fkey;
+--rollback ALTER TABLE public.user_personal_data ADD CONSTRAINT user_personal_data_id_fkey FOREIGN KEY (id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;

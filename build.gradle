@@ -27,6 +27,7 @@ ext {
     surefireVersion = '3.0.0-M5'
     apacheCommonsVersion = '3.11'
     jaxbVersion = '2.3.1'
+    googleApiVersion = '1.30.10'
 }
 
 
@@ -55,6 +56,9 @@ dependencies {
 
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: "${apacheCommonsVersion}"
 
+    implementation group: 'com.google.api-client', name: 'google-api-client', version: "${googleApiVersion}"
+
+
     //
     // To run mockito with junit5
     //
@@ -69,6 +73,7 @@ dependencies {
     liquibaseRuntime group: 'javax.xml.bind', name: 'jaxb-api', version: "${jaxbVersion}"
     liquibaseRuntime group: 'ch.qos.logback', name: 'logback-core', version: "${logbackVersion}"
     liquibaseRuntime group: 'ch.qos.logback', name: 'logback-classic', version: "${logbackVersion}"
+    liquibaseRuntime group: 'org.postgresql', name: 'postgresql', version: "${postgresVersion}"
 }
 
 test {
@@ -82,6 +87,7 @@ liquibase {
             url 'jdbc:postgresql://localhost:5432/youtube_activity_manager'
             username 'postgres'
             password 'postgres'
+
         }
     }
     runList = 'main'

@@ -19,7 +19,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 @SpringBootTest
-class DtoToUserPersonalDataTranslatorTest {
+class RequestDtoToUserPersonalDataTranslatorTest {
 
     @Autowired
     private UserUtils userUtils;
