@@ -13,6 +13,20 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: youtube_activity_manager
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
     - uses: actions/checkout@v2
@@ -22,5 +36,7 @@ jobs:
         java-version: 14
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    - name: Initialize test db
+      run: ./gradlew update
     - name: Build and run tests with Gradle
       run: ./gradlew build test
