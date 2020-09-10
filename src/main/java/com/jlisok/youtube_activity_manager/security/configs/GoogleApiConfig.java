@@ -1,5 +1,6 @@
 package com.jlisok.youtube_activity_manager.security.configs;
 
+import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -10,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.Collections;
 
 @Configuration
-public class GoogleTokenConfig {
+public class GoogleApiConfig {
 
     @Value("${google.client_id}")
     private String clientId;
@@ -18,7 +19,8 @@ public class GoogleTokenConfig {
 
     @Bean
     public GoogleIdTokenVerifier createGoogleTokenVerifier() {
-        return new GoogleIdTokenVerifier.Builder(netHttpTransport(), jacksonFactory())
+        return new GoogleIdTokenVerifier
+                .Builder(netHttpTransport(), jacksonFactory())
                 .setAudience(Collections.singletonList(clientId))
                 .build();
     }
@@ -35,4 +37,9 @@ public class GoogleTokenConfig {
         return new JacksonFactory();
     }
 
+
+    @Bean
+    public LocalServerReceiver localServerReceiver() {
+        return new LocalServerReceiver();
+    }
 }
