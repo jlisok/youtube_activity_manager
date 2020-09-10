@@ -76,7 +76,7 @@ public class UserUtils {
         Instant now = Instant.now();
         Payload userData = googleIdToken.getPayload();
         String fistName = userData.get("given_name").toString();
-        UUID googleId = UUID.fromString(userData.getSubject());
+        String googleId = userData.getSubject();
         UserPersonalData userPersonalData = new UserPersonalData(userId, fistName, now, now);
         return new User(userId, userData.getEmail(), googleId, token, now, now, userPersonalData);
     }

@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
+import java.util.Random;
 
 public class MockGoogleIdTokenVerifier {
 
@@ -36,10 +36,10 @@ public class MockGoogleIdTokenVerifier {
 
 
     private static Payload createPayload(String email, Boolean ifEmailVerified) {
-        UUID googleId = UUID.randomUUID();
+        String googleId = String.valueOf(new Random().nextLong());
         Payload payload = new GoogleIdToken.Payload();
         payload.setEmail(email);
-        payload.setSubject(googleId.toString());
+        payload.setSubject(googleId);
         payload.setEmailVerified(ifEmailVerified);
         payload.set("given_name", "Joe");
         payload.set("last_name", "Doe");

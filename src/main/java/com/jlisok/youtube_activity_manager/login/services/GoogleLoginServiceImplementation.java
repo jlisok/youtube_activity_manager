@@ -1,8 +1,10 @@
 package com.jlisok.youtube_activity_manager.login.services;
 
+import com.google.api.client.auth.oauth.OAuthGetAccessToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.googleapis.auth.oauth2.GoogleOAuthConstants;
 import com.jlisok.youtube_activity_manager.login.dto.GoogleLoginRequestDto;
 import com.jlisok.youtube_activity_manager.login.exceptions.DataInconsistencyAuthenticationException;
 import com.jlisok.youtube_activity_manager.login.exceptions.EmailNotVerifiedAuthenticationException;
@@ -49,6 +51,7 @@ public class GoogleLoginServiceImplementation implements GoogleLoginService {
 
     private GoogleIdToken verifyGoogleIdToken(String googleToken) throws GeneralSecurityException, IOException {
         GoogleIdToken idToken = googleIdTokenVerifier.verify(googleToken);
+
         if (idToken != null) {
             logger.debug("GoogleLoginService - GoogleIdToken verified and valid.");
             return idToken;
@@ -60,7 +63,7 @@ public class GoogleLoginServiceImplementation implements GoogleLoginService {
 
     private User verifyIfUserInDatabaseOrCreateNewUser(String googleIdToken, Payload userData) {
         Instant now = Instant.now();
-        UUID googleId = UUID.fromString(userData.getSubject());
+        String googleId = userData.getSubject();
         return userRepository
                 .findByEmail(userData.getEmail())
                 .map(user -> updateGoogleDataInDatabase(user, googleId, googleIdToken, now))
@@ -68,7 +71,7 @@ public class GoogleLoginServiceImplementation implements GoogleLoginService {
     }
 
 
-    private User updateGoogleDataInDatabase(User user, UUID googleId, String token, Instant now) throws DataInconsistencyAuthenticationException {
+    private User updateGoogleDataInDatabase(User user, String googleId, String token, Instant now) throws DataInconsistencyAuthenticationException {
         if (userRepository.findByGoogleId(googleId).isPresent()) {
             throw new DataInconsistencyAuthenticationException("Updating user: " + user.getEmail() + " failed. Given googleId " + user.getGoogleId() + " already exists in database under different email.");
         }
@@ -83,7 +86,7 @@ public class GoogleLoginServiceImplementation implements GoogleLoginService {
     }
 
 
-    private User createNewUserInDatabase(String googleIdToken, UUID googleId, Payload userData, Instant now) throws EmailNotVerifiedAuthenticationException {
+    private User createNewUserInDatabase(String googleIdToken, String googleId, Payload userData, Instant now) throws EmailNotVerifiedAuthenticationException {
         if (userData.getEmailVerified()) {
             UUID userId = UUID.randomUUID();
             String fistName = userData.get("given_name").toString();

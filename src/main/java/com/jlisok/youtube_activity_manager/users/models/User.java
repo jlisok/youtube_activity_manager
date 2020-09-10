@@ -25,7 +25,7 @@ public final class User {
     private String googleIdToken;
 
     @Column(name = "google_id")
-    private UUID googleId;
+    private String googleId;
 
     @Column(name = "created_at")
     private Instant createdAt;
@@ -51,7 +51,7 @@ public final class User {
     }
 
     // google registration
-    public User(UUID id, String email, UUID googleId, String googleIdToken, Instant createdAt, Instant modifiedAt, UserPersonalData userPersonalData) {
+    public User(UUID id, String email, String googleId, String googleIdToken, Instant createdAt, Instant modifiedAt, UserPersonalData userPersonalData) {
         this.id = id;
         this.email = email;
         this.googleId = googleId;
@@ -113,7 +113,7 @@ public final class User {
         return googleIdToken;
     }
 
-    public UUID getGoogleId() {
+    public String getGoogleId() {
         return googleId;
     }
 
@@ -121,7 +121,7 @@ public final class User {
         this.googleIdToken = googleIdToken;
     }
 
-    public void setGoogleId(UUID googleId) {
+    public void setGoogleId(String googleId) {
         this.googleId = googleId;
     }
 

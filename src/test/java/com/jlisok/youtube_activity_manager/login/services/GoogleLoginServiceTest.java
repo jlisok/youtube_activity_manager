@@ -19,7 +19,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -129,7 +128,7 @@ class GoogleLoginServiceTest {
         when(userRepository.findByEmail(any(String.class)))
                 .thenReturn(Optional.of(user));
 
-        when(userRepository.findByGoogleId(any(UUID.class)))
+        when(userRepository.findByGoogleId(any(String.class)))
                 .thenReturn(Optional.of(userWithSameGoogleIdButDifferentEmail));
 
         //when //then
