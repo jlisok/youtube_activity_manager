@@ -53,7 +53,6 @@ public class GoogleLoginServiceImplementation implements GoogleLoginService {
 
     private GoogleIdToken verifyGoogleIdToken(String googleToken) throws GeneralSecurityException, IOException {
         GoogleIdToken idToken = googleIdTokenVerifier.verify(googleToken);
-
         if (idToken != null) {
             logger.debug("GoogleLoginService - GoogleIdToken verified and valid.");
             return idToken;

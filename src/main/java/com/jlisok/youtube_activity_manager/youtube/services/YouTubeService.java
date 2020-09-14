@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface YouTubeService {
 
-    public ChannelListResponse listLikedChannels(String userId, List<String> requestParts) throws IOException, GeneralSecurityException;
+    public ChannelListResponse listOfChannels(String accessToken, List<String> requestParts) throws IOException, GeneralSecurityException;
 
 }

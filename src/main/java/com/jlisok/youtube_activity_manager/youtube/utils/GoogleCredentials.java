@@ -1,3 +1,4 @@
+/*
 package com.jlisok.youtube_activity_manager.youtube.utils;
 
 import com.google.api.client.auth.oauth2.Credential;
@@ -36,13 +37,13 @@ public class GoogleCredentials {
     }
 
 
-    public Credential create(HttpTransport httpTransport, String userId) throws IOException {
+    public Credential create(HttpTransport httpTransport) throws IOException {
         InputStream inputStream = this.getClass().getResourceAsStream(clientSecretJson);
         InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
         GoogleClientSecrets googleClientSecrets = GoogleClientSecrets.load(jacksonFactory, inputStreamReader);
         GoogleAuthorizationCodeFlow flow = googleAuthorizationCodeFlow(googleClientSecrets, httpTransport);
         return new AuthorizationCodeInstalledApp(flow, localServerReceiver)
-                .authorize(userId);
+                .authorize("user");
     }
 
 
@@ -56,3 +57,4 @@ public class GoogleCredentials {
     }
 
 }
+*/
