@@ -40,20 +40,11 @@ public final class User {
     public User() {
     }
 
-    // traditional registration
-    public User(UUID id, String password, String email, Instant createdAt, Instant modifiedAt, UserPersonalData userPersonalData) {
+    // builder
+    User(UUID id, String email, String password, String googleId, String googleIdToken, Instant createdAt, Instant modifiedAt, UserPersonalData userPersonalData) {
         this.id = id;
+        this.email = email;
         this.password = password;
-        this.email = email;
-        this.createdAt = createdAt;
-        this.modifiedAt = modifiedAt;
-        this.userPersonalData = userPersonalData;
-    }
-
-    // google registration
-    public User(UUID id, String email, String googleId, String googleIdToken, Instant createdAt, Instant modifiedAt, UserPersonalData userPersonalData) {
-        this.id = id;
-        this.email = email;
         this.googleId = googleId;
         this.googleIdToken = googleIdToken;
         this.createdAt = createdAt;

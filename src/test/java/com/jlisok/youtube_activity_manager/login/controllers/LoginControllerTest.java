@@ -3,7 +3,8 @@ package com.jlisok.youtube_activity_manager.login.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jlisok.youtube_activity_manager.domain.exceptions.ResponseCode;
 import com.jlisok.youtube_activity_manager.login.dto.LoginRequestDto;
-import com.jlisok.youtube_activity_manager.testutils.MockMvcResultTester;
+import com.jlisok.youtube_activity_manager.testutils.MockMvcResponse;
+import com.jlisok.youtube_activity_manager.testutils.MockMvcToken;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import org.junit.jupiter.api.Assertions;
@@ -44,7 +45,10 @@ class LoginControllerTest {
     private UserUtils userUtils;
 
     @Autowired
-    private MockMvcResultTester mvcResultTester;
+    private MockMvcResponse mvcResponse;
+
+    @Autowired
+    private MockMvcToken mvcToken;
 
     private String userEmail;
     private String userPassword;
@@ -60,19 +64,22 @@ class LoginControllerTest {
     @Transactional
     void authenticateUserTraditionally_whenUserExistsAndRequestIsValid() throws Exception {
         //given
-        User user = userUtils.createUserInDatabase(userEmail, userPassword);
+        User user = userUtils.insertUserInDatabase(userEmail, userPassword);
         LoginRequestDto validLoginRequestDto = new LoginRequestDto(userPassword, userEmail);
-        String expectedTokenSubject = user.getId().toString();
+        String expectedTokenSubject = user
+                .getId()
+                .toString();
 
         //when //then
-        mockMvc.perform(
-                MockMvcRequestBuilders
-                        .post("/api/v1/login")
-                        .content(objectMapper.writeValueAsString(validLoginRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .post("/api/v1/login")
+                                .content(objectMapper.writeValueAsString(validLoginRequestDto))
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(Assertions::assertNotNull)
-                .andExpect(result -> mvcResultTester.assertEqualsTokenSubject(expectedTokenSubject, result));
+                .andExpect(result -> mvcToken.assertEqualsTokenSubject(expectedTokenSubject, result));
     }
 
 
@@ -84,14 +91,15 @@ class LoginControllerTest {
         ResponseCode expected = ResponseCode.LOGIN_FAILED_PARAMETERS_DO_NOT_MATCH_DATABASE;
 
         //when //then
-        mockMvc.perform(
-                MockMvcRequestBuilders
-                        .post("/api/v1/login")
-                        .content(objectMapper.writeValueAsString(loginRequestDtoNotExistingUser))
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .post("/api/v1/login")
+                                .content(objectMapper.writeValueAsString(loginRequestDtoNotExistingUser))
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof FailedLoginException))
-                .andExpect(result -> mvcResultTester.assertEqualsResponseCode(expected, result));
+                .andExpect(result -> mvcResponse.assertEqualsResponseCode(expected, result));
     }
 
 
@@ -99,20 +107,21 @@ class LoginControllerTest {
     @Transactional
     void authenticateUserTraditionally_whenUserSendsBadPassword() throws Exception {
         //given
-        userUtils.createUserInDatabase(userEmail, userPassword);
+        userUtils.insertUserInDatabase(userEmail, userPassword);
         LoginRequestDto loginRequestDtoBadPassword = new LoginRequestDto("some_other_password", userEmail);
         ResponseCode expected = ResponseCode.LOGIN_FAILED_PARAMETERS_DO_NOT_MATCH_DATABASE;
 
 
         //when //then
-        mockMvc.perform(
-                MockMvcRequestBuilders
-                        .post("/api/v1/login")
-                        .content(objectMapper.writeValueAsString(loginRequestDtoBadPassword))
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .post("/api/v1/login")
+                                .content(objectMapper.writeValueAsString(loginRequestDtoBadPassword))
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof FailedLoginException))
-                .andExpect(result -> mvcResultTester.assertEqualsResponseCode(expected, result));
+                .andExpect(result -> mvcResponse.assertEqualsResponseCode(expected, result));
     }
 
 
@@ -120,11 +129,12 @@ class LoginControllerTest {
     @Transactional
     void authenticateUserTraditionally_whenUserRequestIsNull() throws Exception {
         //given //when //then
-        mockMvc.perform(
-                MockMvcRequestBuilders
-                        .post("/api/v1/login")
-                        .content(objectMapper.writeValueAsString(null))
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .post("/api/v1/login")
+                                .content(objectMapper.writeValueAsString(null))
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof HttpMessageNotReadableException));
     }
@@ -135,11 +145,12 @@ class LoginControllerTest {
     @Transactional
     void authenticateUserTraditionally_whenUserFailsValidation(LoginRequestDto loginRequestDto) throws Exception {
         //given //when //then
-        mockMvc.perform(
-                MockMvcRequestBuilders
-                        .post("/api/v1/login")
-                        .content(objectMapper.writeValueAsString(loginRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .post("/api/v1/login")
+                                .content(objectMapper.writeValueAsString(loginRequestDto))
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException));
     }
@@ -156,9 +167,6 @@ class LoginControllerTest {
                 Arguments.arguments(new LoginRequestDto(userPassword, "something_without_at"))
         );
     }
-
-
-
 
 
 }

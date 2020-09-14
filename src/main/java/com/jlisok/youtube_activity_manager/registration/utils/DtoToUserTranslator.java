@@ -5,6 +5,7 @@ import com.jlisok.youtube_activity_manager.registration.exceptions.PrefixAndPhon
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationDataProcessingException;
 import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalData;
 import com.jlisok.youtube_activity_manager.users.models.User;
+import com.jlisok.youtube_activity_manager.users.models.UserBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -30,12 +31,14 @@ public class DtoToUserTranslator {
         UserPersonalData userPersonalData = dtoToUserPersonalDataTranslator.translate(registrationRequestDto, now, id);
 
         String userPassword = passwordEncoder.encode(registrationRequestDto.getPassword());
-        return new User(userPersonalData.getId(),
-                userPassword,
-                registrationRequestDto.getEmail(),
-                now,
-                now,
-                userPersonalData);
+        return new UserBuilder()
+                .setId(userPersonalData.getId())
+                .setPassword(userPassword)
+                .setEmail(registrationRequestDto.getEmail())
+                .setCreatedAt(now)
+                .setModifiedAt(now)
+                .setUserPersonalData(userPersonalData)
+                .createUser();
     }
 
     private void makeSureInputParametersAreNotNull(RegistrationRequestDto registrationRequestDto, Instant now, UUID id) throws RegistrationDataProcessingException {

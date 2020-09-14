@@ -17,7 +17,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import javax.security.auth.login.FailedLoginException;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -47,24 +46,24 @@ class TraditionalLoginServiceTest {
     }
 
 
-
     @Test
     void authenticateUser_whenUserIsPresentInDatabaseAndLoginDataAreValid() throws RegistrationException, FailedLoginException {
         //given
         User user = userUtils.createUser(userEmail, userPassword);
 
-        when(userRepository.findByEmail(any(String.class)))
+        when(userRepository.findByEmail(userEmail))
                 .thenReturn(Optional.of(user));
 
         //when
         String token = traditionalLoginService.authenticateUser(dto);
-        DecodedJWT decodedJWT = jwtVerifier.verify(token);
 
         //then
         Assertions.assertNotNull(token);
-        Assertions.assertEquals(user.getId().toString(), decodedJWT.getSubject());
+        DecodedJWT decodedJWT = jwtVerifier.verify(token);
+        Assertions.assertEquals(user
+                .getId()
+                .toString(), decodedJWT.getSubject());
     }
-
 
 
     @Test
@@ -76,13 +75,12 @@ class TraditionalLoginServiceTest {
     }
 
 
-
     @Test
     void authenticateUser_whenUserIsPresentInDatabaseAndBadPassword() throws RegistrationException {
         //given
         User user = userUtils.createUser(userEmail, userPassword);
 
-        when(userRepository.findByEmail(any(String.class)))
+        when(userRepository.findByEmail(userEmail))
                 .thenReturn(Optional.of(user));
 
         LoginRequestDto loginRequestDtoBadPassword = new LoginRequestDto("some_other_password", userEmail);

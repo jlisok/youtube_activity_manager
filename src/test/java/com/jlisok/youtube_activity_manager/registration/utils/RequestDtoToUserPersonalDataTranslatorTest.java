@@ -5,6 +5,7 @@ import com.jlisok.youtube_activity_manager.registration.exceptions.PrefixAndPhon
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.userPersonalData.enums.Sex;
 import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalData;
+import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalDataBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,16 +52,17 @@ class RequestDtoToUserPersonalDataTranslatorTest {
     @Test
     void translate_whenDtoIsValid() throws PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException {
         //given
-        UserPersonalData expected = new UserPersonalData(
-                id,
-                dto.getGender(),
-                dto.getBirthYear(),
-                dto.getCountry(),
-                dto.getPhonePrefix(),
-                dto.getPhoneNumber(),
-                dto.getFirstName(),
-                now,
-                now);
+        UserPersonalData expected = new UserPersonalDataBuilder()
+                .setId(id)
+                .setGender(dto.getGender())
+                .setBirthYear(dto.getBirthYear())
+                .setCountry(dto.getCountry())
+                .setPhonePrefix(dto.getPhonePrefix())
+                .setPhoneNumber(dto.getPhoneNumber())
+                .setFirstName(dto.getFirstName())
+                .setCreatedAt(now)
+                .setModifiedAt(now)
+                .createUserPersonalData();
 
 
         //when

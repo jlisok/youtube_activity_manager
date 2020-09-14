@@ -6,8 +6,8 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.jlisok.youtube_activity_manager.login.dto.GoogleLoginRequestDto;
 import com.jlisok.youtube_activity_manager.login.exceptions.DataInconsistencyAuthenticationException;
 import com.jlisok.youtube_activity_manager.login.exceptions.EmailNotVerifiedAuthenticationException;
-import com.jlisok.youtube_activity_manager.testutils.MockGoogleIdTokenVerifier;
-import com.jlisok.youtube_activity_manager.testutils.MockMvcResultTester;
+import com.jlisok.youtube_activity_manager.testutils.MockGoogleIdToken;
+import com.jlisok.youtube_activity_manager.testutils.MockMvcToken;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +45,7 @@ class LoginControllerViaGoogleTest {
     private UserUtils userUtils;
 
     @Autowired
-    private MockMvcResultTester mvcResultTester;
+    private MockMvcToken mvcToken;
 
     @MockBean
     private GoogleIdTokenVerifier verifier;
@@ -59,7 +59,7 @@ class LoginControllerViaGoogleTest {
     @BeforeEach
     void createRandomUser() {
         userEmail = userUtils.createRandomEmail();
-        googleIdToken = MockGoogleIdTokenVerifier.createDummyGoogleIdToken(userEmail, true);
+        googleIdToken = MockGoogleIdToken.createDummyGoogleIdToken(userEmail, true);
         googleLoginRequestDto = new GoogleLoginRequestDto(dummyToken);
     }
 
@@ -72,15 +72,16 @@ class LoginControllerViaGoogleTest {
                 .thenReturn(googleIdToken);
 
         //when //then
-        mockMvc.perform(
-                MockMvcRequestBuilders
-                        .post("/api/v1/login/viaGoogle")
-                        .content(objectMapper.writeValueAsString(googleLoginRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .post("/api/v1/login/viaGoogle")
+                                .content(objectMapper.writeValueAsString(googleLoginRequestDto))
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(Assertions::assertNotNull)
                 .andExpect(result ->
-                        mvcResultTester.assertEqualsTokenSubjectAndGoogleIdNotNull(userEmail, result));
+                        mvcToken.assertEqualsTokenSubjectAndGoogleIdNotNull(userEmail, result));
     }
 
 
@@ -88,20 +89,21 @@ class LoginControllerViaGoogleTest {
     @Transactional
     void authenticateUserWithGoogle_whenUpdatingValidUser() throws Exception {
         //given
-        userUtils.createUserInDatabase(userEmail, userUtils.createRandomPassword());
+        userUtils.insertUserInDatabase(userEmail, userUtils.createRandomPassword());
 
         when(verifier.verify(any(String.class)))
                 .thenReturn(googleIdToken);
 
         //when //then
-        mockMvc.perform(
-                MockMvcRequestBuilders
-                        .post("/api/v1/login/viaGoogle")
-                        .content(objectMapper.writeValueAsString(googleLoginRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .post("/api/v1/login/viaGoogle")
+                                .content(objectMapper.writeValueAsString(googleLoginRequestDto))
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(Assertions::assertNotNull)
-                .andExpect(result -> mvcResultTester.assertEqualsTokenSubjectAndGoogleIdNotNull(userEmail, result));
+                .andExpect(result -> mvcToken.assertEqualsTokenSubjectAndGoogleIdNotNull(userEmail, result));
     }
 
 
@@ -112,11 +114,12 @@ class LoginControllerViaGoogleTest {
                 .thenReturn(null);
 
         //when //then
-        mockMvc.perform(
-                MockMvcRequestBuilders
-                        .post("/api/v1/login/viaGoogle")
-                        .content(objectMapper.writeValueAsString(googleLoginRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .post("/api/v1/login/viaGoogle")
+                                .content(objectMapper.writeValueAsString(googleLoginRequestDto))
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof AuthenticationCredentialsNotFoundException));
     }
@@ -126,18 +129,19 @@ class LoginControllerViaGoogleTest {
     @Transactional
     void authenticateUserWithGoogle_whenUserExistsButGoogleIdAlreadyExistsInDatabaseUnderDifferentEmail() throws Exception {
         //given
-        userUtils.createUserInDatabase(userEmail, userUtils.createRandomPassword());
-        userUtils.createUserInDatabaseWithSameGoogleIdAsInTokenButDifferentEmail(dummyToken, googleIdToken);
+        userUtils.insertUserInDatabase(userEmail, userUtils.createRandomPassword());
+        userUtils.insertUserInDatabaseSameGoogleIdDifferentEmail(dummyToken, googleIdToken);
 
         when(verifier.verify(any(String.class)))
                 .thenReturn(googleIdToken);
 
         //when //then
-        mockMvc.perform(
-                MockMvcRequestBuilders
-                        .post("/api/v1/login/viaGoogle")
-                        .content(objectMapper.writeValueAsString(googleLoginRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .post("/api/v1/login/viaGoogle")
+                                .content(objectMapper.writeValueAsString(googleLoginRequestDto))
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof DataInconsistencyAuthenticationException));
     }
@@ -147,16 +151,17 @@ class LoginControllerViaGoogleTest {
     @Transactional
     void authenticateUserWithGoogle_whenUserEmailIsUnverifiedByGoogle() throws Exception {
         //given
-        GoogleIdToken googleIdTokenWithUnverifiedEmail = MockGoogleIdTokenVerifier.createDummyGoogleIdToken(userEmail, false);
+        GoogleIdToken googleIdTokenWithUnverifiedEmail = MockGoogleIdToken.createDummyGoogleIdToken(userEmail, false);
         when(verifier.verify(any(String.class)))
                 .thenReturn(googleIdTokenWithUnverifiedEmail);
 
         //when //then
-        mockMvc.perform(
-                MockMvcRequestBuilders
-                        .post("/api/v1/login/viaGoogle")
-                        .content(objectMapper.writeValueAsString(googleLoginRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .post("/api/v1/login/viaGoogle")
+                                .content(objectMapper.writeValueAsString(googleLoginRequestDto))
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EmailNotVerifiedAuthenticationException));
     }
@@ -167,11 +172,12 @@ class LoginControllerViaGoogleTest {
         //given //when //then
         GoogleLoginRequestDto dtoTokenNull = new GoogleLoginRequestDto(null);
 
-        mockMvc.perform(
-                MockMvcRequestBuilders
-                        .post("/api/v1/login/viaGoogle")
-                        .content(objectMapper.writeValueAsString(dtoTokenNull))
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .post("/api/v1/login/viaGoogle")
+                                .content(objectMapper.writeValueAsString(dtoTokenNull))
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException));
     }
@@ -182,11 +188,12 @@ class LoginControllerViaGoogleTest {
         //given //when //then
         GoogleLoginRequestDto dtoTokenNull = new GoogleLoginRequestDto("");
 
-        mockMvc.perform(
-                MockMvcRequestBuilders
-                        .post("/api/v1/login/viaGoogle")
-                        .content(objectMapper.writeValueAsString(dtoTokenNull))
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .post("/api/v1/login/viaGoogle")
+                                .content(objectMapper.writeValueAsString(dtoTokenNull))
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException));
     }

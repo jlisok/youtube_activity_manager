@@ -9,7 +9,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Random;
 
-public class MockGoogleIdTokenVerifier {
+public class MockGoogleIdToken {
 
     @Value("${google.client_id}")
     private static String client_id;
@@ -23,8 +23,12 @@ public class MockGoogleIdTokenVerifier {
 
 
     private static Header createHeader() {
-        Instant issuedAtTime = Instant.now().minus(Duration.ofMinutes(30));
-        Instant expirationTime = Instant.now().plus(Duration.ofMinutes(30));
+        Instant issuedAtTime = Instant
+                .now()
+                .minus(Duration.ofMinutes(30));
+        Instant expirationTime = Instant
+                .now()
+                .plus(Duration.ofMinutes(30));
         Header header = new Header();
         header.set("iat", issuedAtTime);
         header.set("exp", expirationTime);

@@ -6,7 +6,9 @@ import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationD
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.userPersonalData.enums.Sex;
 import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalData;
+import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalDataBuilder;
 import com.jlisok.youtube_activity_manager.users.models.User;
+import com.jlisok.youtube_activity_manager.users.models.UserBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -57,26 +59,26 @@ class RequestDtoToUserTranslatorTest {
     @Test
     void translate_whenDtoIsValid() throws PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException, RegistrationDataProcessingException {
         //given
-        UserPersonalData userPersonalData = new UserPersonalData(
-                id,
-                dto.getGender(),
-                dto.getBirthYear(),
-                dto.getCountry(),
-                dto.getPhonePrefix(),
-                dto.getPhoneNumber(),
-                dto.getFirstName(),
-                now,
-                now
-        );
+        UserPersonalData userPersonalData = new UserPersonalDataBuilder()
+                .setId(id)
+                .setGender(dto.getGender())
+                .setBirthYear(dto.getBirthYear())
+                .setCountry(dto.getCountry())
+                .setPhonePrefix(dto.getPhonePrefix())
+                .setPhoneNumber(dto.getPhoneNumber())
+                .setFirstName(dto.getFirstName())
+                .setCreatedAt(now)
+                .setModifiedAt(now)
+                .createUserPersonalData();
 
-        User expected = new User(
-                id,
-                passwordEncoder.encode(dto.getPassword()),
-                dto.getEmail(),
-                now,
-                now,
-                userPersonalData
-        );
+        User expected = new UserBuilder()
+                .setId(id)
+                .setPassword(passwordEncoder.encode(dto.getPassword()))
+                .setEmail(dto.getEmail())
+                .setCreatedAt(now)
+                .setModifiedAt(now)
+                .setUserPersonalData(userPersonalData)
+                .createUser();
 
         //when
         User actual = translator.translate(dto, now, id);

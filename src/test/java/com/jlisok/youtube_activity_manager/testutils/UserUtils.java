@@ -6,7 +6,9 @@ import com.jlisok.youtube_activity_manager.registration.dto.RegistrationRequestD
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
 import com.jlisok.youtube_activity_manager.registration.utils.DtoToUserTranslator;
 import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalData;
+import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalDataBuilder;
 import com.jlisok.youtube_activity_manager.users.models.User;
+import com.jlisok.youtube_activity_manager.users.models.UserBuilder;
 import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
@@ -38,7 +40,7 @@ public class UserUtils {
     }
 
 
-    public void createUserInDatabase(RegistrationRequestDto dto) throws RegistrationException {
+    public void insertUserInDatabase(RegistrationRequestDto dto) throws RegistrationException {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         User user = dtoToUserTranslator.translate(dto, now, id);
@@ -51,7 +53,7 @@ public class UserUtils {
     }
 
 
-    public User createUserInDatabase(String userEmail, String userPassword) throws RegistrationException {
+    public User insertUserInDatabase(String userEmail, String userPassword) throws RegistrationException {
         User user = createUser(userEmail, userPassword);
         repository.saveAndFlush(user);
 
@@ -75,14 +77,29 @@ public class UserUtils {
         UUID userId = UUID.randomUUID();
         Instant now = Instant.now();
         Payload userData = googleIdToken.getPayload();
-        String fistName = userData.get("given_name").toString();
+        String fistName = userData
+                .get("given_name")
+                .toString();
         String googleId = userData.getSubject();
-        UserPersonalData userPersonalData = new UserPersonalData(userId, fistName, now, now);
-        return new User(userId, userData.getEmail(), googleId, token, now, now, userPersonalData);
+        UserPersonalData userPersonalData = new UserPersonalDataBuilder()
+                .setId(userId)
+                .setFirstName(fistName)
+                .setCreatedAt(now)
+                .setModifiedAt(now)
+                .createUserPersonalData();
+        return new UserBuilder()
+                .setId(userId)
+                .setEmail(userData.getEmail())
+                .setGoogleId(googleId)
+                .setGoogleIdToken(token)
+                .setCreatedAt(now)
+                .setModifiedAt(now)
+                .setUserPersonalData(userPersonalData)
+                .createUser();
     }
 
 
-    public void createUserInDatabaseWithSameGoogleIdAsInTokenButDifferentEmail(String token, GoogleIdToken googleIdToken) {
+    public void insertUserInDatabaseSameGoogleIdDifferentEmail(String token, GoogleIdToken googleIdToken) {
         User user = createUser(token, googleIdToken);
         user.setEmail(createRandomEmail());
         repository.saveAndFlush(user);
@@ -94,20 +111,26 @@ public class UserUtils {
     }
 
 
-    public User createUserWithSameGoogleIdButDifferentEmailAndId(User user) {
+    public User createUserSameGoogleIdDifferentEmailAndId(User user) {
         UUID id = UUID.randomUUID();
-        UserPersonalData userPersonalData = new UserPersonalData(id,
-                user.getUserPersonalData().getFirstName(),
-                user.getCreatedAt(),
-                user.getModifiedAt());
+        UserPersonalData userPersonalData = new UserPersonalDataBuilder()
+                .setId(id)
+                .setFirstName(user
+                        .getUserPersonalData()
+                        .getFirstName())
+                .setCreatedAt(user.getCreatedAt())
+                .setModifiedAt(user.getModifiedAt())
+                .createUserPersonalData();
 
-        return new User(id,
-                createRandomEmail(),
-                user.getGoogleId(),
-                user.getGoogleIdToken(),
-                user.getCreatedAt(),
-                user.getModifiedAt(),
-                userPersonalData);
+        return new UserBuilder()
+                .setId(id)
+                .setEmail(createRandomEmail())
+                .setGoogleId(user.getGoogleId())
+                .setGoogleIdToken(user.getGoogleIdToken())
+                .setCreatedAt(user.getCreatedAt())
+                .setModifiedAt(user.getModifiedAt())
+                .setUserPersonalData(userPersonalData)
+                .createUser();
     }
 
 

@@ -1,16 +1,16 @@
 package com.jlisok.youtube_activity_manager.login.services;
 
-import com.google.api.client.auth.oauth.OAuthGetAccessToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.googleapis.auth.oauth2.GoogleOAuthConstants;
 import com.jlisok.youtube_activity_manager.login.dto.GoogleLoginRequestDto;
 import com.jlisok.youtube_activity_manager.login.exceptions.DataInconsistencyAuthenticationException;
 import com.jlisok.youtube_activity_manager.login.exceptions.EmailNotVerifiedAuthenticationException;
 import com.jlisok.youtube_activity_manager.login.utils.TokenCreator;
 import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalData;
+import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalDataBuilder;
 import com.jlisok.youtube_activity_manager.users.models.User;
+import com.jlisok.youtube_activity_manager.users.models.UserBuilder;
 import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -42,6 +43,7 @@ public class GoogleLoginServiceImplementation implements GoogleLoginService {
 
 
     @Override
+    @Transactional
     public String authenticateUser(GoogleLoginRequestDto loginRequestDto) throws GeneralSecurityException, IOException, AuthenticationException {
         GoogleIdToken googleIdToken = verifyGoogleIdToken(loginRequestDto.getToken());
         User user = verifyIfUserInDatabaseOrCreateNewUser(loginRequestDto.getToken(), googleIdToken.getPayload());
@@ -60,7 +62,6 @@ public class GoogleLoginServiceImplementation implements GoogleLoginService {
         }
     }
 
-
     private User verifyIfUserInDatabaseOrCreateNewUser(String googleIdToken, Payload userData) {
         Instant now = Instant.now();
         String googleId = userData.getSubject();
@@ -72,7 +73,8 @@ public class GoogleLoginServiceImplementation implements GoogleLoginService {
 
 
     private User updateGoogleDataInDatabase(User user, String googleId, String token, Instant now) throws DataInconsistencyAuthenticationException {
-        if (userRepository.findByGoogleId(googleId).isPresent()) {
+        if (userRepository.findByGoogleId(googleId)
+                .isPresent()) {
             throw new DataInconsistencyAuthenticationException("Updating user: " + user.getEmail() + " failed. Given googleId " + user.getGoogleId() + " already exists in database under different email.");
         }
         if (user.getGoogleId() == null) {
@@ -89,9 +91,23 @@ public class GoogleLoginServiceImplementation implements GoogleLoginService {
     private User createNewUserInDatabase(String googleIdToken, String googleId, Payload userData, Instant now) throws EmailNotVerifiedAuthenticationException {
         if (userData.getEmailVerified()) {
             UUID userId = UUID.randomUUID();
-            String fistName = userData.get("given_name").toString();
-            UserPersonalData userPersonalData = new UserPersonalData(userId, fistName, now, now);
-            User userToSave = new User(userId, userData.getEmail(), googleId, googleIdToken, now, now, userPersonalData);
+            String fistName = userData.get("given_name")
+                    .toString();
+            UserPersonalData userPersonalData = new UserPersonalDataBuilder()
+                    .setId(userId)
+                    .setFirstName(fistName)
+                    .setCreatedAt(now)
+                    .setModifiedAt(now)
+                    .createUserPersonalData();
+            User userToSave = new UserBuilder()
+                    .setId(userId)
+                    .setEmail(userData.getEmail())
+                    .setGoogleId(googleId)
+                    .setGoogleIdToken(googleIdToken)
+                    .setCreatedAt(now)
+                    .setModifiedAt(now)
+                    .setUserPersonalData(userPersonalData)
+                    .createUser();
             User savedUser = userRepository.saveAndFlush(userToSave);
             logger.debug("GoogleLoginService - creating new User in database - success");
             return savedUser;

@@ -20,7 +20,7 @@ public class WelcomePageController {
     }
 
     @GetMapping
-    public boolean isAuthorized(HttpServletRequest request) {
-        return welcomePageService.isConnectedToGoogleAccount(request);
+    public boolean isAuthorized() {
+        return welcomePageService.isConnectedToGoogleAccount();
     }
 }
