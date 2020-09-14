@@ -31,7 +31,6 @@ public class YouTubeApi {
         NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
         GoogleCredential credential = new GoogleCredential();
         credential.setAccessToken(accessToken);
-        //Credential credential = googleCredentials.create(httpTransport);
         return new YouTube
                 .Builder(httpTransport, jacksonFactory, credential)
                 .setApplicationName(applicationName)

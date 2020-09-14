@@ -1,7 +1,7 @@
 package com.jlisok.youtube_activity_manager.youtube.services;
 
-import com.google.api.services.youtube.model.ChannelListResponse;
-import com.google.api.services.youtube.model.VideoListResponse;
+import com.google.api.services.youtube.model.Channel;
+import com.google.api.services.youtube.model.Video;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,7 +21,7 @@ class YouTubeServiceImplementationTest {
     void listOfChannels() throws IOException, GeneralSecurityException {
         List<String> requestParts = Arrays.asList("snippet", "contentDetails", "statistics");
         String accessToken = "ya29.a0AfH6SMB1Hfy-mxIBUM5VDKRlLqFSfUMoCsR6lCytSkf-qE06Yejx8PVYeOFKCN8kRxFZL8sXBINoNH7zSLkR7ED7LHZw_QO4ma5x5CduqTO-Lx0qjXqvA7K0iyDhTpzMn_s7z8ZqFKewAvwRp-l55tuJWI10H0d0ZtQ";
-        ChannelListResponse response = service.listOfChannels(accessToken, requestParts);
+        List<Channel> response = service.listOfChannels(accessToken, requestParts);
         System.out.println(response);
     }
 
@@ -30,7 +30,7 @@ class YouTubeServiceImplementationTest {
     void listLikedVideos() throws IOException, GeneralSecurityException {
         List<String> requestParts = Arrays.asList("snippet", "contentDetails", "statistics");
         String accessToken = "ya29.a0AfH6SMB1Hfy-mxIBUM5VDKRlLqFSfUMoCsR6lCytSkf-qE06Yejx8PVYeOFKCN8kRxFZL8sXBINoNH7zSLkR7ED7LHZw_QO4ma5x5CduqTO-Lx0qjXqvA7K0iyDhTpzMn_s7z8ZqFKewAvwRp-l55tuJWI10H0d0ZtQ";
-        VideoListResponse response = service.listOfVideos(accessToken, "like", requestParts);
+        List<Video> response = service.listRatedVideos(accessToken, "like", requestParts);
         System.out.println(response);
     }
 }
