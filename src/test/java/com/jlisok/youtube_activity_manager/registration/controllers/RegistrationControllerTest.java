@@ -1,9 +1,9 @@
 package com.jlisok.youtube_activity_manager.registration.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jlisok.youtube_activity_manager.domain.exceptions.ResponseCode;
 import com.jlisok.youtube_activity_manager.registration.dto.RegistrationRequestDto;
 import com.jlisok.youtube_activity_manager.registration.exceptions.BadRegistrationRequestException;
+import com.jlisok.youtube_activity_manager.testutils.MockMvcBasicRequestBuilder;
 import com.jlisok.youtube_activity_manager.testutils.MvcResponseVerifier;
 import com.jlisok.youtube_activity_manager.testutils.RandomRegistrationDto;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
@@ -19,9 +19,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
@@ -43,13 +41,15 @@ class RegistrationControllerTest {
     private UserRepository userRepository;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private MockMvcBasicRequestBuilder mvcBasicRequestBuilder;
 
     @Autowired
     private UserUtils userUtils;
 
     @Autowired
     private MvcResponseVerifier mvcResponseVerifier;
+
+    private final String endPointUrl = "/api/v1/registration";
 
     private RegistrationRequestDto dto;
 
@@ -65,12 +65,8 @@ class RegistrationControllerTest {
         //given
 
         //when //then
-        mockMvc.perform(
-                MockMvcRequestBuilders
-                        .post("/api/v1/registration")
-                        .content(objectMapper.writeValueAsString(dto))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+        mockMvc.perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, dto))
+               .andExpect(status().isOk());
 
         Optional<User> user = userRepository.findByEmail(dto.getEmail());
         assertTrue(user.isPresent());
@@ -85,14 +81,10 @@ class RegistrationControllerTest {
         ResponseCode expected = ResponseCode.REGISTRATION_FAILED_VIOLATED_FIELD_EMAIL;
 
         //when //then
-        mockMvc.perform(
-                MockMvcRequestBuilders
-                        .post("/api/v1/registration")
-                        .content(objectMapper.writeValueAsString(dto))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof BadRegistrationRequestException))
-                .andExpect(result -> mvcResponseVerifier.assertEqualsResponseCode(expected, result));
+        mockMvc.perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, dto))
+               .andExpect(status().isBadRequest())
+               .andExpect(result -> assertTrue(result.getResolvedException() instanceof BadRegistrationRequestException))
+               .andExpect(result -> mvcResponseVerifier.assertEqualsResponseCode(expected, result));
     }
 
 
@@ -101,13 +93,9 @@ class RegistrationControllerTest {
     @Transactional
     void addUser_whenUserFailsValidation(RegistrationRequestDto registrationRequestDto) throws Exception {
         //given //when //then
-        mockMvc.perform(
-                MockMvcRequestBuilders
-                        .post("/api/v1/registration")
-                        .content(objectMapper.writeValueAsString(registrationRequestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException));
+        mockMvc.perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, registrationRequestDto))
+               .andExpect(status().isBadRequest())
+               .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException));
     }
 
 

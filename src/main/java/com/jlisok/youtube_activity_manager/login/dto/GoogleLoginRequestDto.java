@@ -23,4 +23,5 @@ public class GoogleLoginRequestDto {
     public String getAccessToken() {
         return accessToken;
     }
+
 }

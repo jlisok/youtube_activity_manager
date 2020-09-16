@@ -1,10 +1,13 @@
 package com.jlisok.youtube_activity_manager.youtube.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.jlisok.youtube_activity_manager.testutils.AuthenticationUtils;
-import com.jlisok.youtube_activity_manager.testutils.MockMvcYouTubeListResponse;
-import com.jlisok.youtube_activity_manager.youtube.dto.YouTubeListDto;
+import com.jlisok.youtube_activity_manager.testutils.MockMvcBasicRequestBuilder;
+import com.jlisok.youtube_activity_manager.testutils.YouTubeListVerifier;
+import com.jlisok.youtube_activity_manager.videos.enums.Rating;
+import com.jlisok.youtube_activity_manager.videos.models.UserVideo;
+import com.jlisok.youtube_activity_manager.videos.repositories.UserVideoRepository;
+import com.jlisok.youtube_activity_manager.youtube.dto.YouTubeRatingDto;
 import com.jlisok.youtube_activity_manager.youtube.utils.AccessTokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -13,22 +16,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
+import java.util.List;
+import java.util.UUID;
+
+import static com.jlisok.youtube_activity_manager.testutils.YouTubeApiUtils.assertVideoNotEmpty;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 @Disabled("test methods require refreshed access token, which is now not implemented. In due time, this test class should be run manually.")
 class YouTubeControllerTest {
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private MockMvcBasicRequestBuilder mvcRequestBuilder;
+
+    @Autowired
+    private UserVideoRepository userVideoRepository;
 
     @Autowired
     private AuthenticationUtils utils;
@@ -39,151 +50,116 @@ class YouTubeControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private final String accessToken = "ya29.a0AfH6SMDaGpCVmAmP8T49IFuWhttGFzOK0dKmDYm5jyMuxGWgsc7GqZBiSTeZTZYCYPU6kQ9G9bec9IsYw-fD14Y-53t8vY7PWycOUXmewL7zWMxGSx0LJQSbmEfCNJpjISAvA-8nOz7xW2j7FmrJdDAHr2UAr3fatI3t";
+    private final String accessToken = "ya29.a0AfH6SMC38cOOPyXX9Lkt4L54qcmh3cgBcKYlDz3hRUuV15Yqo145PryyxQmIBH1bo9XEriNquwaB5Acnkn47-Bdgb36toxQFYhA8UYz6Ahv4T4TfAPm5zBuDScVGEdmyjlJehQM4p6j5ZLBGo-9H3idshTc2xjSh4ISP";
     private final String invalidToken = "gfdes";
-    private YouTubeListDto dto;
+    private final UUID userId = UUID.fromString("16b5d624-cc36-403c-835e-d1988c2410a8");
+    private final String endPointUrl = "/api/v1/youtube/videos";
+
+    private YouTubeRatingDto dto;
     private String jsonHeader;
+
 
     @BeforeEach
     public void createYoutubeRequestDto() {
-        String requestParts = "snippet, contentDetails";
-        dto = new YouTubeListDto(requestParts, "like");
-        String userId = "16b5d624-cc36-403c-835e-d1988c2410a8";
-        jsonHeader = utils.createRequestAuthenticationHeader(userId);
+        dto = new YouTubeRatingDto(Rating.LIKE);
+        jsonHeader = utils.createRequestAuthenticationHeader(userId.toString());
     }
 
 
     @Test
-    void getLikedVideos_whenRequestValid() throws Exception {
+    void getRatedVideos_whenRequestValid_RatingLike() throws Exception {
         //given
-        when(tokenService.get())
+        assertTrue(userVideoRepository.findByUserId(userId).isEmpty());
+        when(tokenService.getAccessToken())
                 .thenReturn(accessToken);
 
         //when //then
         mockMvc
-                .perform(
-                        MockMvcRequestBuilders
-                                .get("/api/v1/youtube/videos")
-                                .header(HttpHeaders.AUTHORIZATION, jsonHeader)
-                                .content(objectMapper.writeValueAsString(dto))
-                                .contentType(MediaType.APPLICATION_JSON))
+                .perform(mvcRequestBuilder.setBasicGetRequest(endPointUrl, jsonHeader, dto))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcYouTubeListResponse::assertResponseListNotNull);
+                .andExpect(YouTubeListVerifier::assertResponseListNotNull);
+
+
+        List<UserVideo> userVideoList = userVideoRepository.findByUserId(userId);
+        assertFalse(userVideoList.isEmpty());
+        userVideoList.forEach(userVideo -> assertVideoNotEmpty(userVideo.getVideo()));
     }
+
 
     @Test
-    void getDislikedVideos_whenRequestValid() throws Exception {
+    void getRatedVideos_whenRequestValid_RatingDislike() throws Exception {
         //given
-        YouTubeListDto dislikedDto = new YouTubeListDto("snippet, contentDetails", "dislike");
-
-        when(tokenService.get())
+        assertTrue(userVideoRepository.findByUserId(userId).isEmpty());
+        YouTubeRatingDto dto = new YouTubeRatingDto(Rating.DISLIKE);
+        when(tokenService.getAccessToken())
                 .thenReturn(accessToken);
 
         //when //then
         mockMvc
-                .perform(
-                        MockMvcRequestBuilders
-                                .get("/api/v1/youtube/videos")
-                                .header(HttpHeaders.AUTHORIZATION, jsonHeader)
-                                .content(objectMapper.writeValueAsString(dislikedDto))
-                                .contentType(MediaType.APPLICATION_JSON))
+                .perform(mvcRequestBuilder.setBasicGetRequest(endPointUrl, jsonHeader, dto))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcYouTubeListResponse::assertResponseListNotNull);
+                .andExpect(YouTubeListVerifier::assertResponseListNotNull);
+
+        List<UserVideo> userVideoList = userVideoRepository.findByUserId(userId);
+        assertFalse(userVideoList.isEmpty());
+        userVideoList.forEach(userVideo -> assertVideoNotEmpty(userVideo.getVideo()));
     }
+
+
+    @Test
+    void getRatedVideos_whenNullRating() throws Exception {
+        //given
+        YouTubeRatingDto badRatingDto = new YouTubeRatingDto(null);
+        when(tokenService.getAccessToken())
+                .thenReturn(accessToken);
+
+        //when //then
+        mockMvc
+                .perform(mvcRequestBuilder.setBasicGetRequest(endPointUrl, jsonHeader, badRatingDto))
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException));
+    }
+
 
     @Test
     void getRatedVideos_whenTokenInvalid() throws Exception {
         //given
 
-        when(tokenService.get())
+        when(tokenService.getAccessToken())
                 .thenReturn(invalidToken);
 
         //when //then
         mockMvc
-                .perform(
-                        MockMvcRequestBuilders
-                                .get("/api/v1/youtube/videos")
-                                .header(HttpHeaders.AUTHORIZATION, jsonHeader)
-                                .content(objectMapper.writeValueAsString(dto))
-                                .contentType(MediaType.APPLICATION_JSON))
+                .perform(mvcRequestBuilder.setBasicGetRequest(endPointUrl, jsonHeader, dto))
                 .andExpect(status().isInternalServerError())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof GoogleJsonResponseException));
     }
 
 
-    @Test
-    void getRatedVideos_badRating() throws Exception {
-        //given
-        YouTubeListDto badRatingDto = new YouTubeListDto("snippet, contentDetails", "blahblah");
-        when(tokenService.get())
-                .thenReturn(accessToken);
-
-        //when //then
-        mockMvc
-                .perform(
-                        MockMvcRequestBuilders
-                                .get("/api/v1/youtube/videos")
-                                .header(HttpHeaders.AUTHORIZATION, jsonHeader)
-                                .content(objectMapper.writeValueAsString(badRatingDto))
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof GoogleJsonResponseException));
-    }
-
-
-    @Test
-    void getRatedVideos_nullRating() throws Exception {
-        //given
-        YouTubeListDto badRatingDto = new YouTubeListDto("snippet, contentDetails", null);
-        when(tokenService.get())
-                .thenReturn(accessToken);
-
-        //when //then
-        mockMvc
-                .perform(
-                        MockMvcRequestBuilders
-                                .get("/api/v1/youtube/videos")
-                                .header(HttpHeaders.AUTHORIZATION, jsonHeader)
-                                .content(objectMapper.writeValueAsString(badRatingDto))
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof GoogleJsonResponseException));
-    }
-
-
+    //TODO: in due time changing flow
     @Test
     void getSubscribedChannels() throws Exception {
         //given
-        when(tokenService.get())
+        when(tokenService.getAccessToken())
                 .thenReturn(accessToken);
 
         //when //then
         mockMvc
-                .perform(
-                        MockMvcRequestBuilders
-                                .get("/api/v1/youtube/channels")
-                                .header(HttpHeaders.AUTHORIZATION, jsonHeader)
-                                .content(objectMapper.writeValueAsString(dto))
-                                .contentType(MediaType.APPLICATION_JSON))
+                .perform(mvcRequestBuilder.setBasicGetRequest(endPointUrl, jsonHeader, dto))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcYouTubeListResponse::assertResponseListNotNull);
+                .andExpect(YouTubeListVerifier::assertResponseListNotNull);
     }
 
-
+    //TODO: in due time changing flow
     @Test
     void getSubscribedChannels_whenTokenInvalid() throws Exception {
         //given
-        when(tokenService.get())
+        when(tokenService.getAccessToken())
                 .thenReturn(invalidToken);
 
         //when //then
         mockMvc
-                .perform(
-                        MockMvcRequestBuilders
-                                .get("/api/v1/youtube/channels")
-                                .header(HttpHeaders.AUTHORIZATION, jsonHeader)
-                                .content(objectMapper.writeValueAsString(dto))
-                                .contentType(MediaType.APPLICATION_JSON))
+                .perform(mvcRequestBuilder.setBasicGetRequest(endPointUrl, jsonHeader, dto))
                 .andExpect(status().isInternalServerError())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof GoogleJsonResponseException));
     }

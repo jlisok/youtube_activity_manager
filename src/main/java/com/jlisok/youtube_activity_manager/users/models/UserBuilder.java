@@ -62,6 +62,7 @@ public class UserBuilder {
         return this;
     }
 
+
     public User createUser() {
         return new User(id, email, password, googleId, googleIdToken, accessToken, createdAt, modifiedAt, userPersonalData);
     }

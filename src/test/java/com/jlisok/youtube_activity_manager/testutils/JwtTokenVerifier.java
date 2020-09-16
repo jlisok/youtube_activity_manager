@@ -33,7 +33,7 @@ public class JwtTokenVerifier {
     }
 
 
-    public void assertEqualsTokenSubjectAndGoogleIdNotNull(String email, MvcResult result) throws Exception {
+    public void assertEqualsUserIdsAndGoogleIdAndTokenNotNull(String email, MvcResult result) throws Exception {
         User user = repository
                 .findByEmail(email)
                 .get();
@@ -45,5 +45,6 @@ public class JwtTokenVerifier {
                 .getId()
                 .toString(), decodedJWT.getSubject());
         assertNotNull(user.getGoogleId());
+        assertNotNull(user.getAccessToken());
     }
 }

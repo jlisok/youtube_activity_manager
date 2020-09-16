@@ -128,6 +128,7 @@ public final class User {
         this.accessToken = accessToken;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

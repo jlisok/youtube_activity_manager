@@ -1,6 +1,6 @@
 package com.jlisok.youtube_activity_manager.userPersonalData.models;
 
-import com.jlisok.youtube_activity_manager.database.SexEnumTypePostgreSql;
+import com.jlisok.youtube_activity_manager.database.enums.SexEnumTypePostgreSql;
 import com.jlisok.youtube_activity_manager.userPersonalData.enums.Sex;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;

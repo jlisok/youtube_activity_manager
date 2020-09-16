@@ -66,7 +66,34 @@ public class UserUtils {
     }
 
 
-    public User createUserNoFirstName(String token, GoogleIdToken googleIdToken) {
+    public User createUser(String token, GoogleIdToken googleIdToken, String accessToken) {
+        UUID userId = UUID.randomUUID();
+        Instant now = Instant.now();
+        GoogleIdToken.Payload userData = googleIdToken.getPayload();
+        String fistName = userData
+                .get("given_name")
+                .toString();
+        String googleId = userData.getSubject();
+        UserPersonalData userPersonalData = new UserPersonalDataBuilder()
+                .setId(userId)
+                .setFirstName(fistName)
+                .setCreatedAt(now)
+                .setModifiedAt(now)
+                .createUserPersonalData();
+        return new UserBuilder()
+                .setId(userId)
+                .setEmail(userData.getEmail())
+                .setGoogleId(googleId)
+                .setGoogleIdToken(token)
+                .setAccessToken(accessToken)
+                .setCreatedAt(now)
+                .setModifiedAt(now)
+                .setUserPersonalData(userPersonalData)
+                .createUser();
+    }
+
+
+    public User createUserNoFirstName(String token, GoogleIdToken googleIdToken, String accessToken) {
         UUID userId = UUID.randomUUID();
         Instant now = Instant.now();
         GoogleIdToken.Payload userData = googleIdToken.getPayload();
@@ -81,6 +108,7 @@ public class UserUtils {
                 .setEmail(userData.getEmail())
                 .setGoogleId(googleId)
                 .setGoogleIdToken(token)
+                .setAccessToken(accessToken)
                 .setCreatedAt(now)
                 .setModifiedAt(now)
                 .setUserPersonalData(userPersonalData)
@@ -88,7 +116,7 @@ public class UserUtils {
     }
 
 
-    public User createUser(UUID userId, String token, String accessToken) {
+    public User createUser(UUID userId, String googleIdToken, String accessToken) {
         Instant now = Instant.now();
         String googleId = UUID.randomUUID().toString();
         UserPersonalData userPersonalData = new UserPersonalDataBuilder()
@@ -100,7 +128,7 @@ public class UserUtils {
                 .setId(userId)
                 .setEmail(createRandomEmail())
                 .setGoogleId(googleId)
-                .setGoogleIdToken(token)
+                .setGoogleIdToken(googleIdToken)
                 .setAccessToken(accessToken)
                 .setCreatedAt(now)
                 .setModifiedAt(now)
@@ -108,8 +136,8 @@ public class UserUtils {
                 .createUser();
     }
 
-    public void insertUserInDatabaseSameGoogleIdDifferentEmail(String token, GoogleIdToken googleIdToken) {
-        User user = createUser(token, googleIdToken);
+    public void insertUserInDatabaseSameGoogleIdDifferentEmail(String token, GoogleIdToken googleIdToken, String accessToken) {
+        User user = createUser(token, googleIdToken, accessToken);
         user.setEmail(createRandomEmail());
         repository.saveAndFlush(user);
 
@@ -133,6 +161,7 @@ public class UserUtils {
                 .setEmail(createRandomEmail())
                 .setGoogleId(user.getGoogleId())
                 .setGoogleIdToken(user.getGoogleIdToken())
+                .setAccessToken(user.getAccessToken())
                 .setCreatedAt(user.getCreatedAt())
                 .setModifiedAt(user.getModifiedAt())
                 .setUserPersonalData(userPersonalData)
@@ -175,6 +204,4 @@ public class UserUtils {
     public String createRandomPassword() {
         return RandomStringUtils.randomAlphanumeric(20);
     }
-
-
 }

@@ -31,8 +31,8 @@ class AccessTokenServiceTest {
     @MockBean
     private UserRepository repository;
 
-    String token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjRiODNmMTgwMjNhODU1NTg3Zjk0MmU3NTEwMjI1MTEyMDg4N2Y3MjUiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2N";
-    UUID userId = UUID.randomUUID();
+    private final String token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjRiODNmMTgwMjNhODU1NTg3Zjk0MmU3NTEwMjI1MTEyMDg4N2Y3MjUiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2N";
+    private final UUID userId = UUID.randomUUID();
 
     @BeforeEach
     public void setContext() {
@@ -42,12 +42,12 @@ class AccessTokenServiceTest {
     @Test
     void getAccessToken_whenUserAndTokenValid() {
         //given
-        User user = userUtils.createUser(getAuthenticationInContext().getPrincipal(), token, token);
-        when(repository.findById(getAuthenticationInContext().getPrincipal()))
+        User user = userUtils.createUser(userId, token, token);
+        when(repository.findById(getAuthenticationInContext().getAuthenticatedUserId()))
                 .thenReturn(Optional.of(user));
 
         //when
-        String actualToken = accessTokenService.get();
+        String actualToken = accessTokenService.getAccessToken();
 
         //then
         assertEquals(token, actualToken);
@@ -57,23 +57,23 @@ class AccessTokenServiceTest {
     @Test
     void getAccessToken_whenUserNotFound() {
         //given
-        when(repository.findById(getAuthenticationInContext().getPrincipal()))
+        when(repository.findById(userId))
                 .thenReturn(Optional.empty());
 
         //when //then
-        assertThrows(AuthenticationCredentialsNotFoundException.class, () -> accessTokenService.get());
+        assertThrows(AuthenticationCredentialsNotFoundException.class, () -> accessTokenService.getAccessToken());
     }
 
 
     @Test
     void getAccessToken_whenAccessTokenEmpty() {
         //given
-        User user = userUtils.createUser(getAuthenticationInContext().getPrincipal(), token, null);
-        when(repository.findById(getAuthenticationInContext().getPrincipal()))
+        User user = userUtils.createUser(userId, token, null);
+        when(repository.findById(getAuthenticationInContext().getAuthenticatedUserId()))
                 .thenReturn(Optional.of(user));
 
         //when //then
-        assertThrows(AuthenticationCredentialsNotFoundException.class, () -> accessTokenService.get());
+        assertThrows(AuthenticationCredentialsNotFoundException.class, () -> accessTokenService.getAccessToken());
     }
 
 }
