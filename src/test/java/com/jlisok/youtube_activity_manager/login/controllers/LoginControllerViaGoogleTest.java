@@ -51,7 +51,8 @@ class LoginControllerViaGoogleTest {
     private GoogleIdTokenVerifier verifier;
 
     private String userEmail;
-    private final String dummyToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+    private final String dummyIdToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+    private final String dummyAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
     private GoogleIdToken googleIdToken;
     private GoogleLoginRequestDto googleLoginRequestDto;
 
@@ -60,7 +61,7 @@ class LoginControllerViaGoogleTest {
     void createRandomUser() {
         userEmail = userUtils.createRandomEmail();
         googleIdToken = MockGoogleIdToken.createDummyGoogleIdToken(userEmail, true);
-        googleLoginRequestDto = new GoogleLoginRequestDto(dummyToken);
+        googleLoginRequestDto = new GoogleLoginRequestDto(dummyIdToken, dummyAccessToken);
     }
 
 
@@ -130,7 +131,7 @@ class LoginControllerViaGoogleTest {
     void authenticateUserWithGoogle_whenUserExistsButGoogleIdAlreadyExistsInDatabaseUnderDifferentEmail() throws Exception {
         //given
         userUtils.insertUserInDatabase(userEmail, userUtils.createRandomPassword());
-        userUtils.insertUserInDatabaseSameGoogleIdDifferentEmail(dummyToken, googleIdToken);
+        userUtils.insertUserInDatabaseSameGoogleIdDifferentEmail(dummyIdToken, googleIdToken);
 
         when(verifier.verify(any(String.class)))
                 .thenReturn(googleIdToken);
@@ -168,9 +169,9 @@ class LoginControllerViaGoogleTest {
 
 
     @Test
-    void authenticateUser_whenTokenDtoIsNull() throws Exception {
+    void authenticateUser_whenIdTokenDtoIsNull() throws Exception {
         //given //when //then
-        GoogleLoginRequestDto dtoTokenNull = new GoogleLoginRequestDto(null);
+        GoogleLoginRequestDto dtoTokenNull = new GoogleLoginRequestDto(null, dummyAccessToken);
 
         mockMvc
                 .perform(
@@ -184,9 +185,40 @@ class LoginControllerViaGoogleTest {
 
 
     @Test
-    void authenticateUser_whenTokenDtoIsBlank() throws Exception {
+    void authenticateUser_whenIdTokenDtoIsBlank() throws Exception {
         //given //when //then
-        GoogleLoginRequestDto dtoTokenNull = new GoogleLoginRequestDto("");
+        GoogleLoginRequestDto dtoTokenNull = new GoogleLoginRequestDto("", dummyAccessToken);
+
+        mockMvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .post("/api/v1/login/viaGoogle")
+                                .content(objectMapper.writeValueAsString(dtoTokenNull))
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException));
+    }
+
+    @Test
+    void authenticateUser_whenAccessTokenDtoIsNull() throws Exception {
+        //given //when //then
+        GoogleLoginRequestDto dtoTokenNull = new GoogleLoginRequestDto(dummyIdToken, null);
+
+        mockMvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .post("/api/v1/login/viaGoogle")
+                                .content(objectMapper.writeValueAsString(dtoTokenNull))
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException));
+    }
+
+
+    @Test
+    void authenticateUser_whenAccessTokenDtoIsBlank() throws Exception {
+        //given //when //then
+        GoogleLoginRequestDto dtoTokenNull = new GoogleLoginRequestDto(dummyIdToken, "");
 
         mockMvc
                 .perform(

@@ -1,47 +1,55 @@
 package com.jlisok.youtube_activity_manager.youtube.services;
 
 import com.google.api.services.youtube.YouTube;
-import com.google.api.services.youtube.model.Channel;
+import com.google.api.services.youtube.model.Subscription;
 import com.google.api.services.youtube.model.Video;
 import com.jlisok.youtube_activity_manager.youtube.api.YouTubeApi;
+import com.jlisok.youtube_activity_manager.youtube.dto.YouTubeListDto;
+import com.jlisok.youtube_activity_manager.youtube.utils.AccessTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
-@Component
+@Service
 public class YouTubeServiceImplementation implements YouTubeService {
 
     private final YouTubeApi youTubeApi;
+    private final AccessTokenService token;
 
     @Autowired
-    public YouTubeServiceImplementation(YouTubeApi youTubeApi) {
+    public YouTubeServiceImplementation(YouTubeApi youTubeApi, AccessTokenService token) {
         this.youTubeApi = youTubeApi;
+        this.token = token;
     }
 
+
     @Override
-    public List<Channel> listOfChannels(List<String> requestParts) throws IOException, GeneralSecurityException {
-        YouTube youTube = youTubeApi.get(accessToken);
+    public List<Subscription> listOfChannels(YouTubeListDto dto) throws IOException, GeneralSecurityException {
+        YouTube youTube = youTubeApi.get(token.get());
         return youTube
-                .channels()
-                .list(String.join(",", requestParts))
+                .subscriptions()
+                .list(String.join(",", dto.getRequestParts()))
                 .setMine(true)
                 .execute()
                 .getItems();
     }
 
+
     @Override
-    public List<Video> listRatedVideos(String rating, List<String> requestParts) throws IOException, GeneralSecurityException {
-        YouTube youTube = youTubeApi.get(accessToken);
+    public List<Video> listRatedVideos(YouTubeListDto dto) throws IOException, GeneralSecurityException {
+        YouTube youTube = youTubeApi.get(token.get());
         return youTube
                 .videos()
-                .list(String.join(",", requestParts))
-                .setMyRating(rating)
+                .list(String.join(",", dto.getRequestParts()))
+                .setMyRating(dto.getRating())
                 .execute()
                 .getItems();
     }
+
+
 }
 
 

@@ -20,7 +20,6 @@ public class YouTubeApi {
 
     private final JacksonFactory jacksonFactory;
 
-
     @Autowired
     public YouTubeApi(JacksonFactory jacksonFactory) {
         this.jacksonFactory = jacksonFactory;

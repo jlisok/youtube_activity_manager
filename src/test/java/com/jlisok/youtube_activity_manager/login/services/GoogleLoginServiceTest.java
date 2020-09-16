@@ -42,7 +42,7 @@ class GoogleLoginServiceTest {
     @Autowired
     private GoogleLoginServiceImplementation service;
 
-    private final String dummyToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+    private final String dummyIdToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
     private GoogleLoginRequestDto dto;
     private GoogleIdToken token;
     private String email;
@@ -51,7 +51,8 @@ class GoogleLoginServiceTest {
     @BeforeEach
     void createInitialVariablesForTestsAndMocks() {
         email = userUtils.createRandomEmail();
-        dto = new GoogleLoginRequestDto(dummyToken);
+        String dummyAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+        dto = new GoogleLoginRequestDto(dummyIdToken, dummyAccessToken);
         token = MockGoogleIdToken.createDummyGoogleIdToken(email, true);
     }
 
@@ -59,7 +60,7 @@ class GoogleLoginServiceTest {
     @Test
     void authenticateUser_whenNewValidUser() throws Exception {
         //given
-        User user = userUtils.createUser(dummyToken, token);
+        User user = userUtils.createUser(dummyIdToken, token);
 
         when(verifier.verify(dto.getToken()))
                 .thenReturn(token);
@@ -86,7 +87,7 @@ class GoogleLoginServiceTest {
     void authenticateUser_whenUpdatingValidUser() throws Exception {
         //given
         User user = userUtils.createUser(email, "dummyPassword");
-        User expectedUser = userUtils.createUser(dummyToken, token);
+        User expectedUser = userUtils.createUser(dummyIdToken, token);
 
         when(verifier.verify(dto.getToken()))
                 .thenReturn(token);
@@ -123,7 +124,7 @@ class GoogleLoginServiceTest {
     @Test
     void authenticateUser_whenGoogleIdAlreadyPresentUnderDifferentEmail() throws Exception {
         //given
-        User user = userUtils.createUser(dummyToken, token);
+        User user = userUtils.createUser(dummyIdToken, token);
         User userWithSameGoogleIdButDifferentEmail = userUtils.createUserSameGoogleIdDifferentEmailAndId(user);
 
         when(verifier.verify(dto.getToken()))

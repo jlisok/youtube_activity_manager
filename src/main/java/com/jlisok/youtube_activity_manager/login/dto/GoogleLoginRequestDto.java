@@ -10,14 +10,20 @@ public class GoogleLoginRequestDto {
     @NotBlank
     private final String token;
 
-    @JsonCreator
-    public GoogleLoginRequestDto(String token) {
-        this.token = token;
-    }
+    @NotBlank
+    private final String accessToken;
 
+    @JsonCreator
+    public GoogleLoginRequestDto(String token, String accessToken) {
+        this.token = token;
+        this.accessToken = accessToken;
+    }
 
     public String getToken() {
         return token;
     }
 
+    public String getAccessToken() {
+        return accessToken;
+    }
 }

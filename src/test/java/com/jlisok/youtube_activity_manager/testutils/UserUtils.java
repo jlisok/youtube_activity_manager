@@ -99,6 +99,26 @@ public class UserUtils {
     }
 
 
+    public User createUser(UUID userId, String token, String accessToken) {
+        Instant now = Instant.now();
+        String googleId = UUID.randomUUID().toString();
+        UserPersonalData userPersonalData = new UserPersonalDataBuilder()
+                .setId(userId)
+                .setCreatedAt(now)
+                .setModifiedAt(now)
+                .createUserPersonalData();
+        return new UserBuilder()
+                .setId(userId)
+                .setEmail(createRandomEmail())
+                .setGoogleId(googleId)
+                .setGoogleIdToken(token)
+                .setAccessToken(accessToken)
+                .setCreatedAt(now)
+                .setModifiedAt(now)
+                .setUserPersonalData(userPersonalData)
+                .createUser();
+    }
+
     public void insertUserInDatabaseSameGoogleIdDifferentEmail(String token, GoogleIdToken googleIdToken) {
         User user = createUser(token, googleIdToken);
         user.setEmail(createRandomEmail());
