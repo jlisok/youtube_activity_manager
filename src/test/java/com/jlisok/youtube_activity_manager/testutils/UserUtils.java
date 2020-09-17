@@ -73,7 +73,7 @@ public class UserUtils {
     }
 
 
-    public User createUser(String token, GoogleIdToken googleIdToken) {
+    public User createUser(String token, GoogleIdToken googleIdToken, String accessToken) {
         UUID userId = UUID.randomUUID();
         Instant now = Instant.now();
         Payload userData = googleIdToken.getPayload();
@@ -92,6 +92,7 @@ public class UserUtils {
                 .setEmail(userData.getEmail())
                 .setGoogleId(googleId)
                 .setGoogleIdToken(token)
+                .setAccessToken(accessToken)
                 .setCreatedAt(now)
                 .setModifiedAt(now)
                 .setUserPersonalData(userPersonalData)
@@ -119,8 +120,8 @@ public class UserUtils {
                 .createUser();
     }
 
-    public void insertUserInDatabaseSameGoogleIdDifferentEmail(String token, GoogleIdToken googleIdToken) {
-        User user = createUser(token, googleIdToken);
+    public void insertUserInDatabaseSameGoogleIdDifferentEmail(String token, GoogleIdToken googleIdToken, String accessToken) {
+        User user = createUser(token, googleIdToken, accessToken);
         user.setEmail(createRandomEmail());
         repository.saveAndFlush(user);
 
@@ -147,6 +148,7 @@ public class UserUtils {
                 .setEmail(createRandomEmail())
                 .setGoogleId(user.getGoogleId())
                 .setGoogleIdToken(user.getGoogleIdToken())
+                .setAccessToken(user.getAccessToken())
                 .setCreatedAt(user.getCreatedAt())
                 .setModifiedAt(user.getModifiedAt())
                 .setUserPersonalData(userPersonalData)

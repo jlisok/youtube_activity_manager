@@ -42,34 +42,34 @@ class GoogleLoginServiceTest {
     @Autowired
     private GoogleLoginServiceImplementation service;
 
-    private final String dummyIdToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+    private final String dummyToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+    private final String dummyAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi";
     private GoogleLoginRequestDto dto;
-    private GoogleIdToken token;
+    private GoogleIdToken googleIdToken;
     private String email;
 
 
     @BeforeEach
     void createInitialVariablesForTestsAndMocks() {
         email = userUtils.createRandomEmail();
-        String dummyAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
-        dto = new GoogleLoginRequestDto(dummyIdToken, dummyAccessToken);
-        token = MockGoogleIdToken.createDummyGoogleIdToken(email, true);
+        dto = new GoogleLoginRequestDto(dummyToken, dummyAccessToken);
+        googleIdToken = MockGoogleIdToken.createDummyGoogleIdToken(email, true);
     }
 
 
     @Test
     void authenticateUser_whenNewValidUser() throws Exception {
         //given
-        User user = userUtils.createUser(dummyIdToken, token);
+        User expectedUser = userUtils.createUser(dummyToken, googleIdToken, dummyAccessToken);
 
         when(verifier.verify(dto.getToken()))
-                .thenReturn(token);
+                .thenReturn(googleIdToken);
 
-        when(userRepository.findByEmail(user.getEmail()))
+        when(userRepository.findByEmail(expectedUser.getEmail()))
                 .thenReturn(Optional.empty());
 
         when(userRepository.saveAndFlush(any(User.class)))
-                .thenReturn(user);
+                .thenReturn(expectedUser);
 
         //when
         String token = service.authenticateUser(dto);
@@ -77,7 +77,7 @@ class GoogleLoginServiceTest {
         //then
         assertNotNull(token);
         DecodedJWT decodedJWT = jwtVerifier.verify(token);
-        assertEquals(user
+        assertEquals(expectedUser
                 .getId()
                 .toString(), decodedJWT.getSubject());
     }
@@ -87,10 +87,10 @@ class GoogleLoginServiceTest {
     void authenticateUser_whenUpdatingValidUser() throws Exception {
         //given
         User user = userUtils.createUser(email, "dummyPassword");
-        User expectedUser = userUtils.createUser(dummyIdToken, token);
+        User expectedUser = userUtils.createUser(dummyToken, googleIdToken, dummyAccessToken);
 
         when(verifier.verify(dto.getToken()))
-                .thenReturn(token);
+                .thenReturn(googleIdToken);
 
         when(userRepository.findByEmail(email))
                 .thenReturn(Optional.of(user));
@@ -124,11 +124,11 @@ class GoogleLoginServiceTest {
     @Test
     void authenticateUser_whenGoogleIdAlreadyPresentUnderDifferentEmail() throws Exception {
         //given
-        User user = userUtils.createUser(dummyIdToken, token);
+        User user = userUtils.createUser(dummyToken, googleIdToken, dummyAccessToken);
         User userWithSameGoogleIdButDifferentEmail = userUtils.createUserSameGoogleIdDifferentEmailAndId(user);
 
         when(verifier.verify(dto.getToken()))
-                .thenReturn(token);
+                .thenReturn(googleIdToken);
 
         when(userRepository.findByEmail(user.getEmail()))
                 .thenReturn(Optional.of(user));

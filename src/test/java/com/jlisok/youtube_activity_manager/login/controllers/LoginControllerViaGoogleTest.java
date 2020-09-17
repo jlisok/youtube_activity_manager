@@ -82,7 +82,7 @@ class LoginControllerViaGoogleTest {
                 .andExpect(status().isOk())
                 .andExpect(Assertions::assertNotNull)
                 .andExpect(result ->
-                        mvcToken.assertEqualsTokenSubjectAndGoogleIdNotNull(userEmail, result));
+                        mvcToken.assertEqualsUserIdsAndGoogleIdAndTokenNotNull(userEmail, result));
     }
 
 
@@ -104,7 +104,7 @@ class LoginControllerViaGoogleTest {
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(Assertions::assertNotNull)
-                .andExpect(result -> mvcToken.assertEqualsTokenSubjectAndGoogleIdNotNull(userEmail, result));
+                .andExpect(result -> mvcToken.assertEqualsUserIdsAndGoogleIdAndTokenNotNull(userEmail, result));
     }
 
 
@@ -131,7 +131,7 @@ class LoginControllerViaGoogleTest {
     void authenticateUserWithGoogle_whenUserExistsButGoogleIdAlreadyExistsInDatabaseUnderDifferentEmail() throws Exception {
         //given
         userUtils.insertUserInDatabase(userEmail, userUtils.createRandomPassword());
-        userUtils.insertUserInDatabaseSameGoogleIdDifferentEmail(dummyIdToken, googleIdToken);
+        userUtils.insertUserInDatabaseSameGoogleIdDifferentEmail(dummyIdToken, googleIdToken, dummyAccessToken);
 
         when(verifier.verify(any(String.class)))
                 .thenReturn(googleIdToken);
