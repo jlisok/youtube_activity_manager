@@ -12,6 +12,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: gradle:jre14
     
     env:
       DB_HOST: postgres
