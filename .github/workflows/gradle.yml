@@ -1,7 +1,4 @@
-# This workflow will build a Java project with Gradle
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
-
-name: Java CI with Gradle
+name: youtube_activity_manager Pull Request tests
 
 on:
   push:
@@ -10,17 +7,17 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-    container: gradle:jre14
-    
+    container: gradle:6.6.1-jre14
+
     env:
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: youtube_activity_manager
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
-    
+
     services:
       postgres:
         image: postgres:13
@@ -36,12 +33,12 @@ jobs:
           --health-retries 5
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Initialize test db
-      run: ./gradlew update
-    - name: Build code with Gradle
-      run: ./gradlew build
-    - name: Run tests with Gradle
-      run: ./gradlew test
+      - uses: actions/checkout@v2
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Initialize test db
+        run: ./gradlew update
+      - name: Build code with Gradle
+        run: ./gradlew build
+      - name: Run tests with Gradle
+        run: ./gradlew test
