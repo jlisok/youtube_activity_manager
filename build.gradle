@@ -1,3 +1,6 @@
+import java.nio.file.Files
+import java.nio.file.Paths
+
 plugins {
     id 'org.springframework.boot' version '2.3.1.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
@@ -80,14 +83,17 @@ bootRun {
             environment(key, value)
         }
     }
-    file('.environment.local').readLines().each() {
-        if (!it.isEmpty() && !it.startsWith("#")) {
-            def pos = it.indexOf("=")
-            def key = it.substring(0, pos)
-            def value = it.substring(pos + 1)
-            environment(key, value)
+    if (Files.exists(Paths.get('.environment.local'))) {
+        file('.environment.local').readLines().each() {
+            if (!it.isEmpty() && !it.startsWith("#")) {
+                def pos = it.indexOf("=")
+                def key = it.substring(0, pos)
+                def value = it.substring(pos + 1)
+                environment(key, value)
+            }
         }
     }
+
     System.getenv().each() { key, value ->
         environment(key, value)
     }
@@ -102,12 +108,14 @@ test {
             environment(key, value)
         }
     }
-    file('.environment.local').readLines().each() {
-        if (!it.isEmpty() && !it.startsWith("#")) {
-            def pos = it.indexOf("=")
-            def key = it.substring(0, pos)
-            def value = it.substring(pos + 1)
-            environment(key, value)
+    if (Files.exists(Paths.get('.environment.local'))) {
+        file('.environment.local').readLines().each() {
+            if (!it.isEmpty() && !it.startsWith("#")) {
+                def pos = it.indexOf("=")
+                def key = it.substring(0, pos)
+                def value = it.substring(pos + 1)
+                environment(key, value)
+            }
         }
     }
     System.getenv().each() { key, value ->
@@ -129,12 +137,14 @@ liquibase {
             System.setProperty(key, value)
         }
     }
-    file('.environment.local').readLines().each() {
-        if (!it.isEmpty() && !it.startsWith("#")) {
-            def pos = it.indexOf("=")
-            def key = it.substring(0, pos)
-            def value = it.substring(pos + 1)
-            System.setProperty(key, value)
+    if (Files.exists(Paths.get('.environment.local'))) {
+        file('.environment.local').readLines().each() {
+            if (!it.isEmpty() && !it.startsWith("#")) {
+                def pos = it.indexOf("=")
+                def key = it.substring(0, pos)
+                def value = it.substring(pos + 1)
+                System.setProperty(key, value)
+            }
         }
     }
     System.getenv().each() { key, value ->
