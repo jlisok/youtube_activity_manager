@@ -11,16 +11,22 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    
+    env:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: youtube_activity_manager
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
     
     services:
       postgres:
         image: postgres:13
         env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-          POSTGRES_DB: youtube_activity_manager
+          POSTGRES_PASSWORD: $DB_PASSWORD
+          POSTGRES_USER: $DB_USERNAME
+          POSTGRES_DB: $DB_NAME
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
