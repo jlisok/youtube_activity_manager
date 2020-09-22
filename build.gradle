@@ -29,7 +29,6 @@ ext {
     jaxbVersion = '2.3.1'
 }
 
-
 dependencies {
     developmentOnly group: 'org.springframework.boot', name: 'spring-boot-devtools', version: "${springStarterVersion}"
 
@@ -69,23 +68,93 @@ dependencies {
     liquibaseRuntime group: 'javax.xml.bind', name: 'jaxb-api', version: "${jaxbVersion}"
     liquibaseRuntime group: 'ch.qos.logback', name: 'logback-core', version: "${logbackVersion}"
     liquibaseRuntime group: 'ch.qos.logback', name: 'logback-classic', version: "${logbackVersion}"
+    liquibaseRuntime group: 'org.postgresql', name: 'postgresql', version: "${postgresVersion}"
+}
+
+bootRun {
+    file('.environment.shared').readLines().each() {
+        if (!it.isEmpty() && !it.startsWith("#")) {
+            def pos = it.indexOf("=")
+            def key = it.substring(0, pos)
+            def value = it.substring(pos + 1)
+            environment(key, value)
+        }
+    }
+    file('.environment.local').readLines().each() {
+        if (!it.isEmpty() && !it.startsWith("#")) {
+            def pos = it.indexOf("=")
+            def key = it.substring(0, pos)
+            def value = it.substring(pos + 1)
+            environment(key, value)
+        }
+    }
+    System.getenv().each() { key, value ->
+        environment(key, value)
+    }
 }
 
 test {
+    file('.environment.shared').readLines().each() {
+        if (!it.isEmpty() && !it.startsWith("#")) {
+            def pos = it.indexOf("=")
+            def key = it.substring(0, pos)
+            def value = it.substring(pos + 1)
+            environment(key, value)
+        }
+    }
+    file('.environment.local').readLines().each() {
+        if (!it.isEmpty() && !it.startsWith("#")) {
+            def pos = it.indexOf("=")
+            def key = it.substring(0, pos)
+            def value = it.substring(pos + 1)
+            environment(key, value)
+        }
+    }
+    System.getenv().each() { key, value ->
+        environment(key, value)
+    }
+
     useJUnitPlatform()
-    
+
     testLogging.showStandardStreams = true
     testLogging.exceptionFormat = 'full'
 }
 
 liquibase {
+    file('.environment.shared').readLines().each() {
+        if (!it.isEmpty() && !it.startsWith("#")) {
+            def pos = it.indexOf("=")
+            def key = it.substring(0, pos)
+            def value = it.substring(pos + 1)
+            System.setProperty(key, value)
+        }
+    }
+    file('.environment.local').readLines().each() {
+        if (!it.isEmpty() && !it.startsWith("#")) {
+            def pos = it.indexOf("=")
+            def key = it.substring(0, pos)
+            def value = it.substring(pos + 1)
+            System.setProperty(key, value)
+        }
+    }
+    System.getenv().each() { key, value ->
+        System.setProperty(key, value)
+    }
+
+    def dbHost = System.getProperty("DB_HOST")
+    def dbPort = System.getProperty("DB_PORT")
+    def dbName = System.getProperty("DB_NAME")
+    def dbUsername = System.getProperty("DB_USERNAME")
+    def dbPassword = System.getProperty("DB_PASSWORD")
+
     activities {
         main {
             changeLogFile 'src/main/resources/db/changelog/changelog-master.xml'
-            url 'jdbc:postgresql://localhost:5432/youtube_activity_manager'
-            username 'postgres'
-            password 'postgres'
+            url "jdbc:postgresql://$dbHost:$dbPort/$dbName"
+            username "$dbUsername"
+            password "$dbPassword"
         }
     }
+
     runList = 'main'
 }

@@ -1,0 +1,6 @@
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=youtube_activity_manager
+
+DB_USERNAME=!!! PROVIDE YOUR OWN VALUE IN .environment.local !!!
+DB_PASSWORD=!!! PROVIDE YOUR OWN VALUE IN .environment.local !!!
