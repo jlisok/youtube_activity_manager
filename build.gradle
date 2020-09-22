@@ -75,51 +75,52 @@ dependencies {
 }
 
 bootRun {
-    file('.environment.shared').readLines().each() {
-        if (!it.isEmpty() && !it.startsWith("#")) {
-            def pos = it.indexOf("=")
-            def key = it.substring(0, pos)
-            def value = it.substring(pos + 1)
-            environment(key, value)
-        }
-    }
     if (Files.exists(Paths.get('.environment.local'))) {
         file('.environment.local').readLines().each() {
             if (!it.isEmpty() && !it.startsWith("#")) {
                 def pos = it.indexOf("=")
                 def key = it.substring(0, pos)
                 def value = it.substring(pos + 1)
-                environment(key, value)
+                if(System.getenv(key) == null) {
+                    environment(key, value)
+                }
             }
         }
     }
-
-    System.getenv().each() { key, value ->
-        environment(key, value)
+    file('.environment.shared').readLines().each() {
+        if (!it.isEmpty() && !it.startsWith("#")) {
+            def pos = it.indexOf("=")
+            def key = it.substring(0, pos)
+            def value = it.substring(pos + 1)
+            if(System.getenv(key) == null) {
+                environment(key, value)
+            }
+        }
     }
 }
 
 test {
-    file('.environment.shared').readLines().each() {
-        if (!it.isEmpty() && !it.startsWith("#")) {
-            def pos = it.indexOf("=")
-            def key = it.substring(0, pos)
-            def value = it.substring(pos + 1)
-            environment(key, value)
-        }
-    }
     if (Files.exists(Paths.get('.environment.local'))) {
         file('.environment.local').readLines().each() {
             if (!it.isEmpty() && !it.startsWith("#")) {
                 def pos = it.indexOf("=")
                 def key = it.substring(0, pos)
                 def value = it.substring(pos + 1)
-                environment(key, value)
+                if(System.getenv(key) == null) {
+                    environment(key, value)
+                }
             }
         }
     }
-    System.getenv().each() { key, value ->
-        environment(key, value)
+    file('.environment.shared').readLines().each() {
+        if (!it.isEmpty() && !it.startsWith("#")) {
+            def pos = it.indexOf("=")
+            def key = it.substring(0, pos)
+            def value = it.substring(pos + 1)
+            if(System.getenv(key) == null) {
+                environment(key, value)
+            }
+        }
     }
 
     useJUnitPlatform()
