@@ -1,6 +1,5 @@
 package com.jlisok.youtube_activity_manager.login.services;
 
-import com.auth0.jwt.algorithms.Algorithm;
 import com.jlisok.youtube_activity_manager.login.dto.LoginRequestDto;
 import com.jlisok.youtube_activity_manager.login.utils.TokenCreator;
 import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
@@ -15,28 +14,26 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Service
-public class LoginService {
+public class TraditionalLoginServiceImplementation implements TraditionalLoginService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final Algorithm jwtAlgorithm;
     private final TokenCreator tokenCreator;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final UserLoginDetails dummyUser = new UserLoginDetails(UUID.randomUUID(), "");
 
 
     @Autowired
-    public LoginService(UserRepository userRepository, PasswordEncoder passwordEncoder, Algorithm jwtAlgorithm, TokenCreator tokenCreator) {
+    public TraditionalLoginServiceImplementation(UserRepository userRepository, PasswordEncoder passwordEncoder, TokenCreator tokenCreator) {
         logger.debug("Login Service - initialization.");
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.jwtAlgorithm = jwtAlgorithm;
         this.tokenCreator = tokenCreator;
     }
 
 
+    @Override
     public String authenticateUser(LoginRequestDto loginRequestDto) throws FailedLoginException {
-
         UserLoginDetails userLoginDetails = userRepository
                 .findByEmail(loginRequestDto.getEmail())
                 .map(u -> new UserLoginDetails(u.getId(), u.getPassword()))
@@ -44,14 +41,13 @@ public class LoginService {
 
         logger.debug("Login Service - fetching user: " + loginRequestDto.getEmail() + " from database - success.");
         return createTokenIfAuthorized(loginRequestDto, userLoginDetails.getId(), userLoginDetails.getPassword());
-
     }
 
 
     private String createTokenIfAuthorized(LoginRequestDto dto, UUID userId, String userPassword) throws FailedLoginException {
         if (passwordEncoder.matches(dto.getPassword(), userPassword)) {
             Instant now = Instant.now();
-            String token = tokenCreator.create(userId.toString(), jwtAlgorithm, now);
+            String token = tokenCreator.create(userId.toString(), now);
             logger.info("Login Service - success.");
             return token;
         } else {

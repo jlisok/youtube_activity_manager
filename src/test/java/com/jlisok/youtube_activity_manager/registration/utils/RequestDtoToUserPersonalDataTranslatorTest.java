@@ -5,6 +5,7 @@ import com.jlisok.youtube_activity_manager.registration.exceptions.PrefixAndPhon
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.userPersonalData.enums.Sex;
 import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalData;
+import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalDataBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,16 +20,18 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 @SpringBootTest
-class DtoToUserPersonalDataTranslatorTest {
+class RequestDtoToUserPersonalDataTranslatorTest {
 
     @Autowired
     private UserUtils userUtils;
+
+    @Autowired
+    private DtoToUserPersonalDataTranslator translator;
 
     private static String userEmail;
     private RegistrationRequestDto dto;
     private Instant now;
     private UUID id;
-    private DtoToUserPersonalDataTranslator translator;
 
 
     @BeforeEach
@@ -45,22 +48,22 @@ class DtoToUserPersonalDataTranslatorTest {
                 null);
         now = Instant.now();
         id = UUID.randomUUID();
-        translator = new DtoToUserPersonalDataTranslator();
     }
 
     @Test
     void translate_whenDtoIsValid() throws PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException {
         //given
-        UserPersonalData expected = new UserPersonalData(
-                id,
-                dto.getGender(),
-                dto.getBirthYear(),
-                dto.getCountry(),
-                dto.getPhonePrefix(),
-                dto.getPhoneNumber(),
-                dto.getFirstName(),
-                now,
-                now);
+        UserPersonalData expected = new UserPersonalDataBuilder()
+                .setId(id)
+                .setGender(dto.getGender())
+                .setBirthYear(dto.getBirthYear())
+                .setCountry(dto.getCountry())
+                .setPhonePrefix(dto.getPhonePrefix())
+                .setPhoneNumber(dto.getPhoneNumber())
+                .setFirstName(dto.getFirstName())
+                .setCreatedAt(now)
+                .setModifiedAt(now)
+                .createUserPersonalData();
 
 
         //when

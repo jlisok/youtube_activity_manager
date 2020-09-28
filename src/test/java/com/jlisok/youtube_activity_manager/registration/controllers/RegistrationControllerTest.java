@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jlisok.youtube_activity_manager.domain.exceptions.ResponseCode;
 import com.jlisok.youtube_activity_manager.registration.dto.RegistrationRequestDto;
 import com.jlisok.youtube_activity_manager.registration.exceptions.BadRegistrationRequestException;
-import com.jlisok.youtube_activity_manager.testutils.MockMvcResultTester;
+import com.jlisok.youtube_activity_manager.testutils.MvcResponseVerifier;
 import com.jlisok.youtube_activity_manager.testutils.RandomRegistrationDto;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.userPersonalData.enums.Sex;
@@ -49,7 +49,7 @@ class RegistrationControllerTest {
     private UserUtils userUtils;
 
     @Autowired
-    private MockMvcResultTester mockMvcResultTester;
+    private MvcResponseVerifier mvcResponseVerifier;
 
     private RegistrationRequestDto dto;
 
@@ -81,7 +81,7 @@ class RegistrationControllerTest {
     @Transactional
     void addUser_whenUserExistsInDatabase() throws Exception {
         //given
-        userUtils.createUserInDatabase(dto);
+        userUtils.insertUserInDatabase(dto);
         ResponseCode expected = ResponseCode.REGISTRATION_FAILED_VIOLATED_FIELD_EMAIL;
 
         //when //then
@@ -92,7 +92,7 @@ class RegistrationControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof BadRegistrationRequestException))
-                .andExpect(result -> mockMvcResultTester.assertEqualsResponseCode(expected, result));
+                .andExpect(result -> mvcResponseVerifier.assertEqualsResponseCode(expected, result));
     }
 
 

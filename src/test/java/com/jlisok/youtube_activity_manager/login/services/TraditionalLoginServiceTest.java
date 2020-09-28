@@ -17,11 +17,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import javax.security.auth.login.FailedLoginException;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class LoginServiceTest {
+class TraditionalLoginServiceTest {
 
     @Autowired
     private JWTVerifier jwtVerifier;
@@ -33,7 +32,7 @@ class LoginServiceTest {
     private UserRepository userRepository;
 
     @Autowired
-    private LoginService loginService;
+    private TraditionalLoginServiceImplementation traditionalLoginService;
 
     private String userEmail;
     private String userPassword;
@@ -47,26 +46,24 @@ class LoginServiceTest {
     }
 
 
-
     @Test
     void authenticateUser_whenUserIsPresentInDatabaseAndLoginDataAreValid() throws RegistrationException, FailedLoginException {
         //given
         User user = userUtils.createUser(userEmail, userPassword);
 
-        when(userRepository.findByEmail(any(String.class)))
+        when(userRepository.findByEmail(userEmail))
                 .thenReturn(Optional.of(user));
 
         //when
-        String token = loginService.authenticateUser(dto);
-        DecodedJWT decodedJWT = jwtVerifier.verify(token);
+        String token = traditionalLoginService.authenticateUser(dto);
 
         //then
         Assertions.assertNotNull(token);
-        Assertions.assertEquals(user.getId().toString(), decodedJWT.getSubject());
+        DecodedJWT decodedJWT = jwtVerifier.verify(token);
+        Assertions.assertEquals(user
+                .getId()
+                .toString(), decodedJWT.getSubject());
     }
-
-
-
 
 
     @Test
@@ -74,11 +71,8 @@ class LoginServiceTest {
         //given
 
         //when //then
-        Assertions.assertThrows(FailedLoginException.class, () -> loginService.authenticateUser(dto));
+        Assertions.assertThrows(FailedLoginException.class, () -> traditionalLoginService.authenticateUser(dto));
     }
-
-
-
 
 
     @Test
@@ -86,13 +80,13 @@ class LoginServiceTest {
         //given
         User user = userUtils.createUser(userEmail, userPassword);
 
-        when(userRepository.findByEmail(any(String.class)))
+        when(userRepository.findByEmail(userEmail))
                 .thenReturn(Optional.of(user));
 
         LoginRequestDto loginRequestDtoBadPassword = new LoginRequestDto("some_other_password", userEmail);
 
         //when //then
-        Assertions.assertThrows(FailedLoginException.class, () -> loginService.authenticateUser(loginRequestDtoBadPassword));
+        Assertions.assertThrows(FailedLoginException.class, () -> traditionalLoginService.authenticateUser(loginRequestDtoBadPassword));
     }
 
 
