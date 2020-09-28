@@ -194,9 +194,9 @@ public class YouTubeApiUtils {
 
     private static ChannelStatistics createChannelStatistics() {
         return new ChannelStatistics()
-                .setViewCount(BigInteger.valueOf(random.nextInt()))
-                .setSubscriberCount(BigInteger.valueOf(random.nextInt()))
-                .setVideoCount(BigInteger.valueOf(random.nextInt()));
+                .setViewCount(BigInteger.valueOf(new Random().nextInt()))
+                .setSubscriberCount(BigInteger.valueOf(new Random().nextInt()))
+                .setVideoCount(BigInteger.valueOf(new Random().nextInt()));
     }
 
 
