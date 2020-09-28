@@ -38,7 +38,7 @@ jobs:
         run: chmod +x gradlew
       - name: Initialize test db
         run: ./gradlew update
-      - name: Build code with Gradle
-        run: ./gradlew build
       - name: Run tests with Gradle
         run: ./gradlew test
+      - name: Build code with Gradle
+        run: ./gradlew build
