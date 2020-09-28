@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface VideoService {
 
-    List<Video> createListOfVideos(List<com.google.api.services.youtube.model.Video> videoList) throws ExpectedDataNotFoundInDatabase;
+    List<Video> createVideos(List<com.google.api.services.youtube.model.Video> videoList) throws ExpectedDataNotFoundInDatabase;
 
 }

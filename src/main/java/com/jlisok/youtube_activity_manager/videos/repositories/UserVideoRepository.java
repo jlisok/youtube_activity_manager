@@ -13,4 +13,6 @@ public interface UserVideoRepository extends JpaRepository<UserVideo, UUID> {
 
     List<UserVideo> findByUserId(UUID userId);
 
+    boolean existsByUserId(UUID userId);
+
 }

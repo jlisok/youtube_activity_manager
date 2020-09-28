@@ -1,19 +1,23 @@
 package com.jlisok.youtube_activity_manager.youtube.services;
 
-import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.youtube.model.Subscription;
+import com.jlisok.youtube_activity_manager.channel.models.Channel;
+import com.jlisok.youtube_activity_manager.channel.repositories.ChannelRepository;
+import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.testutils.YouTubeApiUtils;
+import com.jlisok.youtube_activity_manager.testutils.YouTubeEntityVerifier;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
 import com.jlisok.youtube_activity_manager.videos.enums.Rating;
 import com.jlisok.youtube_activity_manager.videos.models.UserVideo;
 import com.jlisok.youtube_activity_manager.videos.models.Video;
 import com.jlisok.youtube_activity_manager.videos.repositories.UserVideoRepository;
+import com.jlisok.youtube_activity_manager.youtube.api.YouTubeClient;
 import com.jlisok.youtube_activity_manager.youtube.dto.YouTubeRatingDto;
 import com.jlisok.youtube_activity_manager.youtube.utils.AccessTokenService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.stubbing.Answer;
@@ -21,25 +25,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.Random;
+import java.util.stream.IntStream;
 
 import static com.jlisok.youtube_activity_manager.security.configs.JwtAuthenticationContext.setAuthenticationInContext;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static com.jlisok.youtube_activity_manager.youtube.constants.YouTubeApiClientRequestParts.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-@Disabled("test methods require refreshed access token, which is now not implemented. In due time, this test class should be run manually.")
 class YouTubeServiceImplementationTest {
 
     @Autowired
-    private YouTubeServiceImplementation service;
+    private YouTubeService service;
 
     @Autowired
     private UserUtils userUtils;
+
+    @MockBean
+    private YouTubeClient client;
 
     @MockBean
     private AccessTokenService accessTokenService;
@@ -50,34 +60,54 @@ class YouTubeServiceImplementationTest {
     @MockBean
     private UserVideoRepository userVideoRepository;
 
+    @MockBean
+    private ChannelRepository channelRepository;
+
     @SuppressWarnings("unchecked")
     private static final Answer<List<UserVideo>> interceptUserVideos = invocation -> (List<UserVideo>) invocation.getArguments()[0];
 
-    private final String accessToken = "ya29.a0AfH6SMAuHbqaxqkNncuSc5CfbCiTv42U1YWtk-lMLSPCsLJ1___Do8tgvyHTZ6SygwGpNn39BQVZhVQasCcMM6V_1GuwQTpKR4T71iY7eHhRb5ZsLUDqI_y6T5xlN777MkMLo6yT-agA2ZKwZYdeOnPj4PqblBsMTNqd";
-    private final String validGoogleIdToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjJjNmZhNmY1OTUwYTdjZTQ2NWZjZjI0N2FhMGIwOTQ4MjhhYzk1MmMiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiODQ1MTYxMjIxMjUxLThxY2pqbnFtM2E1NjhwMG05YWxhanYya2FhNTE0am90LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiYXVkIjoiODQ1MTYxMjIxMjUxLThxY2pqbnFtM2E1NjhwMG05YWxhanYya2FhNTE0am90LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTE1MzEwMzM0NDEyNzQ5NTY2MDEzIiwiZW1haWwiOiJqdXN0eW5hLmxpc29rQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoiYTl4a2oyY3dyQW9uemhlaVFjTTNlUSIsIm5hbWUiOiJKdXN0eW5hIExpc29rIiwicGljdHVyZSI6Imh0dHBzOi8vbGg0Lmdvb2dsZXVzZXJjb250ZW50LmNvbS8tbDlMSEdteGptWmcvQUFBQUFBQUFBQUkvQUFBQUFBQUFBQUEvQU1adXVjbDNqYjg4TGRZM2s4LUVRTUxFYldsZVZRZXIwZy9zOTYtYy9waG90by5qcGciLCJnaXZlbl9uYW1lIjoiSnVzdHluYSIsImZhbWlseV9uYW1lIjoiTGlzb2siLCJsb2NhbGUiOiJwbCIsImlhdCI6MTYwMDg1OTA0OCwiZXhwIjoxNjAwODYyNjQ4LCJqdGkiOiIyNjg5Y2VkYjcxYmM4ODhkZjViNzk2NmYzMjQ0YjY5YjUwNDk0MjA1In0.cTie0ibKc5KhYP1OzhFDF79yt_F3lxE2ZIkaGa_pIJIqsAHPoC8c4Wx6Dvuv8boCigYGAFv6j-28EwxEZ5q_DzVK1aQ4Sb4fNa6NF1SUUYQ6KQ2on95vYGDWBVPyCPASK0gxKFrXR9JGBHBKqHpCr3dCohIOJyBE3u7bN-WZfy4mmK0cRIuYUcMXo6k-egx5nUrxug_gjpddVyIGA77KqpQgShQKjCd1paZO5uE463JdrJhbaEoLcYHwnWsqZsTaG4McxDgMqjsIITeDsVVL3hV1Lwsu98C7svJBXYBmTbVE4yJrFkmmFf2ELQSV8zHC9KGyZvPMO2pkfQ9ATeLDIg";
-    private final String invalidToken = "gfdes";
+    @SuppressWarnings("unchecked")
+    private static final Answer<List<Channel>> interceptChannels = invocation -> (List<Channel>) invocation.getArguments()[0];
+
+    private final String dummyAccessToken = "ya29.a0AfH6SMC7u_oxA3QU9cqXJ2m8e7a9JOAToMJbWf-FXFCVxGVeuxA3AdL9DxjF_FtSh3yZLOppEd8lhOlZmZfdtCjByKaU7TgttwRb8TwiKNZbkNaKctO37PKq-mXvsfOe_1FUcv1LrnPsSoNUp_R4FsMaNbgXLJlRvUiH";
+    private final String dummyGoogleIdToken = "ya29.a0AfH6SMC7u_oxA3QU9cqXJ2m8e7a9JOAToMJbWf-FXFCVxGVeuxA3AdL9DxjF_FtSh3yZLOppEd8lhOlZmZfdtCjByKaU7TgttwRb8TwiKNZbkNaKctO37PKq-mXvsfOe_1FUcv1LrnPsSoNUp_R4FsMaNbgXLJlRvUiH";
+    private final Random random = new Random();
 
     private YouTubeRatingDto dto;
     private User user;
-    private UUID id;
+    private List<com.google.api.services.youtube.model.Video> youtubeVideos;
+    private List<Subscription> youtubeSubscriptions;
+    private List<com.google.api.services.youtube.model.Channel> youtubeChannels;
+
 
     @BeforeEach
-    void createDto() {
+    void createDto() throws RegistrationException {
         dto = new YouTubeRatingDto(Rating.LIKE);
-        id = UUID.randomUUID();
-        user = userUtils.createUser(id, validGoogleIdToken, accessToken);
-        setAuthenticationInContext(validGoogleIdToken, id);
+        String email = userUtils.createRandomEmail();
+        String password = userUtils.createRandomPassword();
+        user = userUtils.createUser(email, password);
+        youtubeVideos = YouTubeApiUtils.createRandomYouTubeVideoList(random.nextInt(30));
+        youtubeSubscriptions = YouTubeApiUtils.createRandomSubscriptionList(random.nextInt(30));
+        youtubeChannels = YouTubeApiUtils.createRandomYouTubeChannelList(youtubeSubscriptions.size());
+        setAuthenticationInContext(dummyGoogleIdToken, user.getId());
     }
 
 
     @Test
-    void listRatedVideos_whenTokenInvalid() {
+    void listRatedVideos_andClientReturnsEmptyList() throws Exception {
         //given
         when(accessTokenService.getAccessToken())
-                .thenReturn(invalidToken);
+                .thenReturn(dummyAccessToken);
 
-        //when //then
-        assertThrows(GoogleJsonResponseException.class, () -> service.listRatedVideos(dto));
+        when(client.fetchRatedVideos(dummyAccessToken, VIDEO_REQUEST_PARTS, dto.getRating()))
+                .thenReturn(Collections.emptyList());
+
+        //when
+        List<Video> actualVideos = service.listRatedVideos(dto);
+
+        //then
+        assertNotNull(actualVideos);
+        assertTrue(actualVideos.isEmpty());
     }
 
 
@@ -86,20 +116,24 @@ class YouTubeServiceImplementationTest {
         //given
         YouTubeRatingDto dislikeDto = new YouTubeRatingDto(Rating.DISLIKE);
         when(accessTokenService.getAccessToken())
-                .thenReturn(accessToken);
+                .thenReturn(dummyAccessToken);
 
-        when(userRepository.findById(id))
+        when(client.fetchRatedVideos(dummyAccessToken, VIDEO_REQUEST_PARTS, dislikeDto.getRating()))
+                .thenReturn(youtubeVideos);
+
+        when(userRepository.findById(user.getId()))
                 .thenReturn(Optional.of(user));
 
         when(userVideoRepository.saveAll(ArgumentMatchers.anyList()))
                 .thenAnswer(interceptUserVideos);
 
         //when
-        List<Video> videoList = service.listRatedVideos(dislikeDto);
+        List<Video> videos = service.listRatedVideos(dislikeDto);
 
         //then
         verify(userVideoRepository).saveAll(ArgumentMatchers.anyList());
-        videoList.forEach(YouTubeApiUtils::assertVideoNotEmpty);
+        assertEquals(youtubeVideos.size(), videos.size());
+        videos.forEach(YouTubeEntityVerifier::assertVideoNotEmptyOmitChannel);
     }
 
 
@@ -107,49 +141,117 @@ class YouTubeServiceImplementationTest {
     void listRatedVideos_whenDtoRatingLike() throws Exception {
         //given
         when(accessTokenService.getAccessToken())
-                .thenReturn(accessToken);
+                .thenReturn(dummyAccessToken);
 
-        when(userRepository.findById(id))
+        when(client.fetchRatedVideos(dummyAccessToken, VIDEO_REQUEST_PARTS, dto.getRating()))
+                .thenReturn(youtubeVideos);
+
+        when(userRepository.findById(user.getId()))
                 .thenReturn(Optional.of(user));
 
         when(userVideoRepository.saveAll(ArgumentMatchers.anyList()))
                 .thenAnswer(interceptUserVideos);
 
         //when
-        List<Video> videoList = service.listRatedVideos(dto);
+        List<Video> videos = service.listRatedVideos(dto);
 
         //then
-        verify(userVideoRepository).saveAll(ArgumentMatchers.anyList());
-        videoList.forEach(YouTubeApiUtils::assertVideoNotEmpty);
+        verify(userVideoRepository).saveAll(anyList());
+        assertEquals(youtubeVideos.size(), videos.size());
+        videos.forEach(YouTubeEntityVerifier::assertVideoNotEmptyOmitChannel);
     }
 
 
-    //TODO: method flow to be changed in due time
     @Test
-    void listSubscribedChannels_whenTokenValid() throws Exception {
+    void listSubscribedChannels_andNoChannelsInDatabase() throws Exception {
         //given
         when(accessTokenService.getAccessToken())
-                .thenReturn(accessToken);
+                .thenReturn(dummyAccessToken);
+
+        when(client.fetchSubscriptions(dummyAccessToken, SUBSCRIPTION_REQUEST_PARTS))
+                .thenReturn(youtubeSubscriptions);
+
+        when(client.fetchChannels(eq(dummyAccessToken), eq(CHANNEL_REQUEST_PARTS), ArgumentMatchers.anyList()))
+                .thenReturn(youtubeChannels);
+
+        when(userRepository.findById(user.getId()))
+                .thenReturn(Optional.of(user));
+
+        when(channelRepository.findByUsers_Id(user.getId()))
+                .thenReturn(Collections.emptyList());
+
+        when(channelRepository.saveAll(anyList()))
+                .thenAnswer(interceptChannels);
 
         //when
-        List<Subscription> response = service.listSubscribedChannels();
+        List<Channel> actualChannels = service.listSubscribedChannels();
 
         //then
-        assertNotNull(response);
-        for (Subscription sub : response) {
-            assertNotNull(sub.getSnippet());
-            assertNotNull(sub.getContentDetails());
-        }
+        verify(channelRepository).saveAll(anyList());
+        assertNotNull(actualChannels);
+        assertEquals(youtubeChannels.size(), actualChannels.size());
+        actualChannels.forEach(YouTubeEntityVerifier::assertChannelNotEmpty);
     }
 
-    //TODO: method flow to be changed in due time
+
     @Test
-    void listSubscribedChannels_whenTokenInvalid() {
+    void listSubscribedChannels_andClientReturnsEmptyList() throws Exception {
         //given
         when(accessTokenService.getAccessToken())
-                .thenReturn(invalidToken);
+                .thenReturn(dummyAccessToken);
 
-        //when //then
-        assertThrows(GoogleJsonResponseException.class, () -> service.listSubscribedChannels());
+        when(client.fetchSubscriptions(dummyAccessToken, SUBSCRIPTION_REQUEST_PARTS))
+                .thenReturn(Collections.emptyList());
+
+        //when
+        List<Channel> actualChannels = service.listSubscribedChannels();
+
+        //then
+        assertNotNull(actualChannels);
+        assertTrue(actualChannels.isEmpty());
+    }
+
+
+    @Test
+    void listSubscribedChannels_andAllChannelsAlreadyInDatabase() throws Exception {
+        //given
+        User userInDatabase = userUtils.createUser(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        List<Channel> channels = YouTubeApiUtils.createRandomListOfChannels(youtubeChannels.size(), userInDatabase);
+        List<Channel> repositoryChannels = YouTubeApiUtils.copyOfMinus30MinutesCreatedAt(channels, userInDatabase, youtubeChannels);
+
+        when(accessTokenService.getAccessToken())
+                .thenReturn(dummyAccessToken);
+
+        when(client.fetchSubscriptions(dummyAccessToken, SUBSCRIPTION_REQUEST_PARTS))
+                .thenReturn(youtubeSubscriptions);
+
+        when(client.fetchChannels(eq(dummyAccessToken), eq(CHANNEL_REQUEST_PARTS), ArgumentMatchers.anyList()))
+                .thenReturn(youtubeChannels);
+
+        when(userRepository.findById(user.getId()))
+                .thenReturn(Optional.of(user));
+
+        when(channelRepository.findByUsers_Id(user.getId()))
+                .thenReturn(repositoryChannels);
+
+        when(channelRepository.saveAll(anyList()))
+                .thenAnswer(interceptChannels);
+
+        //when
+        List<Channel> actualChannels = service.listSubscribedChannels();
+
+        //then
+        verify(channelRepository).saveAll(anyList());
+        assertNotNull(actualChannels);
+        assertEquals(youtubeChannels.size(), actualChannels.size());
+        IntStream.range(0, actualChannels.size())
+                 .forEach(i -> {
+                     Assertions.assertEquals(repositoryChannels.get(i).getCreatedAt(),
+                                             actualChannels.get(i).getCreatedAt());
+                     Assertions.assertTrue(repositoryChannels.get(i).getModifiedAt()
+                                                             .isBefore(actualChannels.get(i).getModifiedAt()));
+                     Assertions.assertEquals(repositoryChannels.get(i).getId(), actualChannels.get(i).getId());
+                 });
+        actualChannels.forEach(YouTubeEntityVerifier::assertChannelNotEmpty);
     }
 }

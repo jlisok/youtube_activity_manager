@@ -27,7 +27,6 @@ ext {
     mockitoVersion = '3.5.7'
     postgresVersion = '42.2.16'
     springStarterVersion = '2.3.2.RELEASE'
-    surefireVersion = '3.0.0-M5'
     apacheCommonsVersion = '3.11'
     jaxbVersion = '2.3.1'
     googleApiVersion = '1.30.10'
@@ -87,14 +86,16 @@ dependencies {
 }
 
 bootRun {
-    if (Files.exists(Paths.get('.environment.local'))) {
-        file('.environment.local').readLines().each() {
+    Map<String, String> environmentVariablesToSet = new HashMap<>();
+    File envFile = file('.environment.local')
+    if (envFile.exists()) {
+        envFile.readLines().each {
             if (!it.isEmpty() && !it.startsWith("#")) {
                 def pos = it.indexOf("=")
                 def key = it.substring(0, pos)
                 def value = it.substring(pos + 1)
                 if (System.getenv(key) == null) {
-                    environment(key, value)
+                    environmentVariablesToSet.put(key, value);
                 }
             }
         }
@@ -104,11 +105,12 @@ bootRun {
             def pos = it.indexOf("=")
             def key = it.substring(0, pos)
             def value = it.substring(pos + 1)
-            if (System.getenv(key) == null) {
-                environment(key, value)
+            if (System.getenv(key) == null && !environmentVariablesToSet.containsKey(key)) {
+                environmentVariablesToSet.put(key, value);
             }
         }
     }
+    environment(environmentVariablesToSet)
 }
 
 test {

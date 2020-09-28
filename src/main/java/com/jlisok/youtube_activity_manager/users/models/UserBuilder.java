@@ -1,8 +1,10 @@
 package com.jlisok.youtube_activity_manager.users.models;
 
+import com.jlisok.youtube_activity_manager.channel.models.Channel;
 import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalData;
 
 import java.time.Instant;
+import java.util.Set;
 import java.util.UUID;
 
 public class UserBuilder {
@@ -16,6 +18,7 @@ public class UserBuilder {
     private String googleId;
     private String googleIdToken;
     private String accessToken;
+    private Set<Channel> channels;
 
     public UserBuilder setId(UUID id) {
         this.id = id;
@@ -62,8 +65,12 @@ public class UserBuilder {
         return this;
     }
 
+    public UserBuilder setChannels(Set<Channel> channels) {
+        this.channels = channels;
+        return this;
+    }
 
     public User createUser() {
-        return new User(id, email, password, googleId, googleIdToken, accessToken, createdAt, modifiedAt, userPersonalData);
+        return new User(id, password, email, googleIdToken, accessToken, googleId, createdAt, modifiedAt, userPersonalData, channels);
     }
 }

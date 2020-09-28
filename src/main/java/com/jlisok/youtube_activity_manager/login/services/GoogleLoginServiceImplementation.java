@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -46,7 +47,8 @@ public class GoogleLoginServiceImplementation implements GoogleLoginService {
     @Transactional
     public String authenticateUser(GoogleLoginRequestDto loginRequestDto) throws GeneralSecurityException, IOException, AuthenticationException {
         GoogleIdToken googleIdToken = verifyGoogleIdToken(loginRequestDto.getGoogleIdToken());
-        User user = verifyIfUserInDatabaseOrCreateNewUser(loginRequestDto.getGoogleIdToken(), loginRequestDto.getAccessToken(), googleIdToken.getPayload());
+        User user = verifyIfUserInDatabaseOrCreateNewUser(loginRequestDto.getGoogleIdToken(), loginRequestDto.getAccessToken(), googleIdToken
+                .getPayload());
         return createTokenIfAuthorized(user.getId());
     }
 
@@ -95,11 +97,10 @@ public class GoogleLoginServiceImplementation implements GoogleLoginService {
                     .setId(userId)
                     .setCreatedAt(now)
                     .setModifiedAt(now)
+                    .setFirstName(Optional.ofNullable(userData.get("given_name"))
+                                          .map(Object::toString)
+                                          .orElse(null))
                     .createUserPersonalData();
-
-            if (userData.containsKey("given_name")) {
-                userPersonalData.setFirstName(userData.get("given_name").toString());
-            }
 
             User userToSave = new UserBuilder()
                     .setId(userId)

@@ -10,8 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.jlisok.youtube_activity_manager.testutils.YouTubeApiUtils.assertListOfVideosEqual;
 import static com.jlisok.youtube_activity_manager.testutils.YouTubeApiUtils.createRandomYouTubeVideoList;
+import static com.jlisok.youtube_activity_manager.testutils.YouTubeEntityVerifier.assertListOfVideosEqual;
 
 @SpringBootTest
 class VideoServiceImplementationTest {
@@ -23,7 +23,7 @@ class VideoServiceImplementationTest {
     @MethodSource("exampleYouTubeLists")
     void insertVideos_whenNewVideos(List<com.google.api.services.youtube.model.Video> youTubeVideoList) {
         //given //when
-        List<Video> actualList = service.createListOfVideos(youTubeVideoList);
+        List<Video> actualList = service.createVideos(youTubeVideoList);
 
         //then
         assertListOfVideosEqual(youTubeVideoList, actualList);

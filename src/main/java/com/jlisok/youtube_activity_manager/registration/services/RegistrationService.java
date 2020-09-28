@@ -3,7 +3,6 @@ package com.jlisok.youtube_activity_manager.registration.services;
 import com.jlisok.youtube_activity_manager.registration.dto.RegistrationRequestDto;
 import com.jlisok.youtube_activity_manager.registration.exceptions.BadRegistrationRequestException;
 import com.jlisok.youtube_activity_manager.registration.exceptions.PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException;
-import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationDataProcessingException;
 import com.jlisok.youtube_activity_manager.registration.utils.BadRegistrationExceptionBuilder;
 import com.jlisok.youtube_activity_manager.registration.utils.DtoToUserTranslator;
 import com.jlisok.youtube_activity_manager.users.models.User;
@@ -33,7 +32,7 @@ public class RegistrationService {
         this.dtoToUserTranslator = dtoToUserTranslator;
     }
 
-    public void addUserToDatabase(RegistrationRequestDto registrationRequestDto) throws PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException, BadRegistrationRequestException, RegistrationDataProcessingException {
+    public void addUserToDatabase(RegistrationRequestDto registrationRequestDto) throws PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException, BadRegistrationRequestException {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         User user = dtoToUserTranslator.translate(registrationRequestDto, now, id);
