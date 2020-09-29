@@ -1,23 +1,26 @@
 package com.jlisok.youtube_activity_manager.login.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-
 import javax.validation.constraints.NotBlank;
 
 
 public class GoogleLoginRequestDto {
 
     @NotBlank
-    private final String token;
+    private final String googleIdToken;
 
-    @JsonCreator
-    public GoogleLoginRequestDto(String token) {
-        this.token = token;
+    @NotBlank
+    private final String accessToken;
+
+    public GoogleLoginRequestDto(String googleIdToken, String accessToken) {
+        this.googleIdToken = googleIdToken;
+        this.accessToken = accessToken;
     }
 
-
-    public String getToken() {
-        return token;
+    public String getGoogleIdToken() {
+        return googleIdToken;
     }
 
+    public String getAccessToken() {
+        return accessToken;
+    }
 }

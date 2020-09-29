@@ -45,15 +45,14 @@ public class GoogleLoginServiceImplementation implements GoogleLoginService {
     @Override
     @Transactional
     public String authenticateUser(GoogleLoginRequestDto loginRequestDto) throws GeneralSecurityException, IOException, AuthenticationException {
-        GoogleIdToken googleIdToken = verifyGoogleIdToken(loginRequestDto.getToken());
-        User user = verifyIfUserInDatabaseOrCreateNewUser(loginRequestDto.getToken(), googleIdToken.getPayload());
+        GoogleIdToken googleIdToken = verifyGoogleIdToken(loginRequestDto.getGoogleIdToken());
+        User user = verifyIfUserInDatabaseOrCreateNewUser(loginRequestDto.getGoogleIdToken(), googleIdToken.getPayload());
         return createTokenIfAuthorized(user.getId());
     }
 
 
     private GoogleIdToken verifyGoogleIdToken(String googleToken) throws GeneralSecurityException, IOException {
         GoogleIdToken idToken = googleIdTokenVerifier.verify(googleToken);
-
         if (idToken != null) {
             logger.debug("GoogleLoginService - GoogleIdToken verified and valid.");
             return idToken;
@@ -73,9 +72,9 @@ public class GoogleLoginServiceImplementation implements GoogleLoginService {
 
 
     private User updateGoogleDataInDatabase(User user, String googleId, String token, Instant now) throws DataInconsistencyAuthenticationException {
-        if (userRepository.findByGoogleId(googleId)
-                .isPresent()) {
-            throw new DataInconsistencyAuthenticationException("Updating user: " + user.getEmail() + " failed. Given googleId " + user.getGoogleId() + " already exists in database under different email.");
+        if (userRepository.existsByGoogleId(googleId)) {
+            throw new DataInconsistencyAuthenticationException("Updating user: " + user.getEmail() + " failed. Given googleId " + user
+                    .getGoogleId() + " already exists in database under different email.");
         }
         if (user.getGoogleId() == null) {
             user.setGoogleId(googleId);
@@ -91,14 +90,16 @@ public class GoogleLoginServiceImplementation implements GoogleLoginService {
     private User createNewUserInDatabase(String googleIdToken, String googleId, Payload userData, Instant now) throws EmailNotVerifiedAuthenticationException {
         if (userData.getEmailVerified()) {
             UUID userId = UUID.randomUUID();
-            String fistName = userData.get("given_name")
-                    .toString();
             UserPersonalData userPersonalData = new UserPersonalDataBuilder()
                     .setId(userId)
-                    .setFirstName(fistName)
                     .setCreatedAt(now)
                     .setModifiedAt(now)
                     .createUserPersonalData();
+
+            if (userData.containsKey("given_name")) {
+                userPersonalData.setFirstName(userData.get("given_name").toString());
+            }
+
             User userToSave = new UserBuilder()
                     .setId(userId)
                     .setEmail(userData.getEmail())

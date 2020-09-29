@@ -3,9 +3,7 @@ package com.jlisok.youtube_activity_manager.login.controllers;
 import com.jlisok.youtube_activity_manager.login.dto.GoogleLoginRequestDto;
 import com.jlisok.youtube_activity_manager.login.dto.LoginRequestDto;
 import com.jlisok.youtube_activity_manager.login.services.GoogleLoginService;
-import com.jlisok.youtube_activity_manager.login.services.GoogleLoginServiceImplementation;
 import com.jlisok.youtube_activity_manager.login.services.TraditionalLoginService;
-import com.jlisok.youtube_activity_manager.login.services.TraditionalLoginServiceImplementation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,7 +23,7 @@ public class LoginController {
     private final GoogleLoginService googleLoginService;
 
     @Autowired
-    public LoginController(TraditionalLoginServiceImplementation traditionalLoginService, GoogleLoginServiceImplementation googleLoginService) {
+    public LoginController(TraditionalLoginService traditionalLoginService, GoogleLoginService googleLoginService) {
         this.traditionalLoginService = traditionalLoginService;
         this.googleLoginService = googleLoginService;
     }

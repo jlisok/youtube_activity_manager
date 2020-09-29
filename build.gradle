@@ -31,6 +31,7 @@ ext {
     apacheCommonsVersion = '3.11'
     jaxbVersion = '2.3.1'
     googleApiVersion = '1.30.10'
+    youtubeApiVersion = 'v3-rev222-1.25.0'
 }
 
 
@@ -59,8 +60,10 @@ dependencies {
 
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: "${apacheCommonsVersion}"
 
-    implementation group: 'com.google.api-client', name: 'google-api-client', version: "${googleApiVersion}"
 
+    // Google authentication
+    implementation group: 'com.google.api-client', name: 'google-api-client', version: "${googleApiVersion}"
+    implementation group: 'com.google.apis', name: 'google-api-services-youtube', version: "${youtubeApiVersion}"
 
     //
     // To run mockito with junit5

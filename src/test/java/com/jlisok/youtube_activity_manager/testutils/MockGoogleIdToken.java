@@ -14,9 +14,9 @@ public class MockGoogleIdToken {
     @Value("${google.client_id}")
     private static String client_id;
 
-    public static GoogleIdToken createDummyGoogleIdToken(String email, Boolean ifEmailVerified) {
+    public static GoogleIdToken createDummyGoogleIdToken(String email, Boolean ifEmailVerified, Boolean ifFirstNamePresent) {
         Header header = createHeader();
-        Payload payload = createPayload(email, ifEmailVerified);
+        Payload payload = createPayload(email, ifEmailVerified, ifFirstNamePresent);
         byte[] signatureByte = new byte[1];
         return new GoogleIdToken(header, payload, signatureByte, signatureByte);
     }
@@ -39,13 +39,15 @@ public class MockGoogleIdToken {
     }
 
 
-    private static Payload createPayload(String email, Boolean ifEmailVerified) {
+    private static Payload createPayload(String email, Boolean ifEmailVerified, Boolean ifFirstNamePresent) {
         String googleId = String.valueOf(new Random().nextLong());
         Payload payload = new GoogleIdToken.Payload();
         payload.setEmail(email);
         payload.setSubject(googleId);
         payload.setEmailVerified(ifEmailVerified);
-        payload.set("given_name", "Joe");
+        if (ifFirstNamePresent){
+            payload.set("given_name", "Joe");
+        }
         payload.set("last_name", "Doe");
         return payload;
     }
