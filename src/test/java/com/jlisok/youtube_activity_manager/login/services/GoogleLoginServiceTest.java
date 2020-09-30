@@ -13,6 +13,8 @@ import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,6 +24,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -57,19 +60,19 @@ class GoogleLoginServiceTest {
     }
 
 
+    private static final Answer<User> interceptUser = invocation -> (User) invocation.getArguments()[0];
+
     @Test
     void authenticateUser_whenNewValidUser() throws Exception {
         //given
-        User expectedUser = userUtils.createUser(dummyToken, googleIdToken, dummyAccessToken);
-
         when(verifier.verify(dto.getGoogleIdToken()))
                 .thenReturn(googleIdToken);
 
-        when(userRepository.findByEmail(expectedUser.getEmail()))
+        when(userRepository.findByEmail(email))
                 .thenReturn(Optional.empty());
 
         when(userRepository.saveAndFlush(any(User.class)))
-                .thenReturn(expectedUser);
+                .thenAnswer(interceptUser);
 
         //when
         String token = service.authenticateUser(dto);
@@ -77,35 +80,11 @@ class GoogleLoginServiceTest {
         //then
         assertNotNull(token);
         DecodedJWT decodedJWT = jwtVerifier.verify(token);
-        assertEquals(expectedUser
-                .getId()
-                .toString(), decodedJWT.getSubject());
-    }
 
+        var userCapture = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).saveAndFlush(userCapture.capture());
 
-    @Test
-    void authenticateUser_whenNewValidUserNoFirstName() throws Exception {
-        //given
-        User expectedUser = userUtils.createUserNoFirstName(dummyToken, googleIdToken, dummyAccessToken);
-
-        when(verifier.verify(dto.getGoogleIdToken()))
-                .thenReturn(googleIdToken);
-
-        when(userRepository.findByEmail(expectedUser.getEmail()))
-                .thenReturn(Optional.empty());
-
-        when(userRepository.saveAndFlush(any(User.class)))
-                .thenReturn(expectedUser);
-
-        //when
-        String token = service.authenticateUser(dto);
-
-        //then
-        assertNotNull(token);
-        DecodedJWT decodedJWT = jwtVerifier.verify(token);
-        assertEquals(expectedUser
-                             .getId()
-                             .toString(), decodedJWT.getSubject());
+        assertEquals(userCapture.getValue().getId().toString(), decodedJWT.getSubject());
     }
 
 
@@ -113,7 +92,6 @@ class GoogleLoginServiceTest {
     void authenticateUser_whenUpdatingValidUser() throws Exception {
         //given
         User user = userUtils.createUser(email, "dummyPassword");
-        User expectedUser = userUtils.createUser(dummyToken, googleIdToken, dummyAccessToken);
 
         when(verifier.verify(dto.getGoogleIdToken()))
                 .thenReturn(googleIdToken);
@@ -121,18 +99,19 @@ class GoogleLoginServiceTest {
         when(userRepository.findByEmail(email))
                 .thenReturn(Optional.of(user));
 
-        when(userRepository.saveAndFlush(user))
-                .thenReturn(expectedUser);
+        when(userRepository.saveAndFlush(any(User.class)))
+                .thenAnswer(interceptUser);
+
 
         //when
         String token = service.authenticateUser(dto);
 
         //then
         assertNotNull(token);
+        var userCapture = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).saveAndFlush(userCapture.capture());
         DecodedJWT decodedJWT = jwtVerifier.verify(token);
-        assertEquals(expectedUser
-                .getId()
-                .toString(), decodedJWT.getSubject());
+        assertEquals(userCapture.getValue().getId().toString(), decodedJWT.getSubject());
     }
 
 

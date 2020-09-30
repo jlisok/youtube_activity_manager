@@ -54,10 +54,6 @@ ALTER TABLE public.videos
 
 --changeset jlisok:3
 ALTER TABLE public.videos
-    DROP COLUMN channel_id;
+    MODIFY COLUMN channel_id text NOT NULL;
 
-ALTER TABLE public.videos
-    ADD channel_id text NOT NULL;
-
---rollback ALTER TABLE public.videos DROP COLUMN channel_id;
---rollback ALTER TABLE public.videos ADD channel_id uuid NOT NULL;
+--rollback ALTER TABLE public.videos MODIFY COLUMN channel_id uuid NOT NULL;

@@ -1,6 +1,7 @@
 package com.jlisok.youtube_activity_manager.youtube.services;
 
 import com.google.api.services.youtube.model.Subscription;
+import com.jlisok.youtube_activity_manager.database.exceptions.ExpectedDataNotFoundInDatabase;
 import com.jlisok.youtube_activity_manager.videos.models.Video;
 import com.jlisok.youtube_activity_manager.youtube.api.YouTubeClient;
 import com.jlisok.youtube_activity_manager.youtube.dto.YouTubeRatingDto;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -39,7 +41,7 @@ public class YouTubeServiceImplementation implements YouTubeService {
 
     //TODO: [WIP] full functionality resembling the flow introduced in listRatedVideo not implemented yet but will be within the next commit
     @Override
-    public List<Subscription> listSubscribedChannels() throws Exception {
+    public List<Subscription> listSubscribedChannels() throws IOException {
         List<Subscription> subscriptions = youTubeClient.fetchSubscribedChannels(accessTokenService.getAccessToken(), requestParts);
         logger.debug("YouTubeService - fetching list of subscribed channels for userId {} - success.", getAuthenticationInContext()
                 .getAuthenticatedUserId());
@@ -48,7 +50,7 @@ public class YouTubeServiceImplementation implements YouTubeService {
 
 
     @Override
-    public List<Video> listRatedVideos(YouTubeRatingDto dto) throws Exception {
+    public List<Video> listRatedVideos(YouTubeRatingDto dto) throws IOException, ExpectedDataNotFoundInDatabase {
         UUID userId = getAuthenticationInContext().getAuthenticatedUserId();
         List<com.google.api.services.youtube.model.Video> videos = youTubeClient.fetchRatedVideos(accessTokenService.getAccessToken(), requestParts, dto
                 .getRating());

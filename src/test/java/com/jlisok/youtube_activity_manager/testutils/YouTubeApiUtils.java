@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,64 +25,35 @@ public class YouTubeApiUtils {
     private final static URI uri = URI.create("https://www.example.com");
     private final static Random random = new Random();
 
-    public static List<com.google.api.services.youtube.model.Video> createRandomYouTubeVideoList(int loopEnd) {
-        if (loopEnd == 0) {
+    public static List<com.google.api.services.youtube.model.Video> createRandomYouTubeVideoList(int size) {
+        if (size == 0) {
             return new ArrayList<>(0);
         }
-        List<com.google.api.services.youtube.model.Video> videoList = new ArrayList<>(loopEnd);
-        for (int i = 0; i < loopEnd; i++) {
+        return IntStream.range(0, size).mapToObj(i -> {
             VideoContentDetails details = createRandomVideoContentDetails();
             VideoSnippet snippet = createRandomVideoSnippet();
-            com.google.api.services.youtube.model.Video video = new com.google.api.services.youtube.model.Video()
+            return new com.google.api.services.youtube.model.Video()
                     .setContentDetails(details)
                     .setSnippet(snippet)
-                    .setId(UUID
-                                   .randomUUID()
-                                   .toString());
-
-            videoList.add(video);
-        }
-        return videoList;
+                    .setId(UUID.randomUUID().toString());
+        }).collect(Collectors.toList());
     }
 
 
     public static String createDescriptionWithRandomUriNumber() {
-        String string = "";
-        for (int i = 0; i < random.nextInt(10); i++) {
-            string = string.concat(uri.toString() + " ");
-        }
-        return string;
+        return IntStream.range(0, random.nextInt(10))
+                        .mapToObj(i -> uri.toString() + " ")
+                        .collect(Collectors.joining());
     }
 
 
     public static void assertListOfVideosEqual(List<com.google.api.services.youtube.model.Video> youTubeList, List<Video> actualVideoList) {
         assertEquals(youTubeList.size(), actualVideoList.size());
         for (int i = 0; i < actualVideoList.size(); i++) {
-            assertEquals(youTubeList
-                                 .get(i)
-                                 .getSnippet()
-                                 .getChannelId(), actualVideoList
-                                 .get(i)
-                                 .getChannelId());
-            assertEquals(youTubeList
-                                 .get(i)
-                                 .getSnippet()
-                                 .getTitle(), actualVideoList
-                                 .get(i)
-                                 .getTitle());
-            assertEquals(youTubeList
-                                 .get(i)
-                                 .getContentDetails()
-                                 .getDuration(), actualVideoList
-                                 .get(i)
-                                 .getDuration()
-                                 .toString());
-            assertEquals(youTubeList
-                                 .get(i)
-                                 .getSnippet()
-                                 .getTags(), actualVideoList
-                                 .get(i)
-                                 .getHashtag());
+            assertEquals(youTubeList.get(i).getSnippet().getChannelId(), actualVideoList.get(i).getChannelId());
+            assertEquals(youTubeList.get(i).getSnippet().getTitle(), actualVideoList.get(i).getTitle());
+            assertEquals(youTubeList.get(i).getContentDetails().getDuration(), actualVideoList.get(i).getDuration().toString());
+            assertEquals(youTubeList.get(i).getSnippet().getTags(), actualVideoList.get(i).getHashtag());
         }
     }
 
@@ -93,13 +66,10 @@ public class YouTubeApiUtils {
         assertFalse(video.getId().toString().isEmpty());
     }
 
-    public static List<Video> createRandomListOfVideos(int loopEnd) {
-        List<Video> videoList = new ArrayList<>(loopEnd);
-        for (int i = 0; i < loopEnd; i++) {
-            Video video = createRandomVideo();
-            videoList.add(video);
-        }
-        return videoList;
+    public static List<Video> createRandomListOfVideos(int size) {
+        return IntStream.range(0, size)
+                        .mapToObj(i -> createRandomVideo())
+                        .collect(Collectors.toList());
     }
 
     public static Video createRandomVideo() {
@@ -111,9 +81,7 @@ public class YouTubeApiUtils {
 
     private static VideoContentDetails createRandomVideoContentDetails() {
         return new VideoContentDetails()
-                .setDuration(Duration
-                                     .ofMinutes(15)
-                                     .toString());
+                .setDuration(Duration.ofMinutes(15).toString());
     }
 
 
@@ -123,9 +91,7 @@ public class YouTubeApiUtils {
                 .setTags(createRandomTags())
                 .setTitle(createRandomString())
                 .setDescription(createDescriptionWithRandomUriNumber())
-                .setPublishedAt(new DateTime(Instant
-                                                     .now()
-                                                     .toEpochMilli()));
+                .setPublishedAt(new DateTime(Instant.now().toEpochMilli()));
     }
 
     private static String createRandomString() {
@@ -134,12 +100,8 @@ public class YouTubeApiUtils {
 
 
     private static List<String> createRandomTags() {
-        List<String> hashtags = new ArrayList<>();
-        for (int i = 0; i < random.nextInt(10); i++) {
-            hashtags.add(createRandomString());
-        }
-        return hashtags;
+        return IntStream.range(0, random.nextInt(10))
+                        .mapToObj(i -> createRandomString())
+                        .collect(Collectors.toList());
     }
-
-
 }

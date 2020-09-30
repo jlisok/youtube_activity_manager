@@ -71,8 +71,10 @@ class UserVideoServiceImplementationTest {
         when(userRepository.findById(id))
                 .thenReturn(Optional.of(user));
 
-        //when //then
+        //when
         service.insertListInDatabase(videoList, rating, id);
+
+        //then
         verify(userVideoRepository).saveAll(ArgumentMatchers.anyList());
     }
 
@@ -85,8 +87,10 @@ class UserVideoServiceImplementationTest {
         when(userRepository.findById(id))
                 .thenReturn(Optional.of(user));
 
-        //when //then
+        //when
         service.insertListInDatabase(videoList, rating, id);
+
+        //then
         verify(userVideoRepository).saveAll(ArgumentMatchers.anyList());
     }
 }
