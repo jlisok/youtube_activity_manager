@@ -54,6 +54,7 @@ ALTER TABLE public.videos
 
 --changeset jlisok:3
 ALTER TABLE public.videos
-    MODIFY COLUMN channel_id text NOT NULL;
+    ALTER COLUMN channel_id TYPE text,
+    ALTER COLUMN channel_id SET NOT NULL;
 
---rollback ALTER TABLE public.videos MODIFY COLUMN channel_id uuid NOT NULL;
+--rollback ALTER TABLE public.videos ALTER COLUMN channel_id uuid, ALTER COLUMN channel_id SET NOT NULL;
