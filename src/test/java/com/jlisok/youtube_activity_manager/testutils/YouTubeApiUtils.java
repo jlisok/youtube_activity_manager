@@ -42,8 +42,8 @@ public class YouTubeApiUtils {
 
     public static String createDescriptionWithRandomUriNumber() {
         return IntStream.range(0, random.nextInt(10))
-                        .mapToObj(i -> uri.toString() + " ")
-                        .collect(Collectors.joining());
+                        .mapToObj(i -> uri.toString())
+                        .collect(Collectors.joining(" "));
     }
 
 
