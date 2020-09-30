@@ -145,6 +145,11 @@ test {
 
 liquibase {
     Map<String, String> environmentVariablesToSet = new HashMap<>();
+
+    System.getenv().each() { key, value ->
+        environmentVariablesToSet.put(key, value);
+    }
+
     File envFile = file('.environment.local')
     if (envFile.exists()) {
         envFile.readLines().each {
