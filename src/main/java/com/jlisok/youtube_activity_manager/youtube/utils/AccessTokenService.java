@@ -20,12 +20,11 @@ public class AccessTokenService {
         this.repository = repository;
     }
 
-    public String get() {
-        UUID userId = getAuthenticationInContext().getPrincipal();
+    public String getAccessToken() {
+        UUID userId = getAuthenticationInContext().getAuthenticatedUserId();
         return repository
                 .findById(userId)
                 .map(User::getAccessToken)
                 .orElseThrow(() -> new AuthenticationCredentialsNotFoundException("Authentication failed. Access token not found for userId: " + userId));
-
     }
 }

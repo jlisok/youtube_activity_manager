@@ -27,4 +27,7 @@ public class JwtAuthentication extends AbstractAuthenticationToken {
         return userId;
     }
 
+    public UUID getAuthenticatedUserId() {
+        return userId;
+    }
 }

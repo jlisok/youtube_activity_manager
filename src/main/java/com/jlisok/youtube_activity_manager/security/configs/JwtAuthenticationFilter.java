@@ -1,6 +1,7 @@
 package com.jlisok.youtube_activity_manager.security.configs;
 
 import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 DecodedJWT decodedToken = jwtVerifier.verify(token);
                 UUID userId = UUID.fromString(decodedToken.getSubject());
                 setAuthenticationInContext(token, userId);
-            } catch (Exception e) {
+            } catch (JWTVerificationException e) {
                 SecurityContextHolder.clearContext();
             }
         }

@@ -35,3 +35,6 @@ out/
 
 # local environment setup
 .environment.local
+
+# personal notes
+personalNotesTodo*

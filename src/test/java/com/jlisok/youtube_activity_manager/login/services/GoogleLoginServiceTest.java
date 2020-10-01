@@ -13,6 +13,8 @@ import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,6 +24,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -42,34 +45,34 @@ class GoogleLoginServiceTest {
     @Autowired
     private GoogleLoginServiceImplementation service;
 
-    private final String dummyIdToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+    private final String dummyToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+    private final String dummyAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi";
     private GoogleLoginRequestDto dto;
-    private GoogleIdToken token;
+    private GoogleIdToken googleIdToken;
     private String email;
 
 
     @BeforeEach
     void createInitialVariablesForTestsAndMocks() {
         email = userUtils.createRandomEmail();
-        String dummyAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
-        dto = new GoogleLoginRequestDto(dummyIdToken, dummyAccessToken);
-        token = MockGoogleIdToken.createDummyGoogleIdToken(email, true, true);
+        dto = new GoogleLoginRequestDto(dummyToken, dummyAccessToken);
+        googleIdToken = MockGoogleIdToken.createDummyGoogleIdToken(email, true, true);
     }
 
+
+    private static final Answer<User> interceptUser = invocation -> (User) invocation.getArguments()[0];
 
     @Test
     void authenticateUser_whenNewValidUser() throws Exception {
         //given
-        User user = userUtils.createUser(dummyIdToken, token);
-
         when(verifier.verify(dto.getGoogleIdToken()))
-                .thenReturn(token);
+                .thenReturn(googleIdToken);
 
-        when(userRepository.findByEmail(user.getEmail()))
+        when(userRepository.findByEmail(email))
                 .thenReturn(Optional.empty());
 
         when(userRepository.saveAndFlush(any(User.class)))
-                .thenReturn(user);
+                .thenAnswer(interceptUser);
 
         //when
         String token = service.authenticateUser(dto);
@@ -77,36 +80,11 @@ class GoogleLoginServiceTest {
         //then
         assertNotNull(token);
         DecodedJWT decodedJWT = jwtVerifier.verify(token);
-        assertEquals(user
-                             .getId()
-                             .toString(), decodedJWT.getSubject());
-    }
 
+        var userCapture = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).saveAndFlush(userCapture.capture());
 
-    @Test
-    void authenticateUser_whenNewValidUserNoFirstNameInPayload() throws Exception {
-        //given
-        GoogleIdToken tokenNoFirstName = MockGoogleIdToken.createDummyGoogleIdToken(email, true, true);
-        User user = userUtils.createUserNoFirstName(dummyIdToken, token);
-
-        when(verifier.verify(dto.getGoogleIdToken()))
-                .thenReturn(tokenNoFirstName);
-
-        when(userRepository.findByEmail(user.getEmail()))
-                .thenReturn(Optional.empty());
-
-        when(userRepository.saveAndFlush(any(User.class)))
-                .thenReturn(user);
-
-        //when
-        String token = service.authenticateUser(dto);
-
-        //then
-        assertNotNull(token);
-        DecodedJWT decodedJWT = jwtVerifier.verify(token);
-        assertEquals(user
-                             .getId()
-                             .toString(), decodedJWT.getSubject());
+        assertEquals(userCapture.getValue().getId().toString(), decodedJWT.getSubject());
     }
 
 
@@ -114,26 +92,26 @@ class GoogleLoginServiceTest {
     void authenticateUser_whenUpdatingValidUser() throws Exception {
         //given
         User user = userUtils.createUser(email, "dummyPassword");
-        User expectedUser = userUtils.createUser(dummyIdToken, token);
 
         when(verifier.verify(dto.getGoogleIdToken()))
-                .thenReturn(token);
+                .thenReturn(googleIdToken);
 
         when(userRepository.findByEmail(email))
                 .thenReturn(Optional.of(user));
 
-        when(userRepository.saveAndFlush(user))
-                .thenReturn(expectedUser);
+        when(userRepository.saveAndFlush(any(User.class)))
+                .thenAnswer(interceptUser);
+
 
         //when
         String token = service.authenticateUser(dto);
 
         //then
         assertNotNull(token);
+        var userCapture = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).saveAndFlush(userCapture.capture());
         DecodedJWT decodedJWT = jwtVerifier.verify(token);
-        assertEquals(expectedUser
-                             .getId()
-                             .toString(), decodedJWT.getSubject());
+        assertEquals(userCapture.getValue().getId().toString(), decodedJWT.getSubject());
     }
 
 
@@ -151,11 +129,11 @@ class GoogleLoginServiceTest {
     @Test
     void authenticateUser_whenGoogleIdAlreadyPresentUnderDifferentEmail() throws Exception {
         //given
-        User user = userUtils.createUser(dummyIdToken, token);
+        User user = userUtils.createUser(dummyToken, googleIdToken, dummyAccessToken);
         User userWithSameGoogleIdButDifferentEmail = userUtils.createUserSameGoogleIdDifferentEmailAndId(user);
 
         when(verifier.verify(dto.getGoogleIdToken()))
-                .thenReturn(token);
+                .thenReturn(googleIdToken);
 
         when(userRepository.findByEmail(user.getEmail()))
                 .thenReturn(Optional.of(user));

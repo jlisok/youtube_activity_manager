@@ -1,10 +1,10 @@
 package com.jlisok.youtube_activity_manager.login.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jlisok.youtube_activity_manager.domain.exceptions.ResponseCode;
 import com.jlisok.youtube_activity_manager.login.dto.LoginRequestDto;
-import com.jlisok.youtube_activity_manager.testutils.MvcResponseVerifier;
 import com.jlisok.youtube_activity_manager.testutils.JwtTokenVerifier;
+import com.jlisok.youtube_activity_manager.testutils.MockMvcBasicRequestBuilder;
+import com.jlisok.youtube_activity_manager.testutils.MvcResponseVerifier;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import org.junit.jupiter.api.Assertions;
@@ -17,10 +17,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
@@ -39,16 +37,18 @@ class LoginControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private MockMvcBasicRequestBuilder mvcBasicRequestBuilder;
 
     @Autowired
     private UserUtils userUtils;
 
     @Autowired
-    private MvcResponseVerifier mvcResponse;
+    private MvcResponseVerifier responseVerifier;
 
     @Autowired
-    private JwtTokenVerifier mvcToken;
+    private JwtTokenVerifier jwtTokenVerifier;
+
+    private final String endPointUrl = "/api/v1/login";
 
     private String userEmail;
     private String userPassword;
@@ -72,14 +72,10 @@ class LoginControllerTest {
 
         //when //then
         mockMvc
-                .perform(
-                        MockMvcRequestBuilders
-                                .post("/api/v1/login")
-                                .content(objectMapper.writeValueAsString(validLoginRequestDto))
-                                .contentType(MediaType.APPLICATION_JSON))
+                .perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, validLoginRequestDto))
                 .andExpect(status().isOk())
                 .andExpect(Assertions::assertNotNull)
-                .andExpect(result -> mvcToken.assertEqualsTokenSubject(expectedTokenSubject, result));
+                .andExpect(result -> jwtTokenVerifier.assertEqualsTokenSubject(expectedTokenSubject, result));
     }
 
 
@@ -92,14 +88,10 @@ class LoginControllerTest {
 
         //when //then
         mockMvc
-                .perform(
-                        MockMvcRequestBuilders
-                                .post("/api/v1/login")
-                                .content(objectMapper.writeValueAsString(loginRequestDtoNotExistingUser))
-                                .contentType(MediaType.APPLICATION_JSON))
+                .perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, loginRequestDtoNotExistingUser))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof FailedLoginException))
-                .andExpect(result -> mvcResponse.assertEqualsResponseCode(expected, result));
+                .andExpect(result -> responseVerifier.assertEqualsResponseCode(expected, result));
     }
 
 
@@ -114,14 +106,10 @@ class LoginControllerTest {
 
         //when //then
         mockMvc
-                .perform(
-                        MockMvcRequestBuilders
-                                .post("/api/v1/login")
-                                .content(objectMapper.writeValueAsString(loginRequestDtoBadPassword))
-                                .contentType(MediaType.APPLICATION_JSON))
+                .perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, loginRequestDtoBadPassword))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof FailedLoginException))
-                .andExpect(result -> mvcResponse.assertEqualsResponseCode(expected, result));
+                .andExpect(result -> responseVerifier.assertEqualsResponseCode(expected, result));
     }
 
 
@@ -130,11 +118,7 @@ class LoginControllerTest {
     void authenticateUserTraditionally_whenUserRequestIsNull() throws Exception {
         //given //when //then
         mockMvc
-                .perform(
-                        MockMvcRequestBuilders
-                                .post("/api/v1/login")
-                                .content(objectMapper.writeValueAsString(null))
-                                .contentType(MediaType.APPLICATION_JSON))
+                .perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, null))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof HttpMessageNotReadableException));
     }
@@ -146,11 +130,7 @@ class LoginControllerTest {
     void authenticateUserTraditionally_whenUserFailsValidation(LoginRequestDto loginRequestDto) throws Exception {
         //given //when //then
         mockMvc
-                .perform(
-                        MockMvcRequestBuilders
-                                .post("/api/v1/login")
-                                .content(objectMapper.writeValueAsString(loginRequestDto))
-                                .contentType(MediaType.APPLICATION_JSON))
+                .perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, loginRequestDto))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException));
     }
@@ -167,6 +147,4 @@ class LoginControllerTest {
                 Arguments.arguments(new LoginRequestDto(userPassword, "something_without_at"))
         );
     }
-
-
 }
