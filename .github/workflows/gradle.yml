@@ -1,4 +1,4 @@
-name: youtube_activity_manager Pull Request tests
+name: test & build & push
 
 on:
   push:
@@ -34,6 +34,16 @@ jobs:
           --health-retries 5
 
     steps:
+      - uses: actions/checkout@v2
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Test with Gradle
+        run: ./gradlew test
+  
+  build&push:
+    runs-on: ubuntu-latest
+    
+    steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -42,13 +52,8 @@ jobs:
           aws-region: eu-central-1
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
-
+        
       - uses: actions/checkout@v2
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Test with Gradle
-        run: ./gradlew test
-
       - name: grant executable permission to buildImage
         run: chmod +x ci/buildImage.sh
       - name: build docker image
