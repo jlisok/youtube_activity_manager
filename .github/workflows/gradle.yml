@@ -9,7 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: gradle:6.6.1-jre14
 
     env:
       DB_HOST: postgres
@@ -35,16 +34,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - name: Setup Java JDK
+        with:    
+          java-version: 14
+
       - name: Grant execute permission to gradlew
         run: chmod +x gradlew
       - name: Test with Gradle
         run: ./gradlew test
   
-  buildAndPush:
-    needs: [test]
-    runs-on: ubuntu-latest
-    
-    steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -54,10 +52,7 @@ jobs:
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
         
-      - uses: actions/checkout@v2
       - name: Grant executable permission to buildImage
         run: chmod +x ci/buildImage.sh
-      - name: Grant execute permission to gradlew
-        run: chmod +x gradlew
       - name: Build and push docker image
         run: ./ci/buildImage.sh
