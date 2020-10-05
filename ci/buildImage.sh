@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -xe
+
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
 # IMAGE_VERSION will be passed through environment variables
