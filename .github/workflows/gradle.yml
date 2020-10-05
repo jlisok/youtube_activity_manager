@@ -34,6 +34,9 @@ jobs:
           --health-retries 5
 
     steps:
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
       - uses: actions/checkout@v2
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -46,9 +49,6 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-central-1
-
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v1
 
       - name: grant executable permission to buildImage
         run: chmod +x ci/buildImage.sh
