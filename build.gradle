@@ -60,6 +60,9 @@ dependencies {
 
     implementation group: 'javax.persistence', name: 'javax.persistence-api', version: "${javaxPersistenceVersion}"
 
+    //start liquibase at bootRun
+    implementation group: 'org.liquibase', name: 'liquibase-core', version: "${liquibaseVersion}"
+
     implementation group: 'javax.validation', name: 'validation-api', version: "${javaxValidationVersion}"
 
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: "${apacheCommonsVersion}"
@@ -85,6 +88,7 @@ dependencies {
     liquibaseRuntime group: 'ch.qos.logback', name: 'logback-classic', version: "${logbackVersion}"
     liquibaseRuntime group: 'org.postgresql', name: 'postgresql', version: "${postgresVersion}"
 }
+
 
 bootRun {
     if (Files.exists(Paths.get('.environment.local'))) {
