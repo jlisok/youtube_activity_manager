@@ -1,4 +1,4 @@
-name: testBuildPush
+name: testAndBuildAndPush
 
 on:
   push:
@@ -35,12 +35,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Grant execute permission for gradlew
+      - name: Grant execute permission to gradlew
         run: chmod +x gradlew
       - name: Test with Gradle
         run: ./gradlew test
   
   buildAndPush:
+    needs: [test]
     runs-on: ubuntu-latest
     
     steps:
@@ -54,7 +55,9 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
         
       - uses: actions/checkout@v2
-      - name: grant executable permission to buildImage
+      - name: Grant executable permission to buildImage
         run: chmod +x ci/buildImage.sh
-      - name: build docker image
+      - name: Grant execute permission to gradlew
+        run: chmod +x gradlew
+      - name: Build and push docker image
         run: ./ci/buildImage.sh
