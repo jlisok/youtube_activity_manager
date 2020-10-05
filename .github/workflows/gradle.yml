@@ -17,6 +17,7 @@ jobs:
       DB_NAME: youtube_activity_manager
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
+      FRONTEND_URL: localhost
 
     services:
       postgres:
@@ -38,5 +39,7 @@ jobs:
         run: chmod +x gradlew
       - name: Test with Gradle
         run: ./gradlew test
+      - name: grant executable permission to buildImage
+        run: chmod +x ci/buildImage.sh
       - name: build docker image
         run: ./ci/buildImage.sh
