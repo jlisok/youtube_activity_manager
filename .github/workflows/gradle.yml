@@ -1,4 +1,4 @@
-name: test & build & push
+name: testBuildPush
 
 on:
   push:
@@ -40,7 +40,7 @@ jobs:
       - name: Test with Gradle
         run: ./gradlew test
   
-  build&push:
+  buildAndPush:
     runs-on: ubuntu-latest
     
     steps:
