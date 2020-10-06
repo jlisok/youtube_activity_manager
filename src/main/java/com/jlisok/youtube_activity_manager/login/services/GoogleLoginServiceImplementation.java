@@ -74,10 +74,13 @@ public class GoogleLoginServiceImplementation implements GoogleLoginService {
 
 
     private User updateGoogleDataInDatabase(User user, String googleId, String token, String accessToken, Instant now) throws DataInconsistencyAuthenticationException {
-        if (userRepository.existsByGoogleId(googleId)) {
-            throw new DataInconsistencyAuthenticationException("Updating user: " + user.getEmail() + " failed. Given googleId " + user
-                    .getGoogleId() + " already exists in database under different email.");
-        }
+        userRepository
+                .findByGoogleId(googleId)
+                .filter(u -> !user.getEmail().equals(u.getEmail()))
+                .ifPresent(s -> {
+                    throw new DataInconsistencyAuthenticationException("Updating user: " + user.getEmail() + " failed. Given googleId " + googleId + " already exists in database under different email.");
+                });
+
         if (user.getGoogleId() == null) {
             user.setGoogleId(googleId);
         }
