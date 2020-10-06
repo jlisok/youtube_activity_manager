@@ -11,6 +11,7 @@ import com.jlisok.youtube_activity_manager.testutils.MockGoogleIdToken;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -138,11 +139,42 @@ class GoogleLoginServiceTest {
         when(userRepository.findByEmail(user.getEmail()))
                 .thenReturn(Optional.of(user));
 
-        when(userRepository.existsByGoogleId(userWithSameGoogleIdButDifferentEmail.getGoogleId()))
-                .thenReturn(true);
+        when(userRepository.findByGoogleId(userWithSameGoogleIdButDifferentEmail.getGoogleId()))
+                .thenReturn(Optional.of(userWithSameGoogleIdButDifferentEmail));
 
         //when //then
         assertThrows(DataInconsistencyAuthenticationException.class, () -> service.authenticateUser(dto));
+    }
+
+
+    @Test
+    void authenticateUser_whenUserWithGoogleIdPresent() throws Exception {
+        //given
+        User user = userUtils.createUser(dummyToken, googleIdToken, dummyAccessToken);
+
+        Assertions.assertNotNull(user.getGoogleId());
+
+        when(verifier.verify(dto.getGoogleIdToken()))
+                .thenReturn(googleIdToken);
+
+        when(userRepository.findByEmail(user.getEmail()))
+                .thenReturn(Optional.of(user));
+
+        when(userRepository.findByGoogleId(user.getGoogleId()))
+                .thenReturn(Optional.of(user));
+
+        when(userRepository.saveAndFlush(any(User.class)))
+                .thenAnswer(interceptUser);
+
+        //when
+        String token = service.authenticateUser(dto);
+
+        //then
+        assertNotNull(token);
+        var userCapture = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).saveAndFlush(userCapture.capture());
+        DecodedJWT decodedJWT = jwtVerifier.verify(token);
+        assertEquals(userCapture.getValue().getId().toString(), decodedJWT.getSubject());
     }
 
 

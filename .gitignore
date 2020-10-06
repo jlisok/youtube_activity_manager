@@ -38,3 +38,6 @@ out/
 
 # personal notes
 personalNotesTodo.sql
+
+# docker
+docker-compose.yml
