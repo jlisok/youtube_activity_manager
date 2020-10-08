@@ -23,6 +23,16 @@ public class MockMvcBasicRequestBuilder {
                 .contentType(MediaType.APPLICATION_JSON);
     }
 
+
+    public MockHttpServletRequestBuilder setGetRequestWithParams(String endPointUrl, String jsonHeader, String parameterName, String parameterValue) throws JsonProcessingException {
+        return MockMvcRequestBuilders
+                .get(endPointUrl)
+                .header(HttpHeaders.AUTHORIZATION, jsonHeader)
+                .param(parameterName, parameterValue)
+                .contentType(MediaType.APPLICATION_JSON);
+    }
+
+
     public MockHttpServletRequestBuilder setBasicPostRequest(String endPointUrl, Object dto) throws JsonProcessingException {
         return MockMvcRequestBuilders
                 .post(endPointUrl)

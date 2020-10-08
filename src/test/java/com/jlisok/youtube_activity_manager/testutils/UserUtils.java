@@ -64,9 +64,11 @@ public class UserUtils {
     @Transactional
     public User insertUserInDatabase(String token, GoogleIdToken googleIdToken, String accessToken) {
         User user = createUser(token, googleIdToken, accessToken);
+        repository.findByEmail(user.getEmail())
+                  .ifPresent(user1 -> user.setId(user1.getId()));
         repository.saveAndFlush(user);
 
-        assertTrue(repository.existsByEmail(user.getEmail()));
+        //assertTrue(repository.existsByEmail(user.getEmail()));
         return user;
     }
 
@@ -90,29 +92,6 @@ public class UserUtils {
         UserPersonalData userPersonalData = new UserPersonalDataBuilder()
                 .setId(userId)
                 .setFirstName(fistName)
-                .setCreatedAt(now)
-                .setModifiedAt(now)
-                .createUserPersonalData();
-        return new UserBuilder()
-                .setId(userId)
-                .setEmail(userData.getEmail())
-                .setGoogleId(googleId)
-                .setGoogleIdToken(token)
-                .setAccessToken(accessToken)
-                .setCreatedAt(now)
-                .setModifiedAt(now)
-                .setUserPersonalData(userPersonalData)
-                .createUser();
-    }
-
-
-    public User createUserNoFirstName(String token, GoogleIdToken googleIdToken, String accessToken) {
-        UUID userId = UUID.randomUUID();
-        Instant now = Instant.now();
-        GoogleIdToken.Payload userData = googleIdToken.getPayload();
-        String googleId = userData.getSubject();
-        UserPersonalData userPersonalData = new UserPersonalDataBuilder()
-                .setId(userId)
                 .setCreatedAt(now)
                 .setModifiedAt(now)
                 .createUserPersonalData();

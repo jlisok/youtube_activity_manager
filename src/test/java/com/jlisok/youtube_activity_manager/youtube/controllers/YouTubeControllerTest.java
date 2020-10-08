@@ -10,7 +10,6 @@ import com.jlisok.youtube_activity_manager.testutils.YouTubeEntityVerifier;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.videos.enums.Rating;
 import com.jlisok.youtube_activity_manager.videos.repositories.UserVideoRepository;
-import com.jlisok.youtube_activity_manager.youtube.dto.YouTubeRatingDto;
 import com.jlisok.youtube_activity_manager.youtube.utils.AccessTokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -21,7 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.validation.BindException;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -58,13 +57,15 @@ class YouTubeControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private final String accessToken = "ya29.a0AfH6SMD3PLkPZPJ3YQoC6wAJdljv03l3DtGuddxwlmkzTP3qgwU1H3In8Sz5wN_OT_vcKUhspa2VZ6r5nErKM7e3CdIg709LnLWGQIVtCOFX4xd53mtF8cCr0fay1kK6knW6ff8OEqus1rXr990z0Lf_X5wMThbQXF-A";
-    private final String googleIdTokenString = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjVlZmZhNzZlZjMzZWNiNWUzNDZiZDUxMmQ3ZDg5YjMwZTQ3ZDhlOTgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiODQ1MTYxMjIxMjUxLThxY2pqbnFtM2E1NjhwMG05YWxhanYya2FhNTE0am90LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiYXVkIjoiODQ1MTYxMjIxMjUxLThxY2pqbnFtM2E1NjhwMG05YWxhanYya2FhNTE0am90LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTE1MzEwMzM0NDEyNzQ5NTY2MDEzIiwiZW1haWwiOiJqdXN0eW5hLmxpc29rQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoiUjFNZVFodXZFSVFOTHFBWHZMSzFHUSIsIm5hbWUiOiJKdXN0eW5hIExpc29rIiwicGljdHVyZSI6Imh0dHBzOi8vbGg0Lmdvb2dsZXVzZXJjb250ZW50LmNvbS8tbDlMSEdteGptWmcvQUFBQUFBQUFBQUkvQUFBQUFBQUFBQUEvQU1adXVjbDNqYjg4TGRZM2s4LUVRTUxFYldsZVZRZXIwZy9zOTYtYy9waG90by5qcGciLCJnaXZlbl9uYW1lIjoiSnVzdHluYSIsImZhbWlseV9uYW1lIjoiTGlzb2siLCJsb2NhbGUiOiJwbCIsImlhdCI6MTYwMTY0OTQyNiwiZXhwIjoxNjAxNjUzMDI2LCJqdGkiOiJkMmMxNDJjOGY0ODJhZDU4YjJiMjc2NzIxYjk1MTY0NDM2MTBmZTlmIn0.IshRAM7Nk3wonJdFKgLiJJRBqervSNPAk8sFAJBr8q0FoOzXOYX7T3-E7OpBfGa7pauIGxk6fBiKQKBmetePYvPof4tI4JE9X_23Tj2VB1G8mxoYj9ovrTSnS2Bktk59YEuJ-RNl1iMFM5VNTf677L3sUPnAy1UFr5RnhYoKfD4KF_MMUqk9YLAvYcAdWCHLe41WlmHhbVvjVE78PUqC1iwCtMVZIKVVbNtfhaJjsuBfvut3cjAjY2rqw_z20wGvgE3hNWnOh5IvCiGDLBqDOnn4a9K5XwL4BlOqcGDgpDrhA10QfX7Hf8Mdpl5nqm0e14Dtis-AevZXYoAr98T0_g";
+
+    private final String accessToken = "ya29.a0AfH6SMDlGKLfUTTDHrjYyQq2tBUukALHRH3jczxHbuOcXoQmVm2WG8bkczV2m3NmXGPFlvgAyjNI3Vo_w1YQUCiAFq81C_cm7kggdg3P44Nip0oCfgGie4BA1Tw23YEGbXrfrDvQObP-LymoUgzInLjJJ3amNSd-1SM8";
+    private final String googleIdTokenString = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjdkYTc4NjNlODYzN2Q2NjliYzJhMTI2MjJjZWRlMmE4ODEzZDExYjEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiODQ1MTYxMjIxMjUxLThxY2pqbnFtM2E1NjhwMG05YWxhanYya2FhNTE0am90LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiYXVkIjoiODQ1MTYxMjIxMjUxLThxY2pqbnFtM2E1NjhwMG05YWxhanYya2FhNTE0am90LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTE1MzEwMzM0NDEyNzQ5NTY2MDEzIiwiZW1haWwiOiJqdXN0eW5hLmxpc29rQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoiaExJa0I3NDE5Zml3NjFSb25RVGY3QSIsIm5hbWUiOiJKdXN0eW5hIExpc29rIiwicGljdHVyZSI6Imh0dHBzOi8vbGg0Lmdvb2dsZXVzZXJjb250ZW50LmNvbS8tbDlMSEdteGptWmcvQUFBQUFBQUFBQUkvQUFBQUFBQUFBQUEvQU1adXVjbDNqYjg4TGRZM2s4LUVRTUxFYldsZVZRZXIwZy9zOTYtYy9waG90by5qcGciLCJnaXZlbl9uYW1lIjoiSnVzdHluYSIsImZhbWlseV9uYW1lIjoiTGlzb2siLCJsb2NhbGUiOiJwbCIsImlhdCI6MTYwMjE4MDI2NiwiZXhwIjoxNjAyMTgzODY2LCJqdGkiOiJhMDMyZjQwNDE4ZmQ0Y2VlMzI3NjBjYTliMTdlOTIxYjU2NDYwYTRmIn0.AoboNAgY1wUaGLSjfeFbfTrv56n_9fAi_nM5jga_IFJrIT1dh1NTfQ7cllFNbcPPkGlS7UwiRc161FlnmvWIYNEacC0kHa4FRuhzdxTn6w_JwhnDlMKHl2kr9bwMfBuFwKs6MCWhvtMba6y127s3iCHGcyZdq7OYWJ9fiZYJVBa4q98R58RgA2mcpnXGiN-FfTVYTOW5cAu_UmTsjrEWW3IrjEzrF9uVrxidMdDAdmq8qodXgPlpuiFrA2morAbwyY5MEYw9ILWYXtmQ3gEBmI1vPi_WyNw532KRy5lcL6oWC7WJbVTq7PqwuY8e56d7KfCVNuUrzXdLIr0QgihFMg";
     private final String invalidToken = "gfdes";
     private final String endPointUrlVideos = "/api/v1/youtube/videos";
     private final String endPointUrlChannels = "/api/v1/youtube/channels";
+    private final String parameterName = "rating";
+    private final String parameterValue = Rating.LIKE.toString();
 
-    private YouTubeRatingDto dto;
     private String jsonHeader;
     private User user;
 
@@ -73,7 +74,6 @@ class YouTubeControllerTest {
     public void createYoutubeRequestDto() throws GeneralSecurityException, IOException {
         GoogleIdToken googleIdToken = tokenVerifier.verify(googleIdTokenString);
         user = userUtils.insertUserInDatabase(googleIdTokenString, googleIdToken, accessToken);
-        dto = new YouTubeRatingDto(Rating.LIKE);
         jsonHeader = utils.createRequestAuthenticationHeader(user.getId().toString());
     }
 
@@ -87,7 +87,7 @@ class YouTubeControllerTest {
 
         //when //then
         mockMvc
-                .perform(mvcRequestBuilder.setBasicGetRequest(endPointUrlVideos, jsonHeader, dto))
+                .perform(mvcRequestBuilder.setGetRequestWithParams(endPointUrlVideos, jsonHeader, parameterName, parameterValue))
                 .andExpect(status().isOk())
                 .andExpect(YouTubeEntityVerifier::assertResponseVideosNotNull);
     }
@@ -97,13 +97,13 @@ class YouTubeControllerTest {
     void getRatedVideos_whenRequestValid_RatingDislike() throws Exception {
         //given
         assertFalse(userVideoRepository.existsByUserId(user.getId()));
-        YouTubeRatingDto dto = new YouTubeRatingDto(Rating.DISLIKE);
         when(tokenService.getAccessToken())
                 .thenReturn(accessToken);
 
         //when //then
         mockMvc
-                .perform(mvcRequestBuilder.setBasicGetRequest(endPointUrlVideos, jsonHeader, dto))
+                .perform(mvcRequestBuilder.setGetRequestWithParams(endPointUrlVideos, jsonHeader, parameterName, Rating.DISLIKE
+                        .toString()))
                 .andExpect(status().isOk())
                 .andExpect(YouTubeEntityVerifier::assertResponseVideosNotNull);
     }
@@ -112,15 +112,14 @@ class YouTubeControllerTest {
     @Test
     void getRatedVideos_whenNullRating() throws Exception {
         //given
-        YouTubeRatingDto badRatingDto = new YouTubeRatingDto(null);
         when(tokenService.getAccessToken())
                 .thenReturn(accessToken);
 
         //when //then
         mockMvc
-                .perform(mvcRequestBuilder.setBasicGetRequest(endPointUrlVideos, jsonHeader, badRatingDto))
+                .perform(mvcRequestBuilder.setGetRequestWithParams(endPointUrlVideos, jsonHeader, parameterName, null))
                 .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException));
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof BindException));
     }
 
 
@@ -133,7 +132,7 @@ class YouTubeControllerTest {
 
         //when //then
         mockMvc
-                .perform(mvcRequestBuilder.setBasicGetRequest(endPointUrlVideos, jsonHeader, dto))
+                .perform(mvcRequestBuilder.setGetRequestWithParams(endPointUrlVideos, jsonHeader, parameterName, parameterValue))
                 .andExpect(status().isInternalServerError())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof GoogleJsonResponseException));
     }
@@ -147,7 +146,7 @@ class YouTubeControllerTest {
 
         //when //then
         mockMvc
-                .perform(mvcRequestBuilder.setBasicGetRequest(endPointUrlChannels, jsonHeader, dto))
+                .perform(mvcRequestBuilder.setBasicGetRequest(endPointUrlChannels, jsonHeader, ""))
                 .andExpect(status().isOk())
                 .andExpect(YouTubeEntityVerifier::assertResponseChannelsNotNull);
     }
@@ -161,7 +160,7 @@ class YouTubeControllerTest {
 
         //when //then
         mockMvc
-                .perform(mvcRequestBuilder.setBasicGetRequest(endPointUrlChannels, jsonHeader, dto))
+                .perform(mvcRequestBuilder.setBasicGetRequest(endPointUrlChannels, jsonHeader, ""))
                 .andExpect(status().isInternalServerError())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof GoogleJsonResponseException));
     }
