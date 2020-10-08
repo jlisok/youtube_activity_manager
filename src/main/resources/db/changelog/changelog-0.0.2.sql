@@ -1,26 +1,47 @@
 --liquibase formatted sql
 
 --changeset jlisok:1
-ALTER TABLE public.user_personal_data
-    ALTER COLUMN birth_year DROP NOT NULL;
+CREATE TYPE public.rating AS ENUM (
+    'LIKE',
+    'DISLIKE'
+);
 
-ALTER TABLE public.user_personal_data
-    ALTER COLUMN country DROP NOT NULL;
+CREATE TABLE public.videos (
+    id uuid PRIMARY KEY NOT NULL,
+    title text NOT NULL,
+    youtube_channel_id text NOT NULL,
+    youtube_video_id text NOT NULL,
+    duration interval NOT NULL,
+    published_at timestamp without time zone NOT NULL,
+    hashtag text[],
+    uri text[],
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    modified_at timestamp without time zone DEFAULT now() NOT NULL
+);
 
-ALTER TABLE public.users
-    ADD google_id text NULL;
+CREATE TABLE public.users_videos (
+    id uuid PRIMARY KEY NOT NULL,
+    user_id uuid NOT NULL,
+    video_id uuid NOT NULL,
+    rating public.rating NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    modified_at timestamp without time zone DEFAULT now() NOT NULL
+);
 
-ALTER TABLE public.users
-    ADD google_id_token text NULL;
+ALTER TABLE public.users_videos
+    ADD CONSTRAINT video_id_fkey_users FOREIGN KEY (user_id) REFERENCES public.users(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
 
---rollback ALTER TABLE public.user_personal_data ALTER COLUMN birth_year SET NOT NULL;
---rollback ALTER TABLE public.user_personal_data ALTER COLUMN country SET NOT NULL;
---rollback ALTER TABLE public.users DROP COLUMN google_id;
---rollback ALTER TABLE public.users DROP COLUMN google_id_token;
+ALTER TABLE public.users_videos
+    ADD CONSTRAINT video_id_fkey_videos FOREIGN KEY (video_id) REFERENCES public.videos(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
 
 
---changeset jlisok:2
-ALTER TABLE public.users
-    ADD access_token text NULL;
+--rollback DROP TABLE public.videos CASCADE;
+--rollback DROP TABLE public.users_videos CASCADE;
+--rollback DROP TYPE public.rating;
 
---rollback ALTER TABLE public.users DROP COLUMN access_token;
+
+
