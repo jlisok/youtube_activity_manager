@@ -5,7 +5,6 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.jlisok.youtube_activity_manager.login.dto.GoogleLoginRequestDto;
-import com.jlisok.youtube_activity_manager.login.exceptions.DataInconsistencyAuthenticationException;
 import com.jlisok.youtube_activity_manager.login.exceptions.EmailNotVerifiedAuthenticationException;
 import com.jlisok.youtube_activity_manager.testutils.MockGoogleIdToken;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
@@ -128,26 +127,6 @@ class GoogleLoginServiceTest {
 
 
     @Test
-    void authenticateUser_whenGoogleIdAlreadyPresentUnderDifferentEmail() throws Exception {
-        //given
-        User user = userUtils.createUser(dummyToken, googleIdToken, dummyAccessToken);
-        User userWithSameGoogleIdButDifferentEmail = userUtils.createUserSameGoogleIdDifferentEmailAndId(user);
-
-        when(verifier.verify(dto.getGoogleIdToken()))
-                .thenReturn(googleIdToken);
-
-        when(userRepository.findByEmail(user.getEmail()))
-                .thenReturn(Optional.of(user));
-
-        when(userRepository.findByGoogleId(userWithSameGoogleIdButDifferentEmail.getGoogleId()))
-                .thenReturn(Optional.of(userWithSameGoogleIdButDifferentEmail));
-
-        //when //then
-        assertThrows(DataInconsistencyAuthenticationException.class, () -> service.authenticateUser(dto));
-    }
-
-
-    @Test
     void authenticateUser_whenUserWithGoogleIdPresent() throws Exception {
         //given
         User user = userUtils.createUser(dummyToken, googleIdToken, dummyAccessToken);
@@ -158,9 +137,6 @@ class GoogleLoginServiceTest {
                 .thenReturn(googleIdToken);
 
         when(userRepository.findByEmail(user.getEmail()))
-                .thenReturn(Optional.of(user));
-
-        when(userRepository.findByGoogleId(user.getGoogleId()))
                 .thenReturn(Optional.of(user));
 
         when(userRepository.saveAndFlush(any(User.class)))
