@@ -26,7 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class ChannelDaoServiceImplementationTest {
+class ChannelDatabaseServiceImplementationTest {
 
     @Autowired
     UserUtils userUtils;
@@ -38,7 +38,7 @@ class ChannelDaoServiceImplementationTest {
     ChannelRepository repository;
 
     @Autowired
-    private ChannelDaoService daoService;
+    private ChannelDatabaseService daoService;
 
     @SuppressWarnings("unchecked")
     private static final Answer<List<Channel>> interceptChannels = invocation -> (List<Channel>) invocation.getArguments()[0];

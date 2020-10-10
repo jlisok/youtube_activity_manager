@@ -29,15 +29,15 @@ public class YouTubeServiceImplementation implements YouTubeService {
     private final UserVideoService userVideoService;
     private final SubscriptionService subscriptionService;
     private final ChannelService channelService;
-    private final ChannelDaoService channelDaoService;
+    private final ChannelDatabaseService channelDatabaseService;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
     @Autowired
-    public YouTubeServiceImplementation(AccessTokenService accessTokenService, YouTubeClient youTubeClient, VideoService videoService, ChannelService channelService, UserVideoService userVideoService, SubscriptionService subscriptionService, ChannelDaoService channelDaoService) {
+    public YouTubeServiceImplementation(AccessTokenService accessTokenService, YouTubeClient youTubeClient, VideoService videoService, ChannelService channelService, UserVideoService userVideoService, SubscriptionService subscriptionService, ChannelDatabaseService channelDatabaseService) {
         logger.debug("YouTubeService - initialization.");
         this.subscriptionService = subscriptionService;
-        this.channelDaoService = channelDaoService;
+        this.channelDatabaseService = channelDatabaseService;
         this.channelService = channelService;
         this.videoService = videoService;
         this.userVideoService = userVideoService;
@@ -59,7 +59,7 @@ public class YouTubeServiceImplementation implements YouTubeService {
                 .fetchChannels(accessTokenService.getAccessToken(), CHANNEL_REQUEST_PARTS, youtubeChannelIds);
         logger.debug("YouTubeService - fetching subscribed channels for userId {} - success.", userId);
         List<Channel> channels = channelService.createChannels(youtubeChannels, userId);
-        channelDaoService.updateChannelsInDatabase(channels, userId);
+        channelDatabaseService.updateChannelsInDatabase(channels, userId);
         logger.debug("YouTubeService - inserting channels in database for userId {} - success.", userId);
         return channels;
     }

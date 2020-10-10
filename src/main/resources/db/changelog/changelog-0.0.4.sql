@@ -26,6 +26,7 @@ CREATE TABLE public.users_channels (
 ALTER TABLE public.users_channels
     ADD CONSTRAINT channel_id_fkey_channels FOREIGN KEY (channel_id) REFERENCES public.channels(id)
     ON UPDATE CASCADE;
+    ON DELETE CASCADE;
 
 ALTER TABLE public.users_channels
     ADD CONSTRAINT user_id_fkey_users FOREIGN KEY (user_id) REFERENCES public.users(id)

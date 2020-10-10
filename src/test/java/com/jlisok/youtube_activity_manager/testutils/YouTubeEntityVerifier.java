@@ -42,19 +42,16 @@ public class YouTubeEntityVerifier {
     public static void assertListOfChannelsEqual(List<com.google.api.services.youtube.model.Channel> youTubeList, List<Channel> actualChannelList) {
         assertEquals(youTubeList.size(), actualChannelList.size());
         for (int i = 0; i < actualChannelList.size(); i++) {
-            assertEquals(youTubeList.get(i).getSnippet().getCountry(), actualChannelList.get(i).getCountry());
-            assertEquals(youTubeList.get(i).getSnippet().getDefaultLanguage(), actualChannelList.get(i).getLanguage());
-            assertEquals(youTubeList.get(i).getSnippet().getTitle(), actualChannelList.get(i).getTitle());
-            assertEquals(youTubeList.get(i).getStatistics().getVideoCount().intValue(), actualChannelList.get(i)
-                                                                                                         .getVideoNumber());
-            assertEquals(youTubeList.get(i).getStatistics().getVideoCount().intValue(), actualChannelList.get(i)
-                                                                                                         .getVideoNumber());
-            assertEquals(youTubeList.get(i).getStatistics().getViewCount().intValue(), actualChannelList.get(i)
-                                                                                                        .getViewNumber());
-            assertEquals(youTubeList.get(i).getStatistics().getSubscriberCount().intValue(), actualChannelList.get(i)
-                                                                                                              .getSubscriberNumber());
-            assertEquals(youTubeList.get(i).getContentOwnerDetails().getContentOwner(), actualChannelList.get(i)
-                                                                                                         .getOwner());
+            com.google.api.services.youtube.model.Channel youtubeChannel = youTubeList.get(i);
+            Channel channel = actualChannelList.get(i);
+            assertEquals(youtubeChannel.getSnippet().getCountry(), channel.getCountry());
+            assertEquals(youtubeChannel.getSnippet().getDefaultLanguage(), channel.getLanguage());
+            assertEquals(youtubeChannel.getSnippet().getTitle(), channel.getTitle());
+            assertEquals(youtubeChannel.getStatistics().getVideoCount().intValue(), channel.getVideoNumber());
+            assertEquals(youtubeChannel.getStatistics().getVideoCount().intValue(), channel.getVideoNumber());
+            assertEquals(youtubeChannel.getStatistics().getViewCount().intValue(), channel.getViewNumber());
+            assertEquals(youtubeChannel.getStatistics().getSubscriberCount().intValue(), channel.getSubscriberNumber());
+            assertEquals(youtubeChannel.getContentOwnerDetails().getContentOwner(), channel.getOwner());
         }
     }
 
@@ -70,12 +67,11 @@ public class YouTubeEntityVerifier {
     public static void assertListOfVideosEqual(List<com.google.api.services.youtube.model.Video> youTubeList, List<Video> actualVideoList) {
         assertEquals(youTubeList.size(), actualVideoList.size());
         for (int i = 0; i < actualVideoList.size(); i++) {
-            assertEquals(youTubeList.get(i).getSnippet().getTitle(),
-                         actualVideoList.get(i).getTitle());
-            assertEquals(youTubeList.get(i).getContentDetails().getDuration(),
-                         actualVideoList.get(i).getDuration().toString());
-            assertEquals(youTubeList.get(i).getSnippet().getTags(),
-                         actualVideoList.get(i).getHashtag());
+            com.google.api.services.youtube.model.Video youtubeVideo = youTubeList.get(i);
+            Video video = actualVideoList.get(i);
+            assertEquals(youtubeVideo.getSnippet().getTitle(), video.getTitle());
+            assertEquals(youtubeVideo.getContentDetails().getDuration(), video.getDuration().toString());
+            assertEquals(youtubeVideo.getSnippet().getTags(), video.getHashtag());
         }
     }
 

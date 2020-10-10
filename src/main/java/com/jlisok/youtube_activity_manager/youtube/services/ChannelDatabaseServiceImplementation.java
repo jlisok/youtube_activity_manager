@@ -12,12 +12,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class ChannelDaoServiceImplementation implements ChannelDaoService {
+public class ChannelDatabaseServiceImplementation implements ChannelDatabaseService {
 
     private final ChannelRepository channelRepository;
 
     @Autowired
-    public ChannelDaoServiceImplementation(ChannelRepository channelRepository) {
+    public ChannelDatabaseServiceImplementation(ChannelRepository channelRepository) {
         this.channelRepository = channelRepository;
     }
 
