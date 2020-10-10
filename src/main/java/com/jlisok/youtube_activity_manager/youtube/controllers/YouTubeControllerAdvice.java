@@ -34,4 +34,5 @@ public class YouTubeControllerAdvice extends BaseExceptionHandler {
     public ResponseEntity<Object> handleFailedLoginException(GoogleJsonResponseException exception) {
         return handleExceptionWithErrorLogging(ResponseCode.YOUTUBE_API_REQUEST_FAILED_INVALID_REQUEST, HttpStatus.INTERNAL_SERVER_ERROR, exception);
     }
+
 }

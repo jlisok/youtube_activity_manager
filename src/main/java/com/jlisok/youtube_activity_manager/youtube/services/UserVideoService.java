@@ -9,6 +9,6 @@ import java.util.UUID;
 
 public interface UserVideoService {
 
-    void insertListInDatabase(List<Video> list, Rating rating, UUID userId) throws ExpectedDataNotFoundInDatabase;
+    void insertVideosInDatabase(List<Video> list, Rating rating, UUID userId) throws ExpectedDataNotFoundInDatabase;
 
 }

@@ -1,10 +1,13 @@
 package com.jlisok.youtube_activity_manager.users.models;
 
+import com.jlisok.youtube_activity_manager.channel.models.Channel;
 import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalData;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -40,20 +43,25 @@ public final class User {
     @PrimaryKeyJoinColumn
     private UserPersonalData userPersonalData;
 
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "users_channels", joinColumns = @JoinColumn(name = "channel_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private Set<Channel> channels = new HashSet<>();
+
     public User() {
     }
 
     // builder
-    User(UUID id, String email, String password, String googleId, String googleIdToken, String accessToken, Instant createdAt, Instant modifiedAt, UserPersonalData userPersonalData) {
+    User(UUID id, String password, String email, String googleIdToken, String accessToken, String googleId, Instant createdAt, Instant modifiedAt, UserPersonalData userPersonalData, Set<Channel> channels) {
         this.id = id;
-        this.email = email;
         this.password = password;
-        this.googleId = googleId;
+        this.email = email;
         this.googleIdToken = googleIdToken;
         this.accessToken = accessToken;
+        this.googleId = googleId;
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
         this.userPersonalData = userPersonalData;
+        this.channels = channels;
     }
 
     public UserPersonalData getUserPersonalData() {
@@ -129,6 +137,14 @@ public final class User {
     }
 
 
+    public Set<Channel> getChannels() {
+        return channels;
+    }
+
+    public void setChannels(Set<Channel> channels) {
+        this.channels = channels;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -137,14 +153,17 @@ public final class User {
         return id.equals(user.id) &&
                 Objects.equals(password, user.password) &&
                 email.equals(user.email) &&
+                Objects.equals(googleIdToken, user.googleIdToken) &&
+                Objects.equals(accessToken, user.accessToken) &&
                 Objects.equals(googleId, user.googleId) &&
                 createdAt.equals(user.createdAt) &&
                 modifiedAt.equals(user.modifiedAt) &&
-                userPersonalData.equals(user.userPersonalData);
+                userPersonalData.equals(user.userPersonalData) &&
+                Objects.equals(channels, user.channels);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, password, email, googleId, createdAt, modifiedAt, userPersonalData);
+        return Objects.hash(id, password, email, googleIdToken, accessToken, googleId, createdAt, modifiedAt, userPersonalData, channels);
     }
 }

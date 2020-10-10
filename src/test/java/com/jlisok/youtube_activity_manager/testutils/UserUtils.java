@@ -149,9 +149,8 @@ public class UserUtils {
         UUID id = UUID.randomUUID();
         UserPersonalData userPersonalData = new UserPersonalDataBuilder()
                 .setId(id)
-                .setFirstName(user
-                                      .getUserPersonalData()
-                                      .getFirstName())
+                .setFirstName(user.getUserPersonalData()
+                                  .getFirstName())
                 .setCreatedAt(user.getCreatedAt())
                 .setModifiedAt(user.getModifiedAt())
                 .createUserPersonalData();
@@ -168,30 +167,12 @@ public class UserUtils {
                 .createUser();
     }
 
+    public User insertUserInDatabase(String token, GoogleIdToken googleIdToken, String accessToken) {
+        User user = createUser(token, googleIdToken, accessToken);
+        repository.saveAndFlush(user);
 
-    public User createUser(String token, GoogleIdToken googleIdToken) {
-        UUID userId = UUID.randomUUID();
-        Instant now = Instant.now();
-        GoogleIdToken.Payload userData = googleIdToken.getPayload();
-        String fistName = userData
-                .get("given_name")
-                .toString();
-        String googleId = userData.getSubject();
-        UserPersonalData userPersonalData = new UserPersonalDataBuilder()
-                .setId(userId)
-                .setFirstName(fistName)
-                .setCreatedAt(now)
-                .setModifiedAt(now)
-                .createUserPersonalData();
-        return new UserBuilder()
-                .setId(userId)
-                .setEmail(userData.getEmail())
-                .setGoogleId(googleId)
-                .setGoogleIdToken(token)
-                .setCreatedAt(now)
-                .setModifiedAt(now)
-                .setUserPersonalData(userPersonalData)
-                .createUser();
+        assertTrue(repository.existsByEmail(user.getEmail()));
+        return user;
     }
 
 

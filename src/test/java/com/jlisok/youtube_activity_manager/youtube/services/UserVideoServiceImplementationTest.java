@@ -59,7 +59,7 @@ class UserVideoServiceImplementationTest {
                 .thenReturn(Optional.empty());
 
         //when //then
-        assertThrows(ExpectedDataNotFoundInDatabase.class, () -> service.insertListInDatabase(videoList, rating, id));
+        assertThrows(ExpectedDataNotFoundInDatabase.class, () -> service.insertVideosInDatabase(videoList, rating, id));
     }
 
 
@@ -72,7 +72,7 @@ class UserVideoServiceImplementationTest {
                 .thenReturn(Optional.of(user));
 
         //when
-        service.insertListInDatabase(videoList, rating, id);
+        service.insertVideosInDatabase(videoList, rating, id);
 
         //then
         verify(userVideoRepository).saveAll(ArgumentMatchers.anyList());
@@ -88,7 +88,7 @@ class UserVideoServiceImplementationTest {
                 .thenReturn(Optional.of(user));
 
         //when
-        service.insertListInDatabase(videoList, rating, id);
+        service.insertVideosInDatabase(videoList, rating, id);
 
         //then
         verify(userVideoRepository).saveAll(ArgumentMatchers.anyList());

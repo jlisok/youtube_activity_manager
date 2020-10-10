@@ -2,7 +2,7 @@ package com.jlisok.youtube_activity_manager.youtube.services;
 
 import com.jlisok.youtube_activity_manager.database.exceptions.ExpectedDataNotFoundInDatabase;
 import com.jlisok.youtube_activity_manager.users.models.User;
-import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
+import com.jlisok.youtube_activity_manager.users.utils.UserFetcher;
 import com.jlisok.youtube_activity_manager.videos.enums.Rating;
 import com.jlisok.youtube_activity_manager.videos.models.UserVideo;
 import com.jlisok.youtube_activity_manager.videos.models.Video;
@@ -18,31 +18,24 @@ import java.util.stream.Collectors;
 @Service
 public class UserVideoServiceImplementation implements UserVideoService {
 
-    private final UserRepository userRepository;
     private final UserVideoRepository userVideoRepository;
+    private final UserFetcher userFetcher;
 
     @Autowired
-    public UserVideoServiceImplementation(UserRepository userRepository, UserVideoRepository userVideoRepository) {
-        this.userRepository = userRepository;
+    public UserVideoServiceImplementation(UserVideoRepository userVideoRepository, UserFetcher userFetcher) {
         this.userVideoRepository = userVideoRepository;
+        this.userFetcher = userFetcher;
     }
 
     @Override
     @Transactional
-    public void insertListInDatabase(List<Video> list, Rating rating, UUID userId) throws ExpectedDataNotFoundInDatabase {
-        User user = fetchUser(userId);
+    public void insertVideosInDatabase(List<Video> list, Rating rating, UUID userId) throws ExpectedDataNotFoundInDatabase {
+        User user = userFetcher.fetchUser(userId);
         List<UserVideo> userVideoList = list
                 .stream()
                 .map(video -> createUserVideo(user, video, rating))
                 .collect(Collectors.toList());
         userVideoRepository.saveAll(userVideoList);
-    }
-
-
-    private User fetchUser(UUID userId) throws ExpectedDataNotFoundInDatabase {
-        return userRepository
-                .findById(userId)
-                .orElseThrow(() -> new ExpectedDataNotFoundInDatabase("Error while fetching User from database. User userId: " + userId + "not found."));
     }
 
 

@@ -1,14 +1,12 @@
 package com.jlisok.youtube_activity_manager.videos.models;
 
+import com.jlisok.youtube_activity_manager.channel.models.Channel;
 import com.vladmihalcea.hibernate.type.array.ListArrayType;
 import com.vladmihalcea.hibernate.type.interval.PostgreSQLIntervalType;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -31,9 +29,6 @@ public class Video {
     @Column(name = "youtube_id")
     private String youTubeId;
 
-    @Column(name = "channel_id")
-    private String channelId;
-
     @Column(name = "duration", columnDefinition = "interval")
     private Duration duration;
 
@@ -54,20 +49,33 @@ public class Video {
     @Column(name = "modified_at")
     private Instant modifiedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "channel_id")
+    private Channel channel;
+
+
     public Video() {
     }
 
-    Video(UUID id, String title, String youTubeId, String channelId, Duration duration, Instant publishedAt, List<String> hashtag, List<String> uri, Instant createdAt, Instant modifiedAt) {
+    Video(UUID id, String title, String youTubeId, Duration duration, Instant publishedAt, List<String> hashtag, List<String> uri, Instant createdAt, Instant modifiedAt, Channel channel) {
         this.id = id;
         this.title = title;
         this.youTubeId = youTubeId;
-        this.channelId = channelId;
         this.duration = duration;
         this.publishedAt = publishedAt;
         this.hashtag = hashtag;
         this.uri = uri;
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
+        this.channel = channel;
+    }
+
+    public String getYouTubeId() {
+        return youTubeId;
+    }
+
+    public void setYouTubeId(String youTubeId) {
+        this.youTubeId = youTubeId;
     }
 
     public UUID getId() {
@@ -84,14 +92,6 @@ public class Video {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public String getChannelId() {
-        return channelId;
-    }
-
-    public void setChannelId(String channelId) {
-        this.channelId = channelId;
     }
 
     public Duration getDuration() {
@@ -142,6 +142,15 @@ public class Video {
         this.modifiedAt = modifiedAt;
     }
 
+    public Channel getChannel() {
+        return channel;
+    }
+
+    public void setChannel(Channel channel) {
+        this.channel = channel;
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -149,17 +158,18 @@ public class Video {
         Video video = (Video) o;
         return id.equals(video.id) &&
                 title.equals(video.title) &&
-                channelId.equals(video.channelId) &&
+                youTubeId.equals(video.youTubeId) &&
                 duration.equals(video.duration) &&
                 publishedAt.equals(video.publishedAt) &&
                 Objects.equals(hashtag, video.hashtag) &&
                 Objects.equals(uri, video.uri) &&
                 createdAt.equals(video.createdAt) &&
-                modifiedAt.equals(video.modifiedAt);
+                modifiedAt.equals(video.modifiedAt) &&
+                channel.equals(video.channel);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, channelId, duration, publishedAt, hashtag, uri, createdAt, modifiedAt);
+        return Objects.hash(id, title, youTubeId, duration, publishedAt, hashtag, uri, createdAt, modifiedAt, channel);
     }
 }

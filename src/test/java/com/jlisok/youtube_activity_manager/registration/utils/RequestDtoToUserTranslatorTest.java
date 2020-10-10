@@ -2,14 +2,12 @@ package com.jlisok.youtube_activity_manager.registration.utils;
 
 import com.jlisok.youtube_activity_manager.registration.dto.RegistrationRequestDto;
 import com.jlisok.youtube_activity_manager.registration.exceptions.PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException;
-import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationDataProcessingException;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.userPersonalData.enums.Sex;
 import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalData;
 import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalDataBuilder;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.users.models.UserBuilder;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -57,7 +55,7 @@ class RequestDtoToUserTranslatorTest {
     }
 
     @Test
-    void translate_whenDtoIsValid() throws PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException, RegistrationDataProcessingException {
+    void translate_whenDtoIsValid() throws PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException {
         //given
         UserPersonalData userPersonalData = new UserPersonalDataBuilder()
                 .setId(id)
@@ -86,15 +84,4 @@ class RequestDtoToUserTranslatorTest {
         //then
         userUtils.assertUsersAreEqualWhenIgnoringPassword(expected, actual);
     }
-
-    @Test
-    void translate_whenDtoIsInValid() {
-        //when
-        RegistrationRequestDto registrationRequestDto = null;
-
-        // then
-        Assertions.assertThrows(RegistrationDataProcessingException.class, () -> translator.translate(registrationRequestDto, now, id));
-    }
-
-
 }

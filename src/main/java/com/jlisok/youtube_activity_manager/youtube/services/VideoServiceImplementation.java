@@ -1,7 +1,7 @@
 package com.jlisok.youtube_activity_manager.youtube.services;
 
 import com.jlisok.youtube_activity_manager.videos.models.Video;
-import com.jlisok.youtube_activity_manager.youtube.utils.VideoCreator;
+import com.jlisok.youtube_activity_manager.youtube.utils.EntityCreator;
 import com.jlisok.youtube_activity_manager.youtube.utils.VideoDescription;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +13,7 @@ public class VideoServiceImplementation implements VideoService {
 
 
     @Override
-    public List<Video> createListOfVideos(List<com.google.api.services.youtube.model.Video> youTubeVideoList) {
+    public List<Video> createVideos(List<com.google.api.services.youtube.model.Video> youTubeVideoList) {
         return youTubeVideoList
                 .stream()
                 .map(this::translateToVideo)
@@ -23,6 +23,6 @@ public class VideoServiceImplementation implements VideoService {
 
     private Video translateToVideo(com.google.api.services.youtube.model.Video youtubeVideo) {
         List<String> uriList = VideoDescription.toListOfUri(youtubeVideo.getSnippet().getDescription());
-        return VideoCreator.createVideo(youtubeVideo.getId(), youtubeVideo.getSnippet(), youtubeVideo.getContentDetails(), uriList);
+        return EntityCreator.createVideo(youtubeVideo.getId(), youtubeVideo.getSnippet(), youtubeVideo.getContentDetails(), uriList);
     }
 }

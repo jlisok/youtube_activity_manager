@@ -4,7 +4,6 @@ import com.jlisok.youtube_activity_manager.domain.exceptions.BaseExceptionHandle
 import com.jlisok.youtube_activity_manager.domain.exceptions.ResponseCode;
 import com.jlisok.youtube_activity_manager.registration.exceptions.FieldViolationBadRegistrationRequestException;
 import com.jlisok.youtube_activity_manager.registration.exceptions.PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException;
-import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationDataProcessingException;
 import com.jlisok.youtube_activity_manager.registration.exceptions.UnexpectedErrorBadRegistrationRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,11 +43,4 @@ public class RegistrationControllerAdvice extends BaseExceptionHandler {
     public ResponseEntity<Object> handleFailedLoginException(UnexpectedErrorBadRegistrationRequestException exception) {
         return handleExceptionWithErrorLogging(ResponseCode.REGISTRATION_FAILED_UNEXPECTED_ERROR, HttpStatus.INTERNAL_SERVER_ERROR, exception);
     }
-
-
-    @ExceptionHandler({RegistrationDataProcessingException.class})
-    public ResponseEntity<Object> handleFailedLoginException(RegistrationDataProcessingException exception) {
-        return handleExceptionWithErrorLogging(ResponseCode.REGISTRATION_FAILED_SOME_PARAMETERS_NULL, HttpStatus.INTERNAL_SERVER_ERROR, exception);
-    }
-
 }

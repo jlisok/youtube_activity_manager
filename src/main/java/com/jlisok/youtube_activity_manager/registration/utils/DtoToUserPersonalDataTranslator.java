@@ -15,7 +15,17 @@ public class DtoToUserPersonalDataTranslator {
 
     public UserPersonalData translate(RegistrationRequestDto registrationRequestDto, Instant now, UUID id) throws PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException {
         checkIfWholePhoneNumberIsNullOrFilledIn(registrationRequestDto.getPhonePrefix(), registrationRequestDto.getPhoneNumber());
-        return new UserPersonalDataBuilder().setId(id).setGender(registrationRequestDto.getGender()).setBirthYear(registrationRequestDto.getBirthYear()).setCountry(registrationRequestDto.getCountry()).setPhonePrefix(registrationRequestDto.getPhonePrefix()).setPhoneNumber(registrationRequestDto.getPhoneNumber()).setFirstName(registrationRequestDto.getFirstName()).setCreatedAt(now).setModifiedAt(now).createUserPersonalData();
+        return new UserPersonalDataBuilder()
+                .setId(id)
+                .setGender(registrationRequestDto.getGender())
+                .setBirthYear(registrationRequestDto.getBirthYear())
+                .setCountry(registrationRequestDto.getCountry())
+                .setPhonePrefix(registrationRequestDto.getPhonePrefix())
+                .setPhoneNumber(registrationRequestDto.getPhoneNumber())
+                .setFirstName(registrationRequestDto.getFirstName())
+                .setCreatedAt(now)
+                .setModifiedAt(now)
+                .createUserPersonalData();
     }
 
     private void checkIfWholePhoneNumberIsNullOrFilledIn(String phonePrefix, String phoneNumber) throws PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException {

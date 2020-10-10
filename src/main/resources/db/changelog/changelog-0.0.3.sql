@@ -18,7 +18,6 @@ CREATE TABLE public.videos (
     modified_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
-
 CREATE TABLE public.users_videos (
     id uuid PRIMARY KEY NOT NULL,
     user_id uuid NOT NULL,
@@ -27,7 +26,6 @@ CREATE TABLE public.users_videos (
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     modified_at timestamp without time zone DEFAULT now() NOT NULL
 );
-
 
 ALTER TABLE public.users_videos
     ADD CONSTRAINT video_id_fkey_users FOREIGN KEY (user_id) REFERENCES public.users(id)
@@ -57,4 +55,4 @@ ALTER TABLE public.videos
     ALTER COLUMN channel_id TYPE text,
     ALTER COLUMN channel_id SET NOT NULL;
 
---rollback ALTER TABLE public.videos ALTER COLUMN channel_id uuid, ALTER COLUMN channel_id SET NOT NULL;
+--rollback ALTER TABLE public.videos ALTER COLUMN channel_id TYPE uuid, ALTER COLUMN channel_id SET NOT NULL;

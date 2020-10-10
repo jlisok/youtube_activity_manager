@@ -1,6 +1,6 @@
 package com.jlisok.youtube_activity_manager.youtube.controllers;
 
-import com.google.api.services.youtube.model.Subscription;
+import com.jlisok.youtube_activity_manager.channel.models.Channel;
 import com.jlisok.youtube_activity_manager.database.exceptions.ExpectedDataNotFoundInDatabase;
 import com.jlisok.youtube_activity_manager.videos.models.Video;
 import com.jlisok.youtube_activity_manager.youtube.dto.YouTubeRatingDto;
@@ -28,14 +28,14 @@ public class YouTubeController {
     }
 
     @GetMapping("/videos")
-    public ResponseEntity<List<Video>> getRatedVideos(@Valid @RequestBody YouTubeRatingDto dto) throws IOException, ExpectedDataNotFoundInDatabase {
+    public ResponseEntity<List<Video>> getRatedVideos(@Valid @RequestBody YouTubeRatingDto dto) throws ExpectedDataNotFoundInDatabase, IOException {
         return ResponseEntity
                 .ok()
                 .body(service.listRatedVideos(dto));
     }
 
     @GetMapping("/channels")
-    public ResponseEntity<List<Subscription>> getSubscribedChannels() throws IOException {
+    public ResponseEntity<List<Channel>> getSubscribedChannels() throws Exception {
         return ResponseEntity
                 .ok()
                 .body(service.listSubscribedChannels());
