@@ -4,7 +4,7 @@ import org.springframework.security.core.AuthenticationException;
 
 public class DataInconsistencyAuthenticationException extends AuthenticationException {
 
-    public DataInconsistencyAuthenticationException(String detail) {
-        super(detail);
+    public DataInconsistencyAuthenticationException(String message, Throwable throwable) {
+        super(message, throwable);
     }
 }
