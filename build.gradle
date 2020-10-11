@@ -189,7 +189,7 @@ liquibase {
 
     activities {
         main {
-            changeLogFile 'db/changelog/changelog-master.xml'
+            changeLogFile 'src/main/resources/db/changelog/changelog-master.xml'
             url "jdbc:postgresql://$dbHost:$dbPort/$dbName"
             username "$dbUsername"
             password "$dbPassword"
