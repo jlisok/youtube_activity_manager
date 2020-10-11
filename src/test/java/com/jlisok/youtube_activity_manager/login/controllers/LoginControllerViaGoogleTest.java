@@ -161,7 +161,6 @@ class LoginControllerViaGoogleTest {
                 .andExpect(status().isForbidden())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof DataInconsistencyAuthenticationException));
     }
-    //TODO
 
 
     @Test

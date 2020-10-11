@@ -5,6 +5,7 @@ CREATE TABLE public.channels (
     id uuid PRIMARY KEY NOT NULL,
     youtube_channel_id text NOT NULL,
     title text NOT NULL,
+    owner text,
     published_at timestamp without time zone NOT NULL,
     language text,
     country text,
@@ -57,16 +58,11 @@ ALTER TABLE public.videos
 --rollback ALTER TABLE public.videos DROP COLUMN channel_id;
 --rollback ALTER TABLE public.videos ADD channel_id text NOT NULL;
 
+
+
 --changeset jlisok:3
-ALTER TABLE public.channels
-    ADD owner text NOT NULL;
+ALTER TABLE public.users
+    ADD UNIQUE (google_id);
 
---rollback ALTER TABLE public.channels DROP COLUMN owner;
-
-
---changeset jlisok:4
-ALTER TABLE public.channels
-    ALTER COLUMN owner DROP NOT NULL;
-
---rollback ALTER TABLE public.channels ALTER COLUMN owner SET NOT NULL;
+--rollback ALTER TABLE public.users ALTER COLUMN google_id SET NULL;
 

@@ -8,7 +8,7 @@ ALTER TABLE public.user_personal_data
     ALTER COLUMN country DROP NOT NULL;
 
 ALTER TABLE public.users
-    ADD google_id text UNIQUE;
+    ADD google_id text NULL;
 
 ALTER TABLE public.users
     ADD google_id_token text NULL;
