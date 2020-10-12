@@ -2,6 +2,8 @@ package com.jlisok.youtube_activity_manager.testutils;
 
 import com.jlisok.youtube_activity_manager.channel.models.Channel;
 import com.jlisok.youtube_activity_manager.videos.models.Video;
+import com.jlisok.youtube_activity_manager.youtube.dto.ChannelDto;
+import com.jlisok.youtube_activity_manager.youtube.dto.VideoDto;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
@@ -10,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class YouTubeEntityVerifier {
 
-    public static void assertResponseVideosNotNull(MvcResult result) throws Exception {
+    public static void assertVideoDtoNotNull(MvcResult result) throws Exception {
         String response = result
                 .getResponse()
                 .getContentAsString();
@@ -18,14 +20,13 @@ public class YouTubeEntityVerifier {
         assertNotNull(response);
         assertTrue(response.contains("id"));
         assertTrue(response.contains("title"));
+        assertTrue(response.contains("channelTitle"));
         assertTrue(response.contains("duration"));
-        assertTrue(response.contains("hashtag"));
-        assertTrue(response.contains("uri"));
-        assertTrue(response.contains("channel"));
+        assertTrue(response.contains("publishedAt"));
     }
 
 
-    public static void assertResponseChannelsNotNull(MvcResult result) throws Exception {
+    public static void assertChannelDtoNotNull(MvcResult result) throws Exception {
         String response = result
                 .getResponse()
                 .getContentAsString();
@@ -33,10 +34,10 @@ public class YouTubeEntityVerifier {
         assertNotNull(response);
         assertTrue(response.contains("id"));
         assertTrue(response.contains("title"));
-        assertTrue(response.contains("youTubeChannelId"));
         assertTrue(response.contains("viewNumber"));
         assertTrue(response.contains("subscriberNumber"));
         assertTrue(response.contains("videoNumber"));
+        assertTrue(response.contains("publishedAt"));
     }
 
 
@@ -88,4 +89,24 @@ public class YouTubeEntityVerifier {
         assertNotNull(channel.getVideoNumber());
         assertNotNull(channel.getId());
     }
+
+
+    public static void assertVideoDtoNotEmpty(VideoDto videoDto) {
+        assertNotNull(videoDto.getId());
+        assertNotNull(videoDto.getDuration());
+        assertNotNull(videoDto.getPublishedAt());
+        assertFalse(videoDto.getTitle().isEmpty());
+        assertFalse(videoDto.getChannelTitle().isEmpty());
+    }
+
+
+    public static void assertChannelDtoNotEmpty(ChannelDto channelDto) {
+        assertNotNull(channelDto.getId());
+        assertNotNull(channelDto.getPublishedAt());
+        assertNotNull(channelDto.getSubscriberNumber());
+        assertNotNull(channelDto.getVideoNumber());
+        assertNotNull(channelDto.getViewNumber());
+        assertFalse(channelDto.getTitle().isEmpty());
+    }
+
 }
