@@ -26,6 +26,7 @@ CREATE TABLE public.users_channels (
     modified_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
+
 ALTER TABLE public.users_channels
     ADD CONSTRAINT channel_id_fkey_channels FOREIGN KEY (channel_id) REFERENCES public.channels(id)
     ON UPDATE CASCADE
