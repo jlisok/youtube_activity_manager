@@ -38,3 +38,7 @@ out/
 
 # personal notes
 personalNotesTodo.sql
+
+# ci
+ci/
+.github/
