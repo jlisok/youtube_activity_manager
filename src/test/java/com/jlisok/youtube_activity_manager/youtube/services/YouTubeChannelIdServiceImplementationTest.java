@@ -16,16 +16,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
-class SubscriptionServiceImplementationTest {
+class YouTubeChannelIdServiceImplementationTest {
 
     @Autowired
-    private SubscriptionService service;
+    private YouTubeChannelIdService service;
 
     @ParameterizedTest
     @MethodSource("exampleYouTubeChannels")
     void fetchChannelIds(List<Subscription> youtubeSubscriptionList) {
         //given //when
-        List<String> channelIds = service.retrieveChannelId(youtubeSubscriptionList);
+        List<String> channelIds = service.getChannelIdFromSubscriptions(youtubeSubscriptionList);
 
         //then
         IntStream.range(0, channelIds.size())

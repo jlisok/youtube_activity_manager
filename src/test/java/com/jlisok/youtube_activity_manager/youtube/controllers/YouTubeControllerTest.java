@@ -85,7 +85,8 @@ class YouTubeControllerTest {
 
         //when //then
         mockMvc
-                .perform(mvcRequestBuilder.setGetRequestWithParams(endPointUrlVideos, jsonHeader, parameterName, Rating.LIKE.toString()))
+                .perform(mvcRequestBuilder.setGetRequestWithParams(endPointUrlVideos, jsonHeader, parameterName, Rating.LIKE
+                        .toString()))
                 .andExpect(status().isOk())
                 .andExpect(YouTubeEntityVerifier::assertResponseVideosNotNull);
     }
@@ -130,7 +131,8 @@ class YouTubeControllerTest {
 
         //when //then
         mockMvc
-                .perform(mvcRequestBuilder.setGetRequestWithParams(endPointUrlVideos, jsonHeader, parameterName, Rating.LIKE.toString()))
+                .perform(mvcRequestBuilder.setGetRequestWithParams(endPointUrlVideos, jsonHeader, parameterName, Rating.LIKE
+                        .toString()))
                 .andExpect(status().isInternalServerError())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof GoogleJsonResponseException));
     }

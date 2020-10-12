@@ -50,10 +50,15 @@ ALTER TABLE public.videos
     DROP COLUMN youtube_id,
     ADD youtube_video_id text NOT NULL,
     DROP COLUMN channel_id,
-    ADD youtube_channel_id text NOT NULL;
+    ADD channel_id uuid NOT NULL;
 
+ALTER TABLE public.videos
+     ADD CONSTRAINT channel_id_fkey_channels FOREIGN KEY (channel_id) REFERENCES public.channels(id)
+     ON UPDATE CASCADE
+     ON DELETE CASCADE;
 
---rollback ALTER TABLE public.videos ADD youtube_id text NOT NULL, DROP COLUMN youtube_video_id, ADD channel_id text NOT NULL, DROP COLUMN youtube_channel_id;
+--rollback ALTER TABLE public.videos DROP CONSTRAINT channel_id_fkey_channels;
+--rollback ALTER TABLE public.videos ADD youtube_id text NOT NULL, DROP COLUMN youtube_video_id, DROP COLUMN channel_id, ADD channel_id text NOT NULL;
 
 
 --changeset jlisok:3

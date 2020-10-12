@@ -27,16 +27,16 @@ public class YouTubeServiceImplementation implements YouTubeService {
     private final YouTubeClient youTubeClient;
     private final VideoService videoService;
     private final UserVideoService userVideoService;
-    private final SubscriptionService subscriptionService;
+    private final YouTubeChannelIdService youTubeChannelIdService;
     private final ChannelService channelService;
     private final ChannelDatabaseService channelDatabaseService;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
     @Autowired
-    public YouTubeServiceImplementation(AccessTokenService accessTokenService, YouTubeClient youTubeClient, VideoService videoService, ChannelService channelService, UserVideoService userVideoService, SubscriptionService subscriptionService, ChannelDatabaseService channelDatabaseService) {
+    public YouTubeServiceImplementation(AccessTokenService accessTokenService, YouTubeClient youTubeClient, VideoService videoService, ChannelService channelService, UserVideoService userVideoService, YouTubeChannelIdService youTubeChannelIdService, ChannelDatabaseService channelDatabaseService) {
         logger.debug("YouTubeService - initialization.");
-        this.subscriptionService = subscriptionService;
+        this.youTubeChannelIdService = youTubeChannelIdService;
         this.channelDatabaseService = channelDatabaseService;
         this.channelService = channelService;
         this.videoService = videoService;
@@ -54,7 +54,31 @@ public class YouTubeServiceImplementation implements YouTubeService {
             logger.debug("YouTubeService - returning empty Channel list, userId {} has no subscriptions in YouTube - success.", userId);
             return Collections.emptyList();
         }
-        List<String> youtubeChannelIds = subscriptionService.retrieveChannelId(subscriptions);
+        List<String> youtubeChannelIds = youTubeChannelIdService.getChannelIdFromSubscriptions(subscriptions);
+        return getAndInsertChannels(youtubeChannelIds, userId);
+    }
+
+
+    @Override
+    public List<Video> listRatedVideos(YouTubeRatingDto dto) throws IOException {
+        UUID userId = getAuthenticationInContext().getAuthenticatedUserId();
+        List<com.google.api.services.youtube.model.Video> youtubeVideos = youTubeClient
+                .fetchRatedVideos(accessTokenService.getAccessToken(), VIDEO_REQUEST_PARTS, dto.getRating());
+        if (youtubeVideos.isEmpty()) {
+            logger.debug("YouTubeService - returning empty Video list, userId {} has no subscriptions in YouTube - success.", userId);
+            return new ArrayList<>(0);
+        }
+        logger.debug("YouTubeService - fetching list of rated videos for userId {} - success.", userId);
+        List<String> youtubeChannelIds = youTubeChannelIdService.getChannelIdFromVideos(youtubeVideos);
+        List<Channel> channels = getAndInsertChannels(youtubeChannelIds, userId);
+        List<Video> videos = videoService.createVideos(youtubeVideos, channels);
+        userVideoService.insertVideosInDatabase(videos, dto.getRating(), userId);
+        logger.debug("YouTubeService - inserting videos in database for userId {} - success.", userId);
+        return videos;
+    }
+
+
+    private List<Channel> getAndInsertChannels(List<String> youtubeChannelIds, UUID userId) throws IOException {
         List<com.google.api.services.youtube.model.Channel> youtubeChannels = youTubeClient
                 .fetchChannels(accessTokenService.getAccessToken(), CHANNEL_REQUEST_PARTS, youtubeChannelIds);
         logger.debug("YouTubeService - fetching subscribed channels for userId {} - success.", userId);
@@ -62,23 +86,6 @@ public class YouTubeServiceImplementation implements YouTubeService {
         channelDatabaseService.updateChannelsInDatabase(channels, userId);
         logger.debug("YouTubeService - inserting channels in database for userId {} - success.", userId);
         return channels;
-    }
-
-
-    @Override
-    public List<Video> listRatedVideos(YouTubeRatingDto dto) throws IOException {
-        UUID userId = getAuthenticationInContext().getAuthenticatedUserId();
-        List<com.google.api.services.youtube.model.Video> videos = youTubeClient
-                .fetchRatedVideos(accessTokenService.getAccessToken(), VIDEO_REQUEST_PARTS, dto.getRating());
-        if (videos.isEmpty()) {
-            logger.debug("YouTubeService - returning empty Video list, userId {} has no subscriptions in YouTube - success.", userId);
-            return new ArrayList<>(0);
-        }
-        logger.debug("YouTubeService - fetching list of rated videos for userId {} - success.", userId);
-        List<Video> videoList = videoService.createVideos(videos);
-        userVideoService.insertVideosInDatabase(videoList, dto.getRating(), userId);
-        logger.debug("YouTubeService - inserting videos in database for userId {} - success.", userId);
-        return videoList;
     }
 }
 

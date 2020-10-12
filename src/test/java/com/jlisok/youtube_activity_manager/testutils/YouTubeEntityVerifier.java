@@ -21,6 +21,7 @@ public class YouTubeEntityVerifier {
         assertTrue(response.contains("duration"));
         assertTrue(response.contains("hashtag"));
         assertTrue(response.contains("uri"));
+        assertTrue(response.contains("channel"));
     }
 
 
@@ -56,11 +57,12 @@ public class YouTubeEntityVerifier {
     }
 
 
-    public static void assertVideoNotEmptyOmitChannel(Video video) {
+    public static void assertVideoNotEmpty(Video video) {
         assertNotNull(video.getHashtag());
         assertNotNull(video.getUri());
         assertFalse(video.getTitle().isEmpty());
         assertFalse(video.getId().toString().isEmpty());
+        assertChannelNotEmpty(video.getChannel());
     }
 
 
@@ -69,9 +71,11 @@ public class YouTubeEntityVerifier {
         for (int i = 0; i < actualVideoList.size(); i++) {
             com.google.api.services.youtube.model.Video youtubeVideo = youTubeList.get(i);
             Video video = actualVideoList.get(i);
+            assertChannelNotEmpty(video.getChannel());
             assertEquals(youtubeVideo.getSnippet().getTitle(), video.getTitle());
             assertEquals(youtubeVideo.getContentDetails().getDuration(), video.getDuration().toString());
             assertEquals(youtubeVideo.getSnippet().getTags(), video.getHashtag());
+            assertEquals(youtubeVideo.getSnippet().getChannelId(), video.getChannel().getYouTubeChannelId());
         }
     }
 
