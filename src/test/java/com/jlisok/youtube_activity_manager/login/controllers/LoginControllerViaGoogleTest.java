@@ -5,11 +5,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.jlisok.youtube_activity_manager.login.dto.GoogleLoginRequestDto;
 import com.jlisok.youtube_activity_manager.login.exceptions.DataInconsistencyAuthenticationException;
 import com.jlisok.youtube_activity_manager.login.exceptions.EmailNotVerifiedAuthenticationException;
-import com.jlisok.youtube_activity_manager.testutils.JwtTokenVerifier;
-import com.jlisok.youtube_activity_manager.testutils.MockGoogleIdToken;
-import com.jlisok.youtube_activity_manager.testutils.MockMvcBasicRequestBuilder;
-import com.jlisok.youtube_activity_manager.testutils.UserUtils;
-import com.jlisok.youtube_activity_manager.users.models.User;
+import com.jlisok.youtube_activity_manager.testutils.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Transactional
-class LoginControllerViaGoogleTest {
+class LoginControllerViaGoogleTest implements TestProfile {
 
     @Autowired
     private MockMvc mockMvc;

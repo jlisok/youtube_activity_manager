@@ -3,10 +3,7 @@ package com.jlisok.youtube_activity_manager.registration.controllers;
 import com.jlisok.youtube_activity_manager.domain.exceptions.ResponseCode;
 import com.jlisok.youtube_activity_manager.registration.dto.RegistrationRequestDto;
 import com.jlisok.youtube_activity_manager.registration.exceptions.BadRegistrationRequestException;
-import com.jlisok.youtube_activity_manager.testutils.MockMvcBasicRequestBuilder;
-import com.jlisok.youtube_activity_manager.testutils.MvcResponseVerifier;
-import com.jlisok.youtube_activity_manager.testutils.RandomRegistrationDto;
-import com.jlisok.youtube_activity_manager.testutils.UserUtils;
+import com.jlisok.youtube_activity_manager.testutils.*;
 import com.jlisok.youtube_activity_manager.userPersonalData.enums.Sex;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
@@ -32,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RegistrationControllerTest {
+class RegistrationControllerTest implements TestProfile {
 
     @Autowired
     private MockMvc mockMvc;

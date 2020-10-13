@@ -94,11 +94,11 @@ class ChannelDatabaseServiceImplementationTest {
         List<Channel> actualChannels = captor.getValue();
         IntStream.range(0, actualChannels.size())
                  .forEach(i -> {
-                     Assertions.assertEquals(repositoryChannels.get(i).getCreatedAt(), actualChannels.get(i)
-                                                                                                     .getCreatedAt());
-                     Assertions.assertNotEquals(repositoryChannels.get(i).getModifiedAt(), actualChannels.get(i)
-                                                                                                         .getModifiedAt());
-                     Assertions.assertEquals(repositoryChannels.get(i).getId(), actualChannels.get(i).getId());
+                     Channel dbChannel = repositoryChannels.get(i);
+                     Channel actualChannel = actualChannels.get(i);
+                     Assertions.assertEquals(dbChannel.getCreatedAt(), actualChannel.getCreatedAt());
+                     Assertions.assertNotEquals(dbChannel.getModifiedAt(), actualChannel.getModifiedAt());
+                     Assertions.assertEquals(dbChannel.getId(), actualChannel.getId());
                  });
     }
 }

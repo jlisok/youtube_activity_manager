@@ -1,5 +1,6 @@
 package com.jlisok.youtube_activity_manager.youtube.services;
 
+import com.google.api.client.util.Lists;
 import com.google.api.services.youtube.model.Subscription;
 import com.jlisok.youtube_activity_manager.channel.models.Channel;
 import com.jlisok.youtube_activity_manager.videos.models.Video;
@@ -13,13 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static com.jlisok.youtube_activity_manager.security.configs.JwtAuthenticationContext.getAuthenticationInContext;
-import static com.jlisok.youtube_activity_manager.youtube.constants.YouTubeApiClientRequestParts.*;
+import static com.jlisok.youtube_activity_manager.youtube.constants.YouTubeApiClientRequest.*;
 
 @Service
 public class YouTubeServiceImplementation implements YouTubeService {
@@ -72,8 +70,8 @@ public class YouTubeServiceImplementation implements YouTubeService {
             return new ArrayList<>(0);
         }
         logger.debug("YouTubeService - fetching list of rated videos for userId {} - success.", userId);
-        List<String> youtubeChannelIds = youTubeChannelIdService.getChannelIdFromVideos(youtubeVideos);
-        List<Channel> channels = getAndInsertChannels(youtubeChannelIds, userId);
+        Set<String> youtubeChannelIds = youTubeChannelIdService.getChannelIdFromVideos(youtubeVideos);
+        List<Channel> channels = getAndInsertChannels(Lists.newArrayList(youtubeChannelIds), userId);
         List<Video> videos = videoService.createVideos(youtubeVideos, channels);
         userVideoService.insertVideosInDatabase(videos, dto.getRating(), userId);
         logger.debug("YouTubeService - inserting videos in database for userId {} - success.", userId);
@@ -86,9 +84,9 @@ public class YouTubeServiceImplementation implements YouTubeService {
                 .fetchChannels(accessTokenService.getAccessToken(), CHANNEL_REQUEST_PARTS, youtubeChannelIds);
         logger.debug("YouTubeService - fetching subscribed channels for userId {} - success.", userId);
         List<Channel> channels = channelService.createChannels(youtubeChannels, userId);
-        channelDatabaseService.updateChannelsInDatabase(channels, userId);
+        List<Channel> databaseChannels = channelDatabaseService.updateChannelsInDatabase(channels, userId);
         logger.debug("YouTubeService - inserting channels in database for userId {} - success.", userId);
-        return channels;
+        return databaseChannels;
     }
 }
 

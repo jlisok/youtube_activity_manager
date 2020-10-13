@@ -4,11 +4,12 @@ import com.google.api.services.youtube.model.Subscription;
 import com.google.api.services.youtube.model.Video;
 
 import java.util.List;
+import java.util.Set;
 
 public interface YouTubeChannelIdService {
 
     List<String> getChannelIdFromSubscriptions(List<Subscription> subscriptions);
 
-    List<String> getChannelIdFromVideos(List<Video> videos);
+    Set<String> getChannelIdFromVideos(List<Video> videos);
 
 }

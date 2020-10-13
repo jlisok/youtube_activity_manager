@@ -3,10 +3,7 @@ package com.jlisok.youtube_activity_manager.youtube.controllers;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
-import com.jlisok.youtube_activity_manager.testutils.AuthenticationUtils;
-import com.jlisok.youtube_activity_manager.testutils.MockMvcBasicRequestBuilder;
-import com.jlisok.youtube_activity_manager.testutils.UserUtils;
-import com.jlisok.youtube_activity_manager.testutils.YouTubeEntityVerifier;
+import com.jlisok.youtube_activity_manager.testutils.*;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.videos.enums.Rating;
 import com.jlisok.youtube_activity_manager.videos.repositories.UserVideoRepository;
@@ -34,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @Disabled("test methods require refreshed access token, which is now not implemented. In due time, this test class should be run manually.")
-class YouTubeControllerTest {
+class YouTubeControllerTest implements TestProfile {
 
     @Autowired
     private UserUtils userUtils;

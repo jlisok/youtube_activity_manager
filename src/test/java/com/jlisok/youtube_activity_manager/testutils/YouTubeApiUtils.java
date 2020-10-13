@@ -216,4 +216,23 @@ public class YouTubeApiUtils {
         return new ChannelTopicDetails()
                 .setTopicCategories(Collections.singletonList(createRandomString()));
     }
+
+    public static SubscriptionListResponse createSubscriptionListResponse(List<Subscription> subscriptions, String nextPageToken) {
+        return new SubscriptionListResponse()
+                .setNextPageToken(nextPageToken)
+                .setItems(subscriptions);
+    }
+
+
+    public static ChannelListResponse createChannelListResponse(List<com.google.api.services.youtube.model.Channel> channels) {
+        return new ChannelListResponse()
+                .setItems(channels);
+    }
+
+
+    public static VideoListResponse createVideoListResponse(List<com.google.api.services.youtube.model.Video> videos, String nextPageToken) {
+        return new VideoListResponse()
+                .setNextPageToken(nextPageToken)
+                .setItems(videos);
+    }
 }

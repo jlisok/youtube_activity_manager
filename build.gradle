@@ -17,6 +17,7 @@ repositories {
 ext {
     apacheCommonsVersion = '3.11'
     auth0Version = '3.4.0'
+    collectionsCommonsVersion = '4.4'
     googleApiVersion = '1.30.10'
     hibernateTypesVersion = '2.9.13'
     hibernateVersion = '5.4.18.Final'
@@ -62,6 +63,8 @@ dependencies {
     implementation group: 'javax.validation', name: 'validation-api', version: "${javaxValidationVersion}"
 
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: "${apacheCommonsVersion}"
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: "${collectionsCommonsVersion}"
+
 
 
     // Google authentication
