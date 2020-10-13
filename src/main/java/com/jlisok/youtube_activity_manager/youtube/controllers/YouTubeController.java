@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -28,7 +28,7 @@ public class YouTubeController {
     }
 
     @GetMapping("/videos")
-    public ResponseEntity<List<Video>> getRatedVideos(@Valid @RequestBody YouTubeRatingDto dto) throws ExpectedDataNotFoundInDatabase, IOException {
+    public ResponseEntity<List<Video>> getRatedVideos(@Valid YouTubeRatingDto dto) throws ExpectedDataNotFoundInDatabase, IOException {
         return ResponseEntity
                 .ok()
                 .body(service.listRatedVideos(dto));

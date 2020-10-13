@@ -25,6 +25,7 @@ public class EntityCreator {
                 .setUri(uriList)
                 .setDuration(Duration.parse(details.getDuration()))
                 .setTitle(snippet.getTitle())
+                .setYoutubeChannelId(snippet.getChannelId())
                 .setPublishedAt(Instant.ofEpochMilli(snippet
                                                              .getPublishedAt()
                                                              .getValue()))
