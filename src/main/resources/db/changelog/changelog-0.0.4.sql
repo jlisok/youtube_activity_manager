@@ -16,6 +16,8 @@ CREATE TABLE public.channels (
     modified_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
+
+
 CREATE TABLE public.users_channels (
     id uuid PRIMARY KEY NOT NULL,
     channel_id uuid NOT NULL,
@@ -23,6 +25,7 @@ CREATE TABLE public.users_channels (
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     modified_at timestamp without time zone DEFAULT now() NOT NULL
 );
+
 
 ALTER TABLE public.users_channels
     ADD CONSTRAINT channel_id_fkey_channels FOREIGN KEY (channel_id) REFERENCES public.channels(id)
@@ -44,20 +47,13 @@ ALTER TABLE public.users_channels
 --changeset jlisok:2
 
 ALTER TABLE public.videos
-    DROP COLUMN channel_id;
+    DROP COLUMN youtube_id,
+    ADD youtube_video_id text NOT NULL,
+    DROP COLUMN channel_id,
+    ADD youtube_channel_id text NOT NULL;
 
-ALTER TABLE public.videos
-    ADD channel_id uuid NOT NULL;
 
-ALTER TABLE public.videos
-    ADD CONSTRAINT channel_id_fkey_channels FOREIGN KEY (channel_id) REFERENCES public.channels(id)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE;
-
---rollback ALTER TABLE public.videos DROP CONSTRAINT channel_id_fkey_channels;
---rollback ALTER TABLE public.videos DROP COLUMN channel_id;
---rollback ALTER TABLE public.videos ADD channel_id text NOT NULL;
-
+--rollback ALTER TABLE public.videos ADD youtube_id text NOT NULL, DROP COLUMN youtube_video_id, ADD channel_id text NOT NULL, DROP COLUMN youtube_channel_id;
 
 
 --changeset jlisok:3
@@ -65,4 +61,3 @@ ALTER TABLE public.users
     ADD UNIQUE (google_id);
 
 --rollback ALTER TABLE public.users ALTER COLUMN google_id SET NULL;
-

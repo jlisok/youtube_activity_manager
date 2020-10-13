@@ -86,7 +86,6 @@ public class UserUtils {
         String fistName = userData
                 .get("given_name")
                 .toString();
-        String googleId = userData.getSubject();
         UserPersonalData userPersonalData = new UserPersonalDataBuilder()
                 .setId(userId)
                 .setFirstName(fistName)
@@ -95,8 +94,8 @@ public class UserUtils {
                 .createUserPersonalData();
         return new UserBuilder()
                 .setId(userId)
-                .setEmail(userData.getEmail())
-                .setGoogleId(googleId)
+                .setEmail(createRandomEmail())
+                .setGoogleId(createRandomGoogleId())
                 .setGoogleIdToken(token)
                 .setAccessToken(accessToken)
                 .setCreatedAt(now)
@@ -106,13 +105,17 @@ public class UserUtils {
     }
 
 
-    public User createUserNoFirstName(String token, GoogleIdToken googleIdToken, String accessToken) {
+    public User createUserWithDataFromToken(String token, GoogleIdToken googleIdToken, String accessToken) {
         UUID userId = UUID.randomUUID();
         Instant now = Instant.now();
         GoogleIdToken.Payload userData = googleIdToken.getPayload();
+        String fistName = userData
+                .get("given_name")
+                .toString();
         String googleId = userData.getSubject();
         UserPersonalData userPersonalData = new UserPersonalDataBuilder()
                 .setId(userId)
+                .setFirstName(fistName)
                 .setCreatedAt(now)
                 .setModifiedAt(now)
                 .createUserPersonalData();
@@ -151,7 +154,7 @@ public class UserUtils {
 
     @Transactional
     public void insertUserInDatabaseSameGoogleIdDifferentEmail(String token, GoogleIdToken googleIdToken, String accessToken) {
-        User user = createUser(token, googleIdToken, accessToken);
+        User user = createUserWithDataFromToken(token, googleIdToken, accessToken);
         user.setEmail(createRandomEmail());
         repository.saveAndFlush(user);
 
@@ -159,36 +162,16 @@ public class UserUtils {
     }
 
 
-    public User createUserSameGoogleIdDifferentEmailAndId(User user) {
-        UUID id = UUID.randomUUID();
-        UserPersonalData userPersonalData = new UserPersonalDataBuilder()
-                .setId(id)
-                .setFirstName(user.getUserPersonalData()
-                                  .getFirstName())
-                .setCreatedAt(user.getCreatedAt())
-                .setModifiedAt(user.getModifiedAt())
-                .createUserPersonalData();
-
-        return new UserBuilder()
-                .setId(id)
-                .setEmail(createRandomEmail())
-                .setGoogleId(user.getGoogleId())
-                .setGoogleIdToken(user.getGoogleIdToken())
-                .setAccessToken(user.getAccessToken())
-                .setCreatedAt(user.getCreatedAt())
-                .setModifiedAt(user.getModifiedAt())
-                .setUserPersonalData(userPersonalData)
-                .createUser();
-    }
-
-
     public String createRandomEmail() {
-        Instant now = Instant.now();
-        return now.toEpochMilli() + "@gmail.com";
+        return RandomStringUtils.randomAlphanumeric(20) + "@gmail.com";
     }
 
 
     public String createRandomPassword() {
+        return RandomStringUtils.randomAlphanumeric(20);
+    }
+
+    public String createRandomGoogleId() {
         return RandomStringUtils.randomAlphanumeric(20);
     }
 }

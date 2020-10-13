@@ -9,6 +9,7 @@ import com.jlisok.youtube_activity_manager.testutils.JwtTokenVerifier;
 import com.jlisok.youtube_activity_manager.testutils.MockGoogleIdToken;
 import com.jlisok.youtube_activity_manager.testutils.MockMvcBasicRequestBuilder;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
+import com.jlisok.youtube_activity_manager.users.models.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
