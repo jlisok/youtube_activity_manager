@@ -15,21 +15,18 @@ public class MockMvcBasicRequestBuilder {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public MockHttpServletRequestBuilder setBasicGetRequest(String endPointUrl, String jsonHeader, Object dto) throws JsonProcessingException {
+    public MockHttpServletRequestBuilder setBasicGetRequest(String endPointUrl, String jsonHeader) {
         return MockMvcRequestBuilders
                 .get(endPointUrl)
-                .header(HttpHeaders.AUTHORIZATION, jsonHeader)
-                .content(objectMapper.writeValueAsString(dto))
-                .contentType(MediaType.APPLICATION_JSON);
+                .header(HttpHeaders.AUTHORIZATION, jsonHeader);
     }
 
 
-    public MockHttpServletRequestBuilder setGetRequestWithParams(String endPointUrl, String jsonHeader, String parameterName, String parameterValue) throws JsonProcessingException {
+    public MockHttpServletRequestBuilder setGetRequestWithParams(String endPointUrl, String jsonHeader, String parameterName, String parameterValue) {
         return MockMvcRequestBuilders
                 .get(endPointUrl)
                 .header(HttpHeaders.AUTHORIZATION, jsonHeader)
-                .param(parameterName, parameterValue)
-                .contentType(MediaType.APPLICATION_JSON);
+                .param(parameterName, parameterValue);
     }
 
 

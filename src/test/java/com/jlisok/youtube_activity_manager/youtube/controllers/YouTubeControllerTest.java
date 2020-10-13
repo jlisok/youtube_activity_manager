@@ -57,14 +57,12 @@ class YouTubeControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-
-    private final String accessToken = "ya29.a0AfH6SMDlGKLfUTTDHrjYyQq2tBUukALHRH3jczxHbuOcXoQmVm2WG8bkczV2m3NmXGPFlvgAyjNI3Vo_w1YQUCiAFq81C_cm7kggdg3P44Nip0oCfgGie4BA1Tw23YEGbXrfrDvQObP-LymoUgzInLjJJ3amNSd-1SM8";
-    private final String googleIdTokenString = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjdkYTc4NjNlODYzN2Q2NjliYzJhMTI2MjJjZWRlMmE4ODEzZDExYjEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiODQ1MTYxMjIxMjUxLThxY2pqbnFtM2E1NjhwMG05YWxhanYya2FhNTE0am90LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiYXVkIjoiODQ1MTYxMjIxMjUxLThxY2pqbnFtM2E1NjhwMG05YWxhanYya2FhNTE0am90LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTE1MzEwMzM0NDEyNzQ5NTY2MDEzIiwiZW1haWwiOiJqdXN0eW5hLmxpc29rQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoiaExJa0I3NDE5Zml3NjFSb25RVGY3QSIsIm5hbWUiOiJKdXN0eW5hIExpc29rIiwicGljdHVyZSI6Imh0dHBzOi8vbGg0Lmdvb2dsZXVzZXJjb250ZW50LmNvbS8tbDlMSEdteGptWmcvQUFBQUFBQUFBQUkvQUFBQUFBQUFBQUEvQU1adXVjbDNqYjg4TGRZM2s4LUVRTUxFYldsZVZRZXIwZy9zOTYtYy9waG90by5qcGciLCJnaXZlbl9uYW1lIjoiSnVzdHluYSIsImZhbWlseV9uYW1lIjoiTGlzb2siLCJsb2NhbGUiOiJwbCIsImlhdCI6MTYwMjE4MDI2NiwiZXhwIjoxNjAyMTgzODY2LCJqdGkiOiJhMDMyZjQwNDE4ZmQ0Y2VlMzI3NjBjYTliMTdlOTIxYjU2NDYwYTRmIn0.AoboNAgY1wUaGLSjfeFbfTrv56n_9fAi_nM5jga_IFJrIT1dh1NTfQ7cllFNbcPPkGlS7UwiRc161FlnmvWIYNEacC0kHa4FRuhzdxTn6w_JwhnDlMKHl2kr9bwMfBuFwKs6MCWhvtMba6y127s3iCHGcyZdq7OYWJ9fiZYJVBa4q98R58RgA2mcpnXGiN-FfTVYTOW5cAu_UmTsjrEWW3IrjEzrF9uVrxidMdDAdmq8qodXgPlpuiFrA2morAbwyY5MEYw9ILWYXtmQ3gEBmI1vPi_WyNw532KRy5lcL6oWC7WJbVTq7PqwuY8e56d7KfCVNuUrzXdLIr0QgihFMg";
+    private final String accessToken = "ya29.a0AfH6SMBJLQ9mI5_splp0HJKBrn0DfRIP0K6k6qKLm_gvqW4Y5XDEuQijBFr-CM_AVL-yhQWUQNLRrWDIs2giK2drPUqlhJdahFPc6otm5F-N9hNs7TpOBcp7uvfBSmBDV5WZYjP4HPaaztnTlevSF2AmpuumDaDKjloRUQ";
+    private final String googleIdTokenString = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjdkYTc4NjNlODYzN2Q2NjliYzJhMTI2MjJjZWRlMmE4ODEzZDExYjEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiODQ1MTYxMjIxMjUxLThxY2pqbnFtM2E1NjhwMG05YWxhanYya2FhNTE0am90LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiYXVkIjoiODQ1MTYxMjIxMjUxLThxY2pqbnFtM2E1NjhwMG05YWxhanYya2FhNTE0am90LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTE1MzEwMzM0NDEyNzQ5NTY2MDEzIiwiZW1haWwiOiJqdXN0eW5hLmxpc29rQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoiVkE0N0p0VFZObGpkbF9paGJZZUxXdyIsIm5hbWUiOiJKdXN0eW5hIExpc29rIiwicGljdHVyZSI6Imh0dHBzOi8vbGg0Lmdvb2dsZXVzZXJjb250ZW50LmNvbS8tbDlMSEdteGptWmcvQUFBQUFBQUFBQUkvQUFBQUFBQUFBQUEvQU1adXVjbDNqYjg4TGRZM2s4LUVRTUxFYldsZVZRZXIwZy9zOTYtYy9waG90by5qcGciLCJnaXZlbl9uYW1lIjoiSnVzdHluYSIsImZhbWlseV9uYW1lIjoiTGlzb2siLCJsb2NhbGUiOiJwbCIsImlhdCI6MTYwMjYyNjg3NywiZXhwIjoxNjAyNjMwNDc3LCJqdGkiOiJmZTIzMzNkMGI4NmYyZjg4MzEzZTZjNGVlMWNiOGQ4ZDMzOGMzYzBlIn0.iarxHtOXU_yXf-lBQ0nq1ANDJa1lLTXUyxgMXI6Nu4vD5f1zT_CzP-bvckgKsb_HVREuIoMMRgqEVyJqQV4iwmzVDteNVvGn7BGB7f58kSO6Omp02OVkv1mRI4WJRdOHtgj7SJzjyQxKJoM4CXeaLSsGy3bXPhDVPf-Iy25igKGuCabkBs-L-OQo_c60CA30HbYnkXjzAkloSBHt4HAfohPh7F2XGvC9N9RGR5KSN3UiptMoGGHhhq3v3JdPpa2CPcfk85Fm_AEpzwr2tZDJFKt5dAUvM0ywD4lOGzjG_PWKgQ9NDUg2iQAbxkRekTt6ZFJXi23D9iDs8zQ_iZGn1Q";
     private final String invalidToken = "gfdes";
     private final String endPointUrlVideos = "/api/v1/youtube/videos";
     private final String endPointUrlChannels = "/api/v1/youtube/channels";
     private final String parameterName = "rating";
-    private final String parameterValue = Rating.LIKE.toString();
 
     private String jsonHeader;
     private User user;
@@ -87,7 +85,7 @@ class YouTubeControllerTest {
 
         //when //then
         mockMvc
-                .perform(mvcRequestBuilder.setGetRequestWithParams(endPointUrlVideos, jsonHeader, parameterName, parameterValue))
+                .perform(mvcRequestBuilder.setGetRequestWithParams(endPointUrlVideos, jsonHeader, parameterName, Rating.LIKE.toString()))
                 .andExpect(status().isOk())
                 .andExpect(YouTubeEntityVerifier::assertResponseVideosNotNull);
     }
@@ -132,7 +130,7 @@ class YouTubeControllerTest {
 
         //when //then
         mockMvc
-                .perform(mvcRequestBuilder.setGetRequestWithParams(endPointUrlVideos, jsonHeader, parameterName, parameterValue))
+                .perform(mvcRequestBuilder.setGetRequestWithParams(endPointUrlVideos, jsonHeader, parameterName, Rating.LIKE.toString()))
                 .andExpect(status().isInternalServerError())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof GoogleJsonResponseException));
     }
@@ -146,7 +144,7 @@ class YouTubeControllerTest {
 
         //when //then
         mockMvc
-                .perform(mvcRequestBuilder.setBasicGetRequest(endPointUrlChannels, jsonHeader, ""))
+                .perform(mvcRequestBuilder.setBasicGetRequest(endPointUrlChannels, jsonHeader))
                 .andExpect(status().isOk())
                 .andExpect(YouTubeEntityVerifier::assertResponseChannelsNotNull);
     }
@@ -160,7 +158,7 @@ class YouTubeControllerTest {
 
         //when //then
         mockMvc
-                .perform(mvcRequestBuilder.setBasicGetRequest(endPointUrlChannels, jsonHeader, ""))
+                .perform(mvcRequestBuilder.setBasicGetRequest(endPointUrlChannels, jsonHeader))
                 .andExpect(status().isInternalServerError())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof GoogleJsonResponseException));
     }
