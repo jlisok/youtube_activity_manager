@@ -1,10 +1,7 @@
 name: testAndBuildAndPush
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
-    branches: [ master ]
 
 jobs:
   test:
@@ -39,30 +36,3 @@ jobs:
         run: chmod +x gradlew
       - name: Test with Gradle
         run: ./gradlew test
-
-  buildAndPush:
-    needs: [ test ]
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-central-1
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - uses: actions/checkout@v2
-      - name: Set up JDK 1.8
-        uses: actions/setup-java@v1
-        with:
-          java-version: 14
-
-      - name: Grant executable permission to buildImage
-        run: chmod +x ci/buildImage.sh
-      - name: Grant execute permission to gradlew
-        run: chmod +x gradlew
-      - name: Build and push docker image
-        run: ./ci/buildImage.sh
