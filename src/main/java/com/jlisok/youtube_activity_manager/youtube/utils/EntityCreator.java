@@ -15,7 +15,7 @@ import java.util.UUID;
 
 public class EntityCreator {
 
-    public static Video createVideo(String videoId, VideoSnippet snippet, VideoContentDetails details, List<String> uriList) {
+    public static Video createVideo(String videoId, VideoSnippet snippet, VideoContentDetails details, List<String> uriList, Channel channel) {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         return new VideoBuilder()
@@ -25,10 +25,8 @@ public class EntityCreator {
                 .setUri(uriList)
                 .setDuration(Duration.parse(details.getDuration()))
                 .setTitle(snippet.getTitle())
-                .setYoutubeChannelId(snippet.getChannelId())
-                .setPublishedAt(Instant.ofEpochMilli(snippet
-                                                             .getPublishedAt()
-                                                             .getValue()))
+                .setChannel(channel)
+                .setPublishedAt(Instant.ofEpochMilli(snippet.getPublishedAt().getValue()))
                 .setCreatedAt(now)
                 .setModifiedAt(now)
                 .createVideo();

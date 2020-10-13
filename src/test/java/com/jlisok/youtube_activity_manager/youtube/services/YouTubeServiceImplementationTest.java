@@ -86,9 +86,9 @@ class YouTubeServiceImplementationTest {
         String email = userUtils.createRandomEmail();
         String password = userUtils.createRandomPassword();
         user = userUtils.createUser(email, password);
-        youtubeVideos = YouTubeApiUtils.createRandomYouTubeVideoList(random.nextInt(30));
         youtubeSubscriptions = YouTubeApiUtils.createRandomSubscriptionList(random.nextInt(30));
         youtubeChannels = YouTubeApiUtils.createRandomYouTubeChannelList(youtubeSubscriptions.size());
+        youtubeVideos = YouTubeApiUtils.createRandomYouTubeVideoList(youtubeSubscriptions.size(), youtubeChannels);
         setAuthenticationInContext(dummyGoogleIdToken, user.getId());
     }
 
@@ -121,8 +121,17 @@ class YouTubeServiceImplementationTest {
         when(client.fetchRatedVideos(dummyAccessToken, VIDEO_REQUEST_PARTS, dislikeDto.getRating()))
                 .thenReturn(youtubeVideos);
 
+        when(client.fetchChannels(eq(dummyAccessToken), eq(CHANNEL_REQUEST_PARTS), ArgumentMatchers.anyList()))
+                .thenReturn(youtubeChannels);
+
         when(userRepository.findById(user.getId()))
                 .thenReturn(Optional.of(user));
+
+        when(channelRepository.findByUsers_Id(user.getId()))
+                .thenReturn(Collections.emptyList());
+
+        when(channelRepository.saveAll(anyList()))
+                .thenAnswer(interceptChannels);
 
         when(userVideoRepository.saveAll(ArgumentMatchers.anyList()))
                 .thenAnswer(interceptUserVideos);
@@ -131,9 +140,10 @@ class YouTubeServiceImplementationTest {
         List<Video> videos = service.listRatedVideos(dislikeDto);
 
         //then
+        verify(channelRepository).saveAll(anyList());
         verify(userVideoRepository).saveAll(ArgumentMatchers.anyList());
         assertEquals(youtubeVideos.size(), videos.size());
-        videos.forEach(YouTubeEntityVerifier::assertVideoNotEmptyOmitChannel);
+        videos.forEach(YouTubeEntityVerifier::assertVideoNotEmpty);
     }
 
 
@@ -146,8 +156,18 @@ class YouTubeServiceImplementationTest {
         when(client.fetchRatedVideos(dummyAccessToken, VIDEO_REQUEST_PARTS, dto.getRating()))
                 .thenReturn(youtubeVideos);
 
+        when(client.fetchChannels(eq(dummyAccessToken), eq(CHANNEL_REQUEST_PARTS), ArgumentMatchers.anyList()))
+                .thenReturn(youtubeChannels);
+
         when(userRepository.findById(user.getId()))
                 .thenReturn(Optional.of(user));
+
+        when(channelRepository.findByUsers_Id(user.getId()))
+                .thenReturn(Collections.emptyList());
+
+        when(channelRepository.saveAll(anyList()))
+                .thenAnswer(interceptChannels);
+
 
         when(userVideoRepository.saveAll(ArgumentMatchers.anyList()))
                 .thenAnswer(interceptUserVideos);
@@ -156,9 +176,10 @@ class YouTubeServiceImplementationTest {
         List<Video> videos = service.listRatedVideos(dto);
 
         //then
+        verify(channelRepository).saveAll(anyList());
         verify(userVideoRepository).saveAll(anyList());
         assertEquals(youtubeVideos.size(), videos.size());
-        videos.forEach(YouTubeEntityVerifier::assertVideoNotEmptyOmitChannel);
+        videos.forEach(YouTubeEntityVerifier::assertVideoNotEmpty);
     }
 
 
@@ -243,15 +264,16 @@ class YouTubeServiceImplementationTest {
         //then
         verify(channelRepository).saveAll(anyList());
         assertNotNull(actualChannels);
+        actualChannels.forEach(YouTubeEntityVerifier::assertChannelNotEmpty);
+
         assertEquals(youtubeChannels.size(), actualChannels.size());
         IntStream.range(0, actualChannels.size())
                  .forEach(i -> {
-                     Assertions.assertEquals(repositoryChannels.get(i).getCreatedAt(),
-                                             actualChannels.get(i).getCreatedAt());
-                     Assertions.assertTrue(repositoryChannels.get(i).getModifiedAt()
-                                                             .isBefore(actualChannels.get(i).getModifiedAt()));
-                     Assertions.assertEquals(repositoryChannels.get(i).getId(), actualChannels.get(i).getId());
+                     Channel dbChannel = repositoryChannels.get(i);
+                     Channel actualChannel = actualChannels.get(i);
+                     Assertions.assertEquals(dbChannel.getCreatedAt(), actualChannel.getCreatedAt());
+                     Assertions.assertTrue(dbChannel.getModifiedAt().isBefore(actualChannel.getModifiedAt()));
+                     Assertions.assertEquals(dbChannel.getId(), actualChannel.getId());
                  });
-        actualChannels.forEach(YouTubeEntityVerifier::assertChannelNotEmpty);
     }
 }

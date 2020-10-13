@@ -25,13 +25,18 @@ public class YouTubeApiUtils {
     private final static URI uri = URI.create("https://www.example.com");
     private final static Random random = new Random();
 
-    public static List<com.google.api.services.youtube.model.Video> createRandomYouTubeVideoList(int size) {
+
+    public static List<com.google.api.services.youtube.model.Video> createRandomYouTubeVideoList(int size, List<com.google.api.services.youtube.model.Channel> youTubeChannels) {
         if (size == 0) {
             return new ArrayList<>(0);
         }
         return IntStream.range(0, size).mapToObj(i -> {
+            var channelIndex = i % youTubeChannels.size();
+            var channel = youTubeChannels.get(channelIndex);
+
             VideoContentDetails details = createRandomVideoContentDetails();
             VideoSnippet snippet = createRandomVideoSnippet();
+            snippet.setChannelId(channel.getId());
             return new com.google.api.services.youtube.model.Video()
                     .setContentDetails(details)
                     .setSnippet(snippet)
@@ -40,12 +45,12 @@ public class YouTubeApiUtils {
     }
 
 
-    public static List<com.google.api.services.youtube.model.Channel> createRandomYouTubeChannelList(int loopEnd) {
-        if (loopEnd == 0) {
+    public static List<com.google.api.services.youtube.model.Channel> createRandomYouTubeChannelList(int size) {
+        if (size == 0) {
             return new ArrayList<>(0);
         }
-        List<com.google.api.services.youtube.model.Channel> channelList = new ArrayList<>(loopEnd);
-        for (int i = 0; i < loopEnd; i++) {
+        List<com.google.api.services.youtube.model.Channel> channelList = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
             String id = UUID.randomUUID().toString();
             ChannelSnippet snippet = createRandomChannelSnippet();
             ChannelStatistics statistics = createChannelStatistics();
@@ -70,17 +75,18 @@ public class YouTubeApiUtils {
     }
 
 
-    public static List<Video> createRandomListOfVideos(int size) {
+    public static List<Video> createRandomListOfVideos(int size, User user) {
         return IntStream.range(0, size)
-                        .mapToObj(i -> createRandomVideo())
+                        .mapToObj(i -> createRandomVideo(user))
                         .collect(Collectors.toList());
     }
 
 
-    public static Video createRandomVideo() {
+    public static Video createRandomVideo(User user) {
         String videoId = createRandomString();
         List<String> uriList = VideoDescription.toListOfUri(createDescriptionWithRandomUriNumber());
-        return EntityCreator.createVideo(videoId, createRandomVideoSnippet(), createRandomVideoContentDetails(), uriList);
+        Channel channel = createRandomChannel(user);
+        return EntityCreator.createVideo(videoId, createRandomVideoSnippet(), createRandomVideoContentDetails(), uriList, channel);
     }
 
 
@@ -96,6 +102,7 @@ public class YouTubeApiUtils {
         Set<User> users = Stream.of(user).collect(Collectors.toSet());
         return EntityCreator.createChannel(id, createRandomChannelSnippet(), createChannelStatistics(), createChannelContentOwnerDetails(), users);
     }
+
 
     public static List<Channel> copyOfMinus30MinutesCreatedAt(List<Channel> channels, User user) {
         return channels.stream()

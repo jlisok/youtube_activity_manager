@@ -1,5 +1,6 @@
 package com.jlisok.youtube_activity_manager.videos.models;
 
+import com.jlisok.youtube_activity_manager.channel.models.Channel;
 import com.vladmihalcea.hibernate.type.array.ListArrayType;
 import com.vladmihalcea.hibernate.type.interval.PostgreSQLIntervalType;
 import org.hibernate.annotations.Type;
@@ -48,13 +49,14 @@ public class Video {
     @Column(name = "modified_at")
     private Instant modifiedAt;
 
-    @Column(name = "youtube_channel_id")
-    private String youtubeChannelId;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "channel_id")
+    private Channel channel;
 
     public Video() {
     }
 
-    Video(UUID id, String title, String youTubeId, Duration duration, Instant publishedAt, List<String> hashtag, List<String> uri, Instant createdAt, Instant modifiedAt, String youtubeChannelId) {
+    Video(UUID id, String title, String youTubeId, Duration duration, Instant publishedAt, List<String> hashtag, List<String> uri, Instant createdAt, Instant modifiedAt, Channel channel) {
         this.id = id;
         this.title = title;
         this.youTubeVideoId = youTubeId;
@@ -64,7 +66,7 @@ public class Video {
         this.uri = uri;
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
-        this.youtubeChannelId = youtubeChannelId;
+        this.channel = channel;
     }
 
     public String getYouTubeVideoId() {
@@ -139,14 +141,13 @@ public class Video {
         this.modifiedAt = modifiedAt;
     }
 
-    public String getYoutubeChannelId() {
-        return youtubeChannelId;
+    public Channel getChannel() {
+        return channel;
     }
 
-    public void setYoutubeChannelId(String youtubeChannelId) {
-        this.youtubeChannelId = youtubeChannelId;
+    public void setChannel(Channel channel) {
+        this.channel = channel;
     }
-
 
     @Override
     public boolean equals(Object o) {
@@ -162,11 +163,11 @@ public class Video {
                 Objects.equals(uri, video.uri) &&
                 createdAt.equals(video.createdAt) &&
                 modifiedAt.equals(video.modifiedAt) &&
-                Objects.equals(youtubeChannelId, video.youtubeChannelId);
+                channel.equals(video.channel);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, youTubeVideoId, duration, publishedAt, hashtag, uri, createdAt, modifiedAt, youtubeChannelId);
+        return Objects.hash(id, title, youTubeVideoId, duration, publishedAt, hashtag, uri, createdAt, modifiedAt, channel);
     }
 }

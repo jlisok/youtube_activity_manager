@@ -53,7 +53,7 @@ class UserVideoServiceImplementationTest {
     @Test
     void insertVideos_whenUserDoesNotExistInDatabase() {
         //given
-        List<Video> videoList = createRandomListOfVideos(1);
+        List<Video> videoList = createRandomListOfVideos(1, user);
 
         when(userRepository.findById(id))
                 .thenReturn(Optional.empty());
@@ -66,7 +66,7 @@ class UserVideoServiceImplementationTest {
     @Test
     void insertVideos_whenListOfVideosEmpty() throws ExpectedDataNotFoundInDatabase {
         //given
-        List<Video> videoList = createRandomListOfVideos(0);
+        List<Video> videoList = createRandomListOfVideos(0, user);
 
         when(userRepository.findById(id))
                 .thenReturn(Optional.of(user));
@@ -82,7 +82,7 @@ class UserVideoServiceImplementationTest {
     @Test
     void insertVideos_whenListOfVideosValid() throws ExpectedDataNotFoundInDatabase {
         //given
-        List<Video> videoList = createRandomListOfVideos(5);
+        List<Video> videoList = createRandomListOfVideos(5, user);
 
         when(userRepository.findById(id))
                 .thenReturn(Optional.of(user));
