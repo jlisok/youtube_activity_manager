@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ public class YouTubeServiceImplementation implements YouTubeService {
 
 
     @Override
+    @Transactional
     public List<Channel> listSubscribedChannels() throws IOException {
         UUID userId = getAuthenticationInContext().getAuthenticatedUserId();
         List<Subscription> subscriptions = youTubeClient.fetchSubscriptions(accessTokenService.getAccessToken(), SUBSCRIPTION_REQUEST_PARTS);
@@ -60,6 +62,7 @@ public class YouTubeServiceImplementation implements YouTubeService {
 
 
     @Override
+    @Transactional
     public List<Video> listRatedVideos(YouTubeRatingDto dto) throws IOException {
         UUID userId = getAuthenticationInContext().getAuthenticatedUserId();
         List<com.google.api.services.youtube.model.Video> youtubeVideos = youTubeClient

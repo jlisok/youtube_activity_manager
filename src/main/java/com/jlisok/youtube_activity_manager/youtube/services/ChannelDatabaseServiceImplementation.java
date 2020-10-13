@@ -6,6 +6,7 @@ import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.youtube.utils.MapCreator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.function.Function;
@@ -22,6 +23,7 @@ public class ChannelDatabaseServiceImplementation implements ChannelDatabaseServ
     }
 
     @Override
+    @Transactional
     public void updateChannelsInDatabase(List<Channel> channels, UUID userId) {
         Map<String, Channel> repositoryChannels = fetchAllChannelsRelatedTo(userId);
         List<Channel> readyToInsertChannels = channels

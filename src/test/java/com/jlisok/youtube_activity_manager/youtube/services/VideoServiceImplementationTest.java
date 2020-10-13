@@ -43,8 +43,12 @@ class VideoServiceImplementationTest {
         user = userUtils.createUser(userUtils.createRandomEmail(), userUtils.createRandomPassword());
         channels = youtubeChannels
                 .stream()
-                .map(ytChannel -> EntityCreator.createChannel(ytChannel.getId(), ytChannel.getSnippet(), ytChannel
-                        .getStatistics(), ytChannel.getContentOwnerDetails(), Collections.singleton(user)))
+                .map(ytChannel -> EntityCreator
+                        .createChannel(ytChannel.getId(),
+                                       ytChannel.getSnippet(),
+                                       ytChannel.getStatistics(),
+                                       ytChannel.getContentOwnerDetails(),
+                                       Collections.singleton(user)))
                 .collect(Collectors.toList());
     }
 
@@ -64,7 +68,7 @@ class VideoServiceImplementationTest {
                 Arguments.arguments(createRandomYouTubeVideoList(0, youtubeChannels)),
                 Arguments.arguments(createRandomYouTubeVideoList(1, youtubeChannels)),
                 Arguments.arguments(createRandomYouTubeVideoList(5, youtubeChannels)),
-                Arguments.arguments(createRandomYouTubeVideoList(10, youtubeChannels))
+                Arguments.arguments(createRandomYouTubeVideoList(100, youtubeChannels))
         );
     }
 }

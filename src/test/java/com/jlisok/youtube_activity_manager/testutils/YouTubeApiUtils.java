@@ -31,9 +31,12 @@ public class YouTubeApiUtils {
             return new ArrayList<>(0);
         }
         return IntStream.range(0, size).mapToObj(i -> {
+            var channelIndex = i % youTubeChannels.size();
+            var channel = youTubeChannels.get(channelIndex);
+
             VideoContentDetails details = createRandomVideoContentDetails();
             VideoSnippet snippet = createRandomVideoSnippet();
-            snippet.setChannelId(youTubeChannels.get(i).getId());
+            snippet.setChannelId(channel.getId());
             return new com.google.api.services.youtube.model.Video()
                     .setContentDetails(details)
                     .setSnippet(snippet)
