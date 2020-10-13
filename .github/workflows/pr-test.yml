@@ -1,0 +1,38 @@
+name: testAndBuildAndPush
+
+on:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container: gradle:6.6.1-jre14
+
+    env:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: youtube_activity_manager
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      FRONTEND_URL: localhost
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: youtube_activity_manager
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Grant execute permission to gradlew
+        run: chmod +x gradlew
+      - name: Test with Gradle
+        run: ./gradlew test
