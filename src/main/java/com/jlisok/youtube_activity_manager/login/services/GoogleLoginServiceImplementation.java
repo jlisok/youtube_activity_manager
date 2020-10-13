@@ -15,6 +15,7 @@ import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
@@ -73,20 +74,21 @@ public class GoogleLoginServiceImplementation implements GoogleLoginService {
     }
 
 
-    private User updateGoogleDataInDatabase(User user, String googleId, String token, String accessToken, Instant now) throws DataInconsistencyAuthenticationException {
-        if (userRepository.existsByGoogleId(googleId)) {
-            throw new DataInconsistencyAuthenticationException("Updating user: " + user.getEmail() + " failed. Given googleId " + user
-                    .getGoogleId() + " already exists in database under different email.");
-        }
+    private User updateGoogleDataInDatabase(User user, String googleId, String token, String accessToken, Instant now) {
         if (user.getGoogleId() == null) {
             user.setGoogleId(googleId);
         }
         user.setGoogleIdToken(token);
         user.setAccessToken(accessToken);
         user.setModifiedAt(now);
-        User updatedUser = userRepository.saveAndFlush(user);
-        logger.debug("GoogleLoginService - updating googleIdToken - success");
-        return updatedUser;
+        try {
+            User updatedUser = userRepository.saveAndFlush(user);
+            logger.debug("GoogleLoginService - updating googleIdToken - success");
+            return updatedUser;
+        } catch (DataIntegrityViolationException e) {
+            throw new DataInconsistencyAuthenticationException("Updating user: " + user.getEmail() + " failed. Given googleId " + user
+                    .getGoogleId() + " already exists in database under different email.", e);
+        }
     }
 
 

@@ -8,8 +8,6 @@ import com.jlisok.youtube_activity_manager.login.exceptions.EmailNotVerifiedAuth
 import com.jlisok.youtube_activity_manager.testutils.JwtTokenVerifier;
 import com.jlisok.youtube_activity_manager.testutils.MockGoogleIdToken;
 import com.jlisok.youtube_activity_manager.testutils.MockMvcBasicRequestBuilder;
-import com.jlisok.youtube_activity_manager.testutils.MockGoogleIdToken;
-import com.jlisok.youtube_activity_manager.testutils.MockMvcBasicRequestBuilder;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Transactional
 class LoginControllerViaGoogleTest {
 
     @Autowired
@@ -68,7 +67,6 @@ class LoginControllerViaGoogleTest {
 
 
     @Test
-    @Transactional
     void authenticateUserWithGoogle_whenNewValidUser() throws Exception {
         //given
         when(googleIdTokenVerifier.verify(any(String.class)))
@@ -85,7 +83,6 @@ class LoginControllerViaGoogleTest {
 
 
     @Test
-    @Transactional
     void authenticateUserWithGoogle_whenNewValidUserNoFirstName() throws Exception {
         //given
         GoogleIdToken googleIdTokenNoFirstName = MockGoogleIdToken.createDummyGoogleIdToken(userEmail, true, false);
@@ -103,7 +100,6 @@ class LoginControllerViaGoogleTest {
 
 
     @Test
-    @Transactional
     void authenticateUserWithGoogle_whenUpdatingValidUser() throws Exception {
         //given
         userUtils.insertUserInDatabase(userEmail, userUtils.createRandomPassword());
@@ -116,6 +112,22 @@ class LoginControllerViaGoogleTest {
                 .perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, googleLoginRequestDto))
                 .andExpect(status().isOk())
                 .andExpect(Assertions::assertNotNull)
+                .andExpect(result -> jwtTokenVerifier.assertEqualsUserIdsAndGoogleIdAndTokenNotNull(userEmail, result));
+    }
+
+
+    @Test
+    void authenticateUserWithGoogle_whenUpdatingUserThatHasGoogleId() throws Exception {
+        //given
+        userUtils.insertUserInDatabase(dummyIdToken, googleIdToken, dummyAccessToken);
+
+        when(googleIdTokenVerifier.verify(any(String.class)))
+                .thenReturn(googleIdToken);
+
+        //when //then
+        mockMvc
+                .perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, googleLoginRequestDto))
+                .andExpect(status().isOk())
                 .andExpect(result -> jwtTokenVerifier.assertEqualsUserIdsAndGoogleIdAndTokenNotNull(userEmail, result));
     }
 
@@ -135,7 +147,6 @@ class LoginControllerViaGoogleTest {
 
 
     @Test
-    @Transactional
     void authenticateUserWithGoogle_whenUserExistsButGoogleIdAlreadyExistsInDatabaseUnderDifferentEmail() throws Exception {
         //given
         userUtils.insertUserInDatabase(userEmail, userUtils.createRandomPassword());
@@ -153,7 +164,6 @@ class LoginControllerViaGoogleTest {
 
 
     @Test
-    @Transactional
     void authenticateUserWithGoogle_whenUserEmailIsUnverifiedByGoogle() throws Exception {
         //given
         GoogleIdToken googleIdTokenWithUnverifiedEmail = MockGoogleIdToken.createDummyGoogleIdToken(userEmail, false, true);

@@ -13,6 +13,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -39,6 +40,7 @@ public class UserUtils {
     }
 
 
+    @Transactional
     public void insertUserInDatabase(RegistrationRequestDto dto) throws RegistrationException {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
@@ -49,8 +51,19 @@ public class UserUtils {
     }
 
 
+    @Transactional
     public User insertUserInDatabase(String userEmail, String userPassword) throws RegistrationException {
         User user = createUser(userEmail, userPassword);
+        repository.saveAndFlush(user);
+
+        assertTrue(repository.existsByEmail(user.getEmail()));
+        return user;
+    }
+
+
+    @Transactional
+    public User insertUserInDatabase(String token, GoogleIdToken googleIdToken, String accessToken) {
+        User user = createUser(token, googleIdToken, accessToken);
         repository.saveAndFlush(user);
 
         assertTrue(repository.existsByEmail(user.getEmail()));
@@ -136,6 +149,7 @@ public class UserUtils {
                 .createUser();
     }
 
+    @Transactional
     public void insertUserInDatabaseSameGoogleIdDifferentEmail(String token, GoogleIdToken googleIdToken, String accessToken) {
         User user = createUser(token, googleIdToken, accessToken);
         user.setEmail(createRandomEmail());
@@ -165,14 +179,6 @@ public class UserUtils {
                 .setModifiedAt(user.getModifiedAt())
                 .setUserPersonalData(userPersonalData)
                 .createUser();
-    }
-
-    public User insertUserInDatabase(String token, GoogleIdToken googleIdToken, String accessToken) {
-        User user = createUser(token, googleIdToken, accessToken);
-        repository.saveAndFlush(user);
-
-        assertTrue(repository.existsByEmail(user.getEmail()));
-        return user;
     }
 
 
