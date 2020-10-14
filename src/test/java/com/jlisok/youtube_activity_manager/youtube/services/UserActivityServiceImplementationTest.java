@@ -58,25 +58,8 @@ class UserActivityServiceImplementationTest {
     }
 
     @Test
-    void getRatedVideos_whenRatingLike() throws IOException {
+    void getRatedVideos() throws IOException {
         //given
-        when(youTubeService.listRatedVideos(dto)).thenReturn(videos);
-
-        //when
-        List<VideoDto> videoDtos = userActivityService.getRatedVideos(dto);
-
-        //then
-        verify(youTubeService).listRatedVideos(videoCaptor.capture());
-        Assertions.assertNotNull(videoDtos);
-        videoDtos.forEach(YouTubeEntityVerifier::assertVideoDtoNotEmpty);
-    }
-
-
-    @Test
-    void getRatedVideos_whenRatingDisLike() throws IOException {
-        //given
-        YouTubeRatingDto dto = new YouTubeRatingDto(Rating.DISLIKE);
-
         when(youTubeService.listRatedVideos(dto)).thenReturn(videos);
 
         //when
