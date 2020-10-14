@@ -57,8 +57,8 @@ class YouTubeControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private final String accessToken = "ya29.a0AfH6SMBJLQ9mI5_splp0HJKBrn0DfRIP0K6k6qKLm_gvqW4Y5XDEuQijBFr-CM_AVL-yhQWUQNLRrWDIs2giK2drPUqlhJdahFPc6otm5F-N9hNs7TpOBcp7uvfBSmBDV5WZYjP4HPaaztnTlevSF2AmpuumDaDKjloRUQ";
-    private final String googleIdTokenString = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjdkYTc4NjNlODYzN2Q2NjliYzJhMTI2MjJjZWRlMmE4ODEzZDExYjEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiODQ1MTYxMjIxMjUxLThxY2pqbnFtM2E1NjhwMG05YWxhanYya2FhNTE0am90LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiYXVkIjoiODQ1MTYxMjIxMjUxLThxY2pqbnFtM2E1NjhwMG05YWxhanYya2FhNTE0am90LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTE1MzEwMzM0NDEyNzQ5NTY2MDEzIiwiZW1haWwiOiJqdXN0eW5hLmxpc29rQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoiVkE0N0p0VFZObGpkbF9paGJZZUxXdyIsIm5hbWUiOiJKdXN0eW5hIExpc29rIiwicGljdHVyZSI6Imh0dHBzOi8vbGg0Lmdvb2dsZXVzZXJjb250ZW50LmNvbS8tbDlMSEdteGptWmcvQUFBQUFBQUFBQUkvQUFBQUFBQUFBQUEvQU1adXVjbDNqYjg4TGRZM2s4LUVRTUxFYldsZVZRZXIwZy9zOTYtYy9waG90by5qcGciLCJnaXZlbl9uYW1lIjoiSnVzdHluYSIsImZhbWlseV9uYW1lIjoiTGlzb2siLCJsb2NhbGUiOiJwbCIsImlhdCI6MTYwMjYyNjg3NywiZXhwIjoxNjAyNjMwNDc3LCJqdGkiOiJmZTIzMzNkMGI4NmYyZjg4MzEzZTZjNGVlMWNiOGQ4ZDMzOGMzYzBlIn0.iarxHtOXU_yXf-lBQ0nq1ANDJa1lLTXUyxgMXI6Nu4vD5f1zT_CzP-bvckgKsb_HVREuIoMMRgqEVyJqQV4iwmzVDteNVvGn7BGB7f58kSO6Omp02OVkv1mRI4WJRdOHtgj7SJzjyQxKJoM4CXeaLSsGy3bXPhDVPf-Iy25igKGuCabkBs-L-OQo_c60CA30HbYnkXjzAkloSBHt4HAfohPh7F2XGvC9N9RGR5KSN3UiptMoGGHhhq3v3JdPpa2CPcfk85Fm_AEpzwr2tZDJFKt5dAUvM0ywD4lOGzjG_PWKgQ9NDUg2iQAbxkRekTt6ZFJXi23D9iDs8zQ_iZGn1Q";
+    private final String accessToken = "ya29.a0AfH6SMCkJ9mQ408KmhDAeYVzpJ4vnGm3d5C15pSsQGrHm9pW6RDIz0BdNn6hqXni1AV9ndaRJ5o5HJyYpyBrFMv2L3u0Wn28fTPQImYvCDe2biVEppO4ucavDRgbwk-bYsC9-AJCOv4KSJg3IwsjvTASqeH9-7u6Tpupng";
+    private final String googleIdTokenString = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjdkYTc4NjNlODYzN2Q2NjliYzJhMTI2MjJjZWRlMmE4ODEzZDExYjEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiODQ1MTYxMjIxMjUxLThxY2pqbnFtM2E1NjhwMG05YWxhanYya2FhNTE0am90LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiYXVkIjoiODQ1MTYxMjIxMjUxLThxY2pqbnFtM2E1NjhwMG05YWxhanYya2FhNTE0am90LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTE1MzEwMzM0NDEyNzQ5NTY2MDEzIiwiZW1haWwiOiJqdXN0eW5hLmxpc29rQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoiNUFBWHlrdjFUZjhubzFvM1RNVm1FdyIsIm5hbWUiOiJKdXN0eW5hIExpc29rIiwicGljdHVyZSI6Imh0dHBzOi8vbGg0Lmdvb2dsZXVzZXJjb250ZW50LmNvbS8tbDlMSEdteGptWmcvQUFBQUFBQUFBQUkvQUFBQUFBQUFBQUEvQU1adXVjbDNqYjg4TGRZM2s4LUVRTUxFYldsZVZRZXIwZy9zOTYtYy9waG90by5qcGciLCJnaXZlbl9uYW1lIjoiSnVzdHluYSIsImZhbWlseV9uYW1lIjoiTGlzb2siLCJsb2NhbGUiOiJwbCIsImlhdCI6MTYwMjUxNzM2OSwiZXhwIjoxNjAyNTIwOTY5LCJqdGkiOiJiMzNjMjk3NzJjMTBiMjA1NWVkOGJiZDAwMWY2NmRhODIyMTMzNjFlIn0.bPe31T_RrIsB60zcd3WEndWlt0pvExFnmQqZ6t4UXOP6VEuLTkh_sIEQfDJh6n9iuwDWXLTpG3-ZvPn9SIQ7pD4jOQHXPj-e8qxwLhulmSKs9Ja6g0y50HSVTXnfRPedX8cK0JaWFxqQqToXtbfhgWPTbDP9X-cErss_1mM0IMqnSYVvJ-mep7FA3L04Fg4pu6hZV8uG8LarSp906d-CnwcwIugPbMGAaw_WrYUZEOoxDEU-s-0BuwX7vgusUDI5DUtSmdyoaDFWIWUCr4PJaG4N0wfDhAQ1pq_FQfFr5SeXh6rQ1TeKQ9a1VwZho1KXqiK-hTPgSJBrhMcGY2Izvw";
     private final String invalidToken = "gfdes";
     private final String endPointUrlVideos = "/api/v1/youtube/videos";
     private final String endPointUrlChannels = "/api/v1/youtube/channels";
@@ -88,7 +88,7 @@ class YouTubeControllerTest {
                 .perform(mvcRequestBuilder.setGetRequestWithParams(endPointUrlVideos, jsonHeader, parameterName, Rating.LIKE
                         .toString()))
                 .andExpect(status().isOk())
-                .andExpect(YouTubeEntityVerifier::assertResponseVideosNotNull);
+                .andExpect(YouTubeEntityVerifier::assertVideoDtoNotNull);
     }
 
 
@@ -104,7 +104,7 @@ class YouTubeControllerTest {
                 .perform(mvcRequestBuilder.setGetRequestWithParams(endPointUrlVideos, jsonHeader, parameterName, Rating.DISLIKE
                         .toString()))
                 .andExpect(status().isOk())
-                .andExpect(YouTubeEntityVerifier::assertResponseVideosNotNull);
+                .andExpect(YouTubeEntityVerifier::assertVideoDtoNotNull);
     }
 
 
@@ -148,7 +148,7 @@ class YouTubeControllerTest {
         mockMvc
                 .perform(mvcRequestBuilder.setBasicGetRequest(endPointUrlChannels, jsonHeader))
                 .andExpect(status().isOk())
-                .andExpect(YouTubeEntityVerifier::assertResponseChannelsNotNull);
+                .andExpect(YouTubeEntityVerifier::assertChannelDtoNotNull);
     }
 
 

@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,6 +45,9 @@ class GoogleLoginServiceTest {
 
     @Autowired
     private GoogleLoginServiceImplementation service;
+
+    @Captor
+    ArgumentCaptor<User> userCapture;
 
     private final String dummyToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
     private final String dummyAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi";
@@ -81,7 +85,6 @@ class GoogleLoginServiceTest {
         assertNotNull(token);
         DecodedJWT decodedJWT = jwtVerifier.verify(token);
 
-        var userCapture = ArgumentCaptor.forClass(User.class);
         verify(userRepository).saveAndFlush(userCapture.capture());
 
         assertEquals(userCapture.getValue().getId().toString(), decodedJWT.getSubject());
@@ -108,7 +111,6 @@ class GoogleLoginServiceTest {
 
         //then
         assertNotNull(token);
-        var userCapture = ArgumentCaptor.forClass(User.class);
         verify(userRepository).saveAndFlush(userCapture.capture());
         DecodedJWT decodedJWT = jwtVerifier.verify(token);
         assertEquals(userCapture.getValue().getId().toString(), decodedJWT.getSubject());
@@ -147,7 +149,6 @@ class GoogleLoginServiceTest {
 
         //then
         assertNotNull(token);
-        var userCapture = ArgumentCaptor.forClass(User.class);
         verify(userRepository).saveAndFlush(userCapture.capture());
         DecodedJWT decodedJWT = jwtVerifier.verify(token);
         assertEquals(userCapture.getValue().getId().toString(), decodedJWT.getSubject());

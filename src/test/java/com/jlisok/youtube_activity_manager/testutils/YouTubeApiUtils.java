@@ -49,22 +49,21 @@ public class YouTubeApiUtils {
         if (size == 0) {
             return new ArrayList<>(0);
         }
-        List<com.google.api.services.youtube.model.Channel> channelList = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            String id = UUID.randomUUID().toString();
-            ChannelSnippet snippet = createRandomChannelSnippet();
-            ChannelStatistics statistics = createChannelStatistics();
-            ChannelTopicDetails category = createChannelTopicDetails();
-            ChannelContentOwnerDetails owner = createChannelContentOwnerDetails();
-            com.google.api.services.youtube.model.Channel channel = new com.google.api.services.youtube.model.Channel()
-                    .setId(id)
-                    .setSnippet(snippet)
-                    .setStatistics(statistics)
-                    .setTopicDetails(category)
-                    .setContentOwnerDetails(owner);
-            channelList.add(channel);
-        }
-        return channelList;
+        return IntStream.range(0, size)
+                        .mapToObj(i -> {
+                            String id = UUID.randomUUID().toString();
+                            ChannelSnippet snippet = createRandomChannelSnippet();
+                            ChannelStatistics statistics = createChannelStatistics();
+                            ChannelTopicDetails category = createChannelTopicDetails();
+                            ChannelContentOwnerDetails owner = createChannelContentOwnerDetails();
+                            return new com.google.api.services.youtube.model.Channel()
+                                    .setId(id)
+                                    .setSnippet(snippet)
+                                    .setStatistics(statistics)
+                                    .setTopicDetails(category)
+                                    .setContentOwnerDetails(owner);
+                        })
+                        .collect(Collectors.toList());
     }
 
 
