@@ -1,7 +1,7 @@
 package com.jlisok.youtube_activity_manager.youtube.services;
 
-import com.jlisok.youtube_activity_manager.channel.models.Channel;
-import com.jlisok.youtube_activity_manager.channel.repositories.ChannelRepository;
+import com.jlisok.youtube_activity_manager.channels.models.Channel;
+import com.jlisok.youtube_activity_manager.channels.repositories.ChannelRepository;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.youtube.utils.MapCreator;
 import org.springframework.beans.factory.annotation.Autowired;

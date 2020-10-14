@@ -1,8 +1,8 @@
 package com.jlisok.youtube_activity_manager.youtube.services;
 
 import com.google.api.services.youtube.model.Subscription;
-import com.jlisok.youtube_activity_manager.channel.models.Channel;
-import com.jlisok.youtube_activity_manager.channel.repositories.ChannelRepository;
+import com.jlisok.youtube_activity_manager.channels.models.Channel;
+import com.jlisok.youtube_activity_manager.channels.repositories.ChannelRepository;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.testutils.YouTubeApiUtils;

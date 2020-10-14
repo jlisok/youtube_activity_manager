@@ -1,6 +1,6 @@
 package com.jlisok.youtube_activity_manager.users.models;
 
-import com.jlisok.youtube_activity_manager.channel.models.Channel;
+import com.jlisok.youtube_activity_manager.channels.models.Channel;
 import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalData;
 
 import java.time.Instant;

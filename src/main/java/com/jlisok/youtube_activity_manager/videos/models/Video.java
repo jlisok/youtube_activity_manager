@@ -1,6 +1,6 @@
 package com.jlisok.youtube_activity_manager.videos.models;
 
-import com.jlisok.youtube_activity_manager.channel.models.Channel;
+import com.jlisok.youtube_activity_manager.channels.models.Channel;
 import com.vladmihalcea.hibernate.type.array.ListArrayType;
 import com.vladmihalcea.hibernate.type.interval.PostgreSQLIntervalType;
 import org.hibernate.annotations.Type;

@@ -3,8 +3,8 @@ package com.jlisok.youtube_activity_manager.testutils;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.youtube.model.*;
 import com.google.common.collect.Sets;
-import com.jlisok.youtube_activity_manager.channel.models.Channel;
-import com.jlisok.youtube_activity_manager.channel.models.ChannelBuilder;
+import com.jlisok.youtube_activity_manager.channels.models.Channel;
+import com.jlisok.youtube_activity_manager.channels.models.ChannelBuilder;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.videos.models.Video;
 import com.jlisok.youtube_activity_manager.youtube.utils.EntityCreator;
@@ -89,7 +89,7 @@ public class YouTubeApiUtils {
     }
 
 
-    public static List<com.jlisok.youtube_activity_manager.channel.models.Channel> createRandomListOfChannels(int size, User... user) {
+    public static List<com.jlisok.youtube_activity_manager.channels.models.Channel> createRandomListOfChannels(int size, User... user) {
         return IntStream.range(0, size)
                         .mapToObj(i -> createRandomChannel(user))
                         .collect(Collectors.toList());

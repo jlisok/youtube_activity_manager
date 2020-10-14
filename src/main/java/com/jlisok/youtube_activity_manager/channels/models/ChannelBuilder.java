@@ -1,4 +1,4 @@
-package com.jlisok.youtube_activity_manager.channel.models;
+package com.jlisok.youtube_activity_manager.channels.models;
 
 import com.jlisok.youtube_activity_manager.users.models.User;
 

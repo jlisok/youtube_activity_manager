@@ -1,7 +1,6 @@
-package com.jlisok.youtube_activity_manager.channel.repositories;
+package com.jlisok.youtube_activity_manager.channels.repositories;
 
-import com.jlisok.youtube_activity_manager.channel.models.Channel;
-import com.jlisok.youtube_activity_manager.users.models.User;
+import com.jlisok.youtube_activity_manager.channels.models.Channel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
