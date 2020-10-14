@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.jlisok.youtube_activity_manager.security.configs.JwtAuthenticationContext.getAuthenticationInContext;
-import static com.jlisok.youtube_activity_manager.youtube.constants.YouTubeApiClientRequestParts.*;
+import static com.jlisok.youtube_activity_manager.youtube.constants.YouTubeApiClientRequest.*;
 
 @Service
 public class YouTubeServiceImplementation implements YouTubeService {
@@ -86,9 +86,9 @@ public class YouTubeServiceImplementation implements YouTubeService {
                 .fetchChannels(accessTokenService.getAccessToken(), CHANNEL_REQUEST_PARTS, youtubeChannelIds);
         logger.debug("YouTubeService - fetching subscribed channels for userId {} - success.", userId);
         List<Channel> channels = channelService.createChannels(youtubeChannels, userId);
-        channelDatabaseService.updateChannelsInDatabase(channels, userId);
+        List<Channel> databaseChannels = channelDatabaseService.updateChannelsInDatabase(channels, userId);
         logger.debug("YouTubeService - inserting channels in database for userId {} - success.", userId);
-        return channels;
+        return databaseChannels;
     }
 }
 

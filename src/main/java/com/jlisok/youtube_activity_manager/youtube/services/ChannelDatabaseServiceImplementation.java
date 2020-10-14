@@ -24,14 +24,15 @@ public class ChannelDatabaseServiceImplementation implements ChannelDatabaseServ
 
     @Override
     @Transactional
-    public void updateChannelsInDatabase(List<Channel> channels, UUID userId) {
+    public List<Channel> updateChannelsInDatabase(List<Channel> channels, UUID userId) {
         Map<String, Channel> repositoryChannels = fetchAllChannelsRelatedTo(userId);
         List<Channel> readyToInsertChannels = channels
                 .stream()
                 .map(channel -> createOrUpdateChannel(channel, repositoryChannels))
                 .collect(Collectors.toList());
-        channelRepository.saveAll(readyToInsertChannels);
+        List<Channel> savedChannels = channelRepository.saveAll(readyToInsertChannels);
         channelRepository.flush();
+        return savedChannels;
     }
 
 

@@ -20,8 +20,8 @@ public class YouTubeChannelIdServiceImplementation implements YouTubeChannelIdSe
     @Override
     public List<String> getChannelIdFromVideos(List<Video> videos) {
         return videos.stream()
-                               .map(video -> video.getSnippet().getChannelId())
-                               .collect(Collectors.toList());
+                     .map(video -> video.getSnippet().getChannelId())
+                     .distinct()
+                     .collect(Collectors.toList());
     }
-
 }

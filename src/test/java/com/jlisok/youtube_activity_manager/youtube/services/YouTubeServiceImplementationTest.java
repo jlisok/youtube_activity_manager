@@ -32,7 +32,7 @@ import java.util.Random;
 import java.util.stream.IntStream;
 
 import static com.jlisok.youtube_activity_manager.security.configs.JwtAuthenticationContext.setAuthenticationInContext;
-import static com.jlisok.youtube_activity_manager.youtube.constants.YouTubeApiClientRequestParts.*;
+import static com.jlisok.youtube_activity_manager.youtube.constants.YouTubeApiClientRequest.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;

@@ -2,10 +2,7 @@ package com.jlisok.youtube_activity_manager.login.controllers;
 
 import com.jlisok.youtube_activity_manager.domain.exceptions.ResponseCode;
 import com.jlisok.youtube_activity_manager.login.dto.LoginRequestDto;
-import com.jlisok.youtube_activity_manager.testutils.JwtTokenVerifier;
-import com.jlisok.youtube_activity_manager.testutils.MockMvcBasicRequestBuilder;
-import com.jlisok.youtube_activity_manager.testutils.MvcResponseVerifier;
-import com.jlisok.youtube_activity_manager.testutils.UserUtils;
+import com.jlisok.youtube_activity_manager.testutils.*;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class LoginControllerTest {
+class LoginControllerTest implements TestProfile {
 
     @Autowired
     private MockMvc mockMvc;

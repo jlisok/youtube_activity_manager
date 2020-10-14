@@ -7,6 +7,6 @@ import java.util.UUID;
 
 public interface ChannelDatabaseService {
 
-    void updateChannelsInDatabase(List<Channel> channels, UUID userId);
+    List<Channel> updateChannelsInDatabase(List<Channel> channels, UUID userId);
 
 }

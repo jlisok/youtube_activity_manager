@@ -21,7 +21,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Component
-public class UserUtils {
+public class UserUtils implements TestProfile {
 
     private final DtoToUserTranslator dtoToUserTranslator;
     private final UserRepository repository;

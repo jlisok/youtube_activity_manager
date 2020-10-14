@@ -1,68 +1,71 @@
 package com.jlisok.youtube_activity_manager.youtube.api;
 
 import com.google.api.services.youtube.YouTube;
-import com.google.api.services.youtube.model.Channel;
-import com.google.api.services.youtube.model.Subscription;
-import com.google.api.services.youtube.model.Video;
+import com.google.api.services.youtube.model.*;
 import com.jlisok.youtube_activity_manager.videos.enums.Rating;
+import com.jlisok.youtube_activity_manager.youtube.utils.YouTubeActivityGetter;
+import com.jlisok.youtube_activity_manager.youtube.utils.YouTubeApiRequestHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 
 @Component
 public class YouTubeClientImplementation implements YouTubeClient {
 
     private final YouTubeBuilder youTubeBuilder;
-    private final Long maxResultsPerPage = 50L;
+    private final YouTubeActivityGetter getter;
+
 
     @Autowired
-    public YouTubeClientImplementation(YouTubeBuilder youTubeBuilder) {
+    public YouTubeClientImplementation(YouTubeBuilder youTubeBuilder, YouTubeActivityGetter getter) {
         this.youTubeBuilder = youTubeBuilder;
+        this.getter = getter;
     }
 
 
-    //TODO: retrieving full list of videos/channels, for now only 50 first results are being retrieved
-    //TODO: fetching list of channels not existing in database, when fetching list of videos! Crucial functionality!
     @Override
     public List<Subscription> fetchSubscriptions(String accessToken, String parts) throws IOException {
         YouTube youTube = youTubeBuilder.get(accessToken);
-        return youTube
-                .subscriptions()
-                .list(parts)
-                .setMine(true)
-                .setMaxResults(maxResultsPerPage)
-                .execute()
-                .getItems();
+        List<Subscription> subscriptions = new ArrayList<>();
+        String pageToken = "";
+        do {
+            SubscriptionListResponse response = getter.getSubscriptionsYouTubeApi(youTube, parts, pageToken);
+            subscriptions.addAll(response.getItems());
+            pageToken = response.getNextPageToken();
+        }
+        while (pageToken != null && !pageToken.isEmpty());
+        return subscriptions;
     }
 
 
-    //TODO: retrieving full list of videos/channels, for now only 50 first results are being retrieved
     @Override
-    public List<Channel> fetchChannels(String accessToken, String parts, List<String> channelIds) throws IOException {
+    public List<Channel> fetchChannels(String accessToken, String parts, List<String> channelIds) {
         YouTube youTube = youTubeBuilder.get(accessToken);
-        String inputIds = String.join(",", channelIds);
-        return youTube
-                .channels()
-                .list(parts)
-                .setId(inputIds)
-                .setMaxResults(maxResultsPerPage)
-                .execute()
-                .getItems();
+        List<String> inputChannelIds = YouTubeApiRequestHelper.separateIdsIntoMaxRequestCapacity(channelIds);
+        return inputChannelIds
+                .stream()
+                .map(inputIds -> getter.getChannelsYouTubeApi(youTube, parts, inputIds))
+                .flatMap(items -> items.getItems().stream())
+                .collect(Collectors.toList());
     }
 
 
-    //TODO: retrieving full list of videos/channels, for now only 50 first results are being retrieved
     @Override
     public List<Video> fetchRatedVideos(String accessToken, String parts, Rating rating) throws IOException {
         YouTube youTube = youTubeBuilder.get(accessToken);
-        return youTube
-                .videos()
-                .list(parts)
-                .setMyRating(rating.toString().toLowerCase())
-                .setMaxResults(maxResultsPerPage)
-                .execute()
-                .getItems();
+        List<Video> videos = new ArrayList<>();
+        String pageToken = "";
+        do {
+            VideoListResponse response = getter.getVideosYouTubeApi(youTube, parts, rating, pageToken);
+            videos.addAll(response.getItems());
+            pageToken = response.getNextPageToken();
+        }
+        while (pageToken != null && !pageToken.isEmpty());
+        return videos;
     }
 }
