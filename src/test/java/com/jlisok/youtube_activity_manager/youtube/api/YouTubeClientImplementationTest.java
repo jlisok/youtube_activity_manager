@@ -162,11 +162,11 @@ class YouTubeClientImplementationTest implements TestProfile {
     @Test
     void fetchChannels_whenChannelIdsAboveMaxRequestCapacity() throws IOException {
         //given
-        String dummyInputIds = IntStream
+        List<String> dummyChannelIds = IntStream
                 .range(0, YouTubeApiClientRequest.MAX_ALLOWED_RESULTS_PER_PAGE * 2)
                 .mapToObj(i -> "wdqwdqw")
-                .collect(Collectors.joining(","));
-        List<String> dummyChannelIds = Arrays.asList(split(dummyInputIds, ","));
+                .collect(Collectors.toList());
+
         ChannelListResponse listResponse = YouTubeApiUtils.createChannelListResponse(channels);
 
         when(builder.get(dummyAccessToken))

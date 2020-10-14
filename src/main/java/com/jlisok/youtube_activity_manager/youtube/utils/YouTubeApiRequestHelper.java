@@ -10,8 +10,8 @@ import static com.jlisok.youtube_activity_manager.youtube.constants.YouTubeApiCl
 public class YouTubeApiRequestHelper {
 
     public static List<String> separateIdsIntoMaxRequestCapacity(List<String> channelIds) {
-        List<List<String>> channelIdSubLists = ListUtils.partition(channelIds, MAX_ALLOWED_RESULTS_PER_PAGE);
-        return channelIdSubLists
+        return ListUtils
+                .partition(channelIds, MAX_ALLOWED_RESULTS_PER_PAGE)
                 .stream()
                 .map(ids -> String.join(",", ids))
                 .collect(Collectors.toList());

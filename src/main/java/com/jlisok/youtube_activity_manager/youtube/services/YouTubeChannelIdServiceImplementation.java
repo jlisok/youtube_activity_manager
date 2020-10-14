@@ -5,7 +5,6 @@ import com.google.api.services.youtube.model.Video;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,9 +18,10 @@ public class YouTubeChannelIdServiceImplementation implements YouTubeChannelIdSe
     }
 
     @Override
-    public Set<String> getChannelIdFromVideos(List<Video> videos) {
+    public List<String> getChannelIdFromVideos(List<Video> videos) {
         return videos.stream()
                      .map(video -> video.getSnippet().getChannelId())
-                     .collect(Collectors.toSet());
+                     .distinct()
+                     .collect(Collectors.toList());
     }
 }

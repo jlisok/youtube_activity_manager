@@ -30,9 +30,9 @@ public class ChannelDatabaseServiceImplementation implements ChannelDatabaseServ
                 .stream()
                 .map(channel -> createOrUpdateChannel(channel, repositoryChannels))
                 .collect(Collectors.toList());
-        channelRepository.saveAll(readyToInsertChannels);
+        List<Channel> savedChannels = channelRepository.saveAll(readyToInsertChannels);
         channelRepository.flush();
-        return readyToInsertChannels;
+        return savedChannels;
     }
 
 

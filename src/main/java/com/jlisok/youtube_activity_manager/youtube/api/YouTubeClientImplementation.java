@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -46,13 +47,11 @@ public class YouTubeClientImplementation implements YouTubeClient {
     public List<Channel> fetchChannels(String accessToken, String parts, List<String> channelIds) {
         YouTube youTube = youTubeBuilder.get(accessToken);
         List<String> inputChannelIds = YouTubeApiRequestHelper.separateIdsIntoMaxRequestCapacity(channelIds);
-        List<Channel> outputChannelIds = new ArrayList<>();
-        inputChannelIds
+        return inputChannelIds
                 .stream()
                 .map(inputIds -> getter.getChannelsYouTubeApi(youTube, parts, inputIds))
-                .map(ChannelListResponse::getItems)
-                .forEach(outputChannelIds::addAll);
-        return outputChannelIds;
+                .flatMap(items -> items.getItems().stream())
+                .collect(Collectors.toList());
     }
 
 

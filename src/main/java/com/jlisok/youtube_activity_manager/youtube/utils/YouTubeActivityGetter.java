@@ -18,14 +18,19 @@ import static com.jlisok.youtube_activity_manager.youtube.constants.YouTubeApiCl
 public class YouTubeActivityGetter {
 
 
-    public SubscriptionListResponse getSubscriptionsYouTubeApi(YouTube youTube, String parts, String pageToken) throws IOException {
-        return youTube
-                .subscriptions()
-                .list(parts)
-                .setMine(true)
-                .setPageToken(pageToken)
-                .setMaxResults(MAX_ALLOWED_RESULTS_PER_PAGE.longValue())
-                .execute();
+    public SubscriptionListResponse getSubscriptionsYouTubeApi(YouTube youTube, String parts, String pageToken) {
+        try {
+            return youTube
+                    .subscriptions()
+                    .list(parts)
+                    .setMine(true)
+                    .setPageToken(pageToken)
+                    .setMaxResults(MAX_ALLOWED_RESULTS_PER_PAGE.longValue())
+                    .execute();
+        } catch (IOException e) {
+            UUID userId = JwtAuthenticationContext.getAuthenticationInContext().getAuthenticatedUserId();
+            throw new YouTubeApiException("Failed while connecting to YouTubeApi, userId " + userId + " Bad request.", e);
+        }
     }
 
 
@@ -44,13 +49,18 @@ public class YouTubeActivityGetter {
     }
 
 
-    public VideoListResponse getVideosYouTubeApi(YouTube youTube, String parts, Rating rating, String pageToken) throws IOException {
-        return youTube
-                .videos()
-                .list(parts)
-                .setMyRating(rating.toString().toLowerCase())
-                .setPageToken(pageToken)
-                .setMaxResults(MAX_ALLOWED_RESULTS_PER_PAGE.longValue())
-                .execute();
+    public VideoListResponse getVideosYouTubeApi(YouTube youTube, String parts, Rating rating, String pageToken) {
+        try {
+            return youTube
+                    .videos()
+                    .list(parts)
+                    .setMyRating(rating.toString().toLowerCase())
+                    .setPageToken(pageToken)
+                    .setMaxResults(MAX_ALLOWED_RESULTS_PER_PAGE.longValue())
+                    .execute();
+        } catch (IOException e) {
+            UUID userId = JwtAuthenticationContext.getAuthenticationInContext().getAuthenticatedUserId();
+            throw new YouTubeApiException("Failed while connecting to YouTubeApi, userId " + userId + " Bad request.", e);
+        }
     }
 }
