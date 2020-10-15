@@ -3,6 +3,7 @@ package com.jlisok.youtube_activity_manager.youtube.services;
 import com.jlisok.youtube_activity_manager.channels.models.Channel;
 import com.jlisok.youtube_activity_manager.channels.repositories.ChannelRepository;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
+import com.jlisok.youtube_activity_manager.testutils.TestProfile;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.testutils.ChannelAndSubscriptionUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
@@ -26,16 +27,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class ChannelDatabaseServiceImplementationTest {
+class ChannelDatabaseServiceImplementationTest implements TestProfile {
 
     @Autowired
-    UserUtils userUtils;
+    private UserUtils userUtils;
 
     @Captor
     private ArgumentCaptor<List<Channel>> captor;
 
     @MockBean
-    ChannelRepository repository;
+    private ChannelRepository repository;
 
     @Autowired
     private ChannelDatabaseService daoService;

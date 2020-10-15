@@ -2,6 +2,7 @@
 package com.jlisok.youtube_activity_manager.youtube.services;
 
 import com.jlisok.youtube_activity_manager.database.exceptions.ExpectedDataNotFoundInDatabase;
+import com.jlisok.youtube_activity_manager.testutils.TestProfile;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.testutils.VideoUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
@@ -25,7 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class UserVideoServiceImplementationTest {
+class UserVideoServiceImplementationTest implements TestProfile {
 
     @MockBean
     private UserRepository userRepository;
