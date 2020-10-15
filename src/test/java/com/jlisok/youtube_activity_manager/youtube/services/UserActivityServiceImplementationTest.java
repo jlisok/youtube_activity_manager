@@ -2,8 +2,9 @@ package com.jlisok.youtube_activity_manager.youtube.services;
 
 import com.jlisok.youtube_activity_manager.channels.models.Channel;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
+import com.jlisok.youtube_activity_manager.testutils.ChannelAndSubscriptionUtils;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
-import com.jlisok.youtube_activity_manager.testutils.YouTubeApiUtils;
+import com.jlisok.youtube_activity_manager.testutils.VideoUtils;
 import com.jlisok.youtube_activity_manager.testutils.YouTubeEntityVerifier;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.videos.enums.Rating;
@@ -53,8 +54,8 @@ class UserActivityServiceImplementationTest {
     @BeforeEach
     void createInitialConditions() throws RegistrationException {
         user = userUtils.createUser(userUtils.createRandomEmail(), userUtils.createRandomPassword());
-        channels = YouTubeApiUtils.createRandomListOfChannels(random.nextInt(40), user);
-        videos = YouTubeApiUtils.createRandomListOfVideos(channels.size(), user);
+        channels = ChannelAndSubscriptionUtils.createRandomListOfChannels(random.nextInt(40), user);
+        videos = VideoUtils.createRandomListOfVideos(channels.size(), user);
     }
 
     @Test

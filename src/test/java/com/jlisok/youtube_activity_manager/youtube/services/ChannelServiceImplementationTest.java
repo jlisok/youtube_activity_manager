@@ -16,7 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.jlisok.youtube_activity_manager.testutils.YouTubeApiUtils.createRandomYouTubeChannelList;
+import static com.jlisok.youtube_activity_manager.testutils.ChannelAndSubscriptionUtils.createRandomYouTubeChannelList;
 import static com.jlisok.youtube_activity_manager.testutils.YouTubeEntityVerifier.assertListOfChannelsEqual;
 import static org.mockito.Mockito.when;
 

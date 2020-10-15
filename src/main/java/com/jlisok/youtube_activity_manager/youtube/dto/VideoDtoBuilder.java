@@ -10,6 +10,7 @@ public class VideoDtoBuilder {
     private Duration duration;
     private Instant publishedAt;
     private String channelTitle;
+    private String videoCategory;
 
     public VideoDtoBuilder setId(UUID id) {
         this.id = id;
@@ -36,7 +37,12 @@ public class VideoDtoBuilder {
         return this;
     }
 
+    public VideoDtoBuilder setVideoCategory(String videoCategory) {
+        this.videoCategory = videoCategory;
+        return this;
+    }
+
     public VideoDto createVideoDto() {
-        return new VideoDto(id, title, duration, publishedAt, channelTitle);
+        return new VideoDto(id, title, duration, publishedAt, channelTitle, videoCategory);
     }
 }

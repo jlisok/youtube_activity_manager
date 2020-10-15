@@ -12,13 +12,15 @@ public class VideoDto {
     private final Duration duration;
     private final Instant publishedAt;
     private final String channelTitle;
+    private final String videoCategory;
 
-    VideoDto(UUID id, String title, Duration duration, Instant publishedAt, String channelTitle) {
+    VideoDto(UUID id, String title, Duration duration, Instant publishedAt, String channelTitle, String videoCategory) {
         this.id = id;
         this.title = title;
         this.duration = duration;
         this.publishedAt = publishedAt;
         this.channelTitle = channelTitle;
+        this.videoCategory = videoCategory;
     }
 
     public UUID getId() {
@@ -41,6 +43,10 @@ public class VideoDto {
         return channelTitle;
     }
 
+    public String getVideoCategory() {
+        return videoCategory;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -50,11 +56,12 @@ public class VideoDto {
                 title.equals(videoDto.title) &&
                 duration.equals(videoDto.duration) &&
                 publishedAt.equals(videoDto.publishedAt) &&
-                channelTitle.equals(videoDto.channelTitle);
+                channelTitle.equals(videoDto.channelTitle) &&
+                videoCategory.equals(videoDto.videoCategory);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, duration, publishedAt, channelTitle);
+        return Objects.hash(id, title, duration, publishedAt, channelTitle, videoCategory);
     }
 }

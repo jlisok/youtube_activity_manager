@@ -4,6 +4,7 @@ import com.google.api.services.youtube.model.*;
 import com.jlisok.youtube_activity_manager.channels.models.Channel;
 import com.jlisok.youtube_activity_manager.channels.models.ChannelBuilder;
 import com.jlisok.youtube_activity_manager.users.models.User;
+import com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory;
 import com.jlisok.youtube_activity_manager.videos.models.Video;
 import com.jlisok.youtube_activity_manager.videos.models.VideoBuilder;
 import com.jlisok.youtube_activity_manager.youtube.dto.ChannelDto;
@@ -19,7 +20,7 @@ import java.util.UUID;
 
 public class EntityCreator {
 
-    public static Video createVideo(String videoId, VideoSnippet snippet, VideoContentDetails details, List<String> uriList, Channel channel) {
+    public static Video createVideo(String videoId, VideoSnippet snippet, VideoContentDetails details, List<String> uriList, Channel channel, VideoCategory videoCategory) {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         return new VideoBuilder()
@@ -31,6 +32,7 @@ public class EntityCreator {
                 .setTitle(snippet.getTitle())
                 .setChannel(channel)
                 .setPublishedAt(Instant.ofEpochMilli(snippet.getPublishedAt().getValue()))
+                .setVideoCategory(videoCategory)
                 .setCreatedAt(now)
                 .setModifiedAt(now)
                 .createVideo();
@@ -65,6 +67,7 @@ public class EntityCreator {
                 .setDuration(video.getDuration())
                 .setDuration(video.getDuration())
                 .setPublishedAt(video.getPublishedAt())
+                .setVideoCategory(video.getVideoCategory().getCategoryName())
                 .createVideoDto();
     }
 

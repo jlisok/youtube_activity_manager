@@ -1,6 +1,7 @@
 package com.jlisok.youtube_activity_manager.videos.models;
 
 import com.jlisok.youtube_activity_manager.channels.models.Channel;
+import com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -18,6 +19,7 @@ public class VideoBuilder {
     private Instant createdAt;
     private Instant modifiedAt;
     private Channel channel;
+    private VideoCategory videoCategory;
 
     public VideoBuilder setId(UUID id) {
         this.id = id;
@@ -69,7 +71,13 @@ public class VideoBuilder {
         return this;
     }
 
+    public VideoBuilder setVideoCategory(VideoCategory videoCategory) {
+        this.videoCategory = videoCategory;
+        return this;
+    }
+
+
     public Video createVideo() {
-        return new Video(id, title, youTubeId, duration, publishedAt, hashtag, uri, createdAt, modifiedAt, channel);
+        return new Video(id, title, youTubeId, duration, publishedAt, hashtag, uri, createdAt, modifiedAt, channel, videoCategory);
     }
 }

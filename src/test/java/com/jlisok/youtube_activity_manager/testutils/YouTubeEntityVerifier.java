@@ -1,12 +1,18 @@
 package com.jlisok.youtube_activity_manager.testutils;
 
+import com.google.api.services.youtube.model.VideoCategory;
 import com.jlisok.youtube_activity_manager.channels.models.Channel;
 import com.jlisok.youtube_activity_manager.videos.models.Video;
 import com.jlisok.youtube_activity_manager.youtube.dto.ChannelDto;
 import com.jlisok.youtube_activity_manager.youtube.dto.VideoDto;
+import com.jlisok.youtube_activity_manager.youtube.utils.MapCreator;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -77,6 +83,7 @@ public class YouTubeEntityVerifier {
             assertEquals(youtubeVideo.getContentDetails().getDuration(), video.getDuration().toString());
             assertEquals(youtubeVideo.getSnippet().getTags(), video.getHashtag());
             assertEquals(youtubeVideo.getSnippet().getChannelId(), video.getChannel().getYouTubeChannelId());
+            assertEquals(youtubeVideo.getSnippet().getCategoryId(), video.getVideoCategory().getYoutubeId());
         }
     }
 
@@ -97,6 +104,7 @@ public class YouTubeEntityVerifier {
         assertNotNull(videoDto.getPublishedAt());
         assertFalse(videoDto.getTitle().isEmpty());
         assertFalse(videoDto.getChannelTitle().isEmpty());
+        assertFalse(videoDto.getVideoCategory().isEmpty());
     }
 
 
@@ -109,4 +117,31 @@ public class YouTubeEntityVerifier {
         assertFalse(channelDto.getTitle().isEmpty());
     }
 
+
+    public static void assertYouTubeVideoCategoryAndVideoCategoryEqual(List<VideoCategory> youTubeCategories, List<com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory> videoCategories) {
+        assertEquals(youTubeCategories.size(), videoCategories.size());
+        IntStream.range(0, videoCategories.size())
+                 .forEach(i -> {
+                     var ytCategory = youTubeCategories.get(i);
+                     var category = videoCategories.get(i);
+                     Assertions.assertEquals(ytCategory.getId(), category.getYoutubeId());
+                     Assertions.assertEquals(ytCategory.getSnippet().getTitle(), category.getCategoryName());
+                 });
+    }
+
+    public static void assertDbIdsAndInputIdsExistsAndEqual(List<com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory> returnedVideoCategories, List<com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory> dbVideoCategories, List<String> dbIds, List<String> ids) {
+        Map<String, com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory> videoCategoriesMap = MapCreator
+                .toMap(returnedVideoCategories, com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory::getYoutubeId, Function
+                        .identity());
+
+        IntStream.range(0, dbIds.size())
+                 .forEach(i -> {
+                     assertTrue(videoCategoriesMap.containsKey(dbIds.get(i)));
+                     var actual = videoCategoriesMap.get(dbIds.get(i));
+                     assertEquals(dbVideoCategories.get(i), actual);
+                 });
+
+        IntStream.range(0, ids.size())
+                 .forEach(i -> assertTrue(videoCategoriesMap.containsKey(ids.get(i))));
+    }
 }

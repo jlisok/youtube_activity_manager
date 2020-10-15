@@ -2,8 +2,9 @@ package com.jlisok.youtube_activity_manager.youtube.api;
 
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.*;
+import com.jlisok.youtube_activity_manager.testutils.ChannelAndSubscriptionUtils;
 import com.jlisok.youtube_activity_manager.testutils.TestProfile;
-import com.jlisok.youtube_activity_manager.testutils.YouTubeApiUtils;
+import com.jlisok.youtube_activity_manager.testutils.VideoUtils;
 import com.jlisok.youtube_activity_manager.videos.enums.Rating;
 import com.jlisok.youtube_activity_manager.youtube.constants.YouTubeApiClientRequest;
 import com.jlisok.youtube_activity_manager.youtube.utils.YouTubeActivityGetter;
@@ -15,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -55,23 +55,23 @@ class YouTubeClientImplementationTest implements TestProfile {
 
     @BeforeEach
     void prepareInitialConditions() {
-        subscriptions = YouTubeApiUtils.createRandomSubscriptionList(YouTubeApiClientRequest.MAX_ALLOWED_RESULTS_PER_PAGE);
-        channels = YouTubeApiUtils.createRandomYouTubeChannelList(subscriptions.size());
-        videos = YouTubeApiUtils.createRandomYouTubeVideoList(YouTubeApiClientRequest.MAX_ALLOWED_RESULTS_PER_PAGE, channels);
+        subscriptions = ChannelAndSubscriptionUtils.createRandomSubscriptionList(YouTubeApiClientRequest.MAX_ALLOWED_RESULTS_PER_PAGE);
+        channels = ChannelAndSubscriptionUtils.createRandomYouTubeChannelList(subscriptions.size());
+        videos = VideoUtils.createRandomYouTubeVideoList(YouTubeApiClientRequest.MAX_ALLOWED_RESULTS_PER_PAGE, channels);
     }
 
 
     @Test
-    void fetchSubscriptions_whenNextTokenEmpty() throws IOException {
+    void fetchSubscriptions_whenNextTokenEmpty() {
         //given
         String nextPageToken = "";
-        SubscriptionListResponse subscriptionListResponse = YouTubeApiUtils.createSubscriptionListResponse(subscriptions, nextPageToken);
+        SubscriptionListResponse subscriptionListResponse = ChannelAndSubscriptionUtils.createSubscriptionListResponse(subscriptions, nextPageToken);
 
         when(builder.get(dummyAccessToken))
                 .thenReturn(youTube);
 
 
-        when(getter.getSubscriptionsYouTubeApi(youTube, subscriptionRequestParts, nextPageToken))
+        when(getter.getYouTubeSubscriptions(youTube, subscriptionRequestParts, nextPageToken))
                 .thenReturn(subscriptionListResponse);
 
         //when
@@ -85,18 +85,18 @@ class YouTubeClientImplementationTest implements TestProfile {
 
 
     @Test
-    void fetchSubscriptions_whenNextTokenNotEmpty() throws IOException {
+    void fetchSubscriptions_whenNextTokenNotEmpty() {
         //given
         String nextPageToken = "notEmptyPageToken";
         List<SubscriptionListResponse> subscriptionResponses = new ArrayList<>();
-        subscriptionResponses.add(YouTubeApiUtils.createSubscriptionListResponse(subscriptions, nextPageToken));
-        subscriptionResponses.add(YouTubeApiUtils.createSubscriptionListResponse(subscriptions, ""));
+        subscriptionResponses.add(ChannelAndSubscriptionUtils.createSubscriptionListResponse(subscriptions, nextPageToken));
+        subscriptionResponses.add(ChannelAndSubscriptionUtils.createSubscriptionListResponse(subscriptions, ""));
 
         when(builder.get(dummyAccessToken))
                 .thenReturn(youTube);
 
 
-        when(getter.getSubscriptionsYouTubeApi(eq(youTube), eq(subscriptionRequestParts), any(String.class)))
+        when(getter.getYouTubeSubscriptions(eq(youTube), eq(subscriptionRequestParts), any(String.class)))
                 .thenAnswer(AdditionalAnswers.returnsElementsOf(subscriptionResponses));
 
         //when
@@ -110,16 +110,16 @@ class YouTubeClientImplementationTest implements TestProfile {
 
 
     @Test
-    void fetchSubscriptions_whenNextTokenNull() throws IOException {
+    void fetchSubscriptions_whenNextTokenNull() {
         //given
         String nextPageToken = null;
-        SubscriptionListResponse subscriptionListResponse = YouTubeApiUtils.createSubscriptionListResponse(subscriptions, nextPageToken);
+        SubscriptionListResponse subscriptionListResponse = ChannelAndSubscriptionUtils.createSubscriptionListResponse(subscriptions, nextPageToken);
 
         when(builder.get(dummyAccessToken))
                 .thenReturn(youTube);
 
 
-        when(getter.getSubscriptionsYouTubeApi(eq(youTube), eq(subscriptionRequestParts), any(String.class)))
+        when(getter.getYouTubeSubscriptions(eq(youTube), eq(subscriptionRequestParts), any(String.class)))
                 .thenReturn(subscriptionListResponse);
 
         //when
@@ -133,20 +133,20 @@ class YouTubeClientImplementationTest implements TestProfile {
 
 
     @Test
-    void fetchChannels_whenChannelIdsBelowMaxRequestCapacity() throws IOException {
+    void fetchChannels_whenChannelIdsBelowMaxRequestCapacity() {
         //given
         String dummyInputIds = IntStream
                 .range(0, YouTubeApiClientRequest.MAX_ALLOWED_RESULTS_PER_PAGE)
                 .mapToObj(i -> "wdqwdqw")
                 .collect(Collectors.joining(","));
         List<String> dummyChannelIds = Arrays.asList(split(dummyInputIds, ","));
-        ChannelListResponse listResponse = YouTubeApiUtils.createChannelListResponse(channels);
+        ChannelListResponse listResponse = ChannelAndSubscriptionUtils.createChannelListResponse(channels);
 
         when(builder.get(dummyAccessToken))
                 .thenReturn(youTube);
 
 
-        when(getter.getChannelsYouTubeApi(eq(youTube), eq(channelRequestParts), any(String.class)))
+        when(getter.getYouTubeChannels(eq(youTube), eq(channelRequestParts), any(String.class)))
                 .thenReturn(listResponse);
 
         //when
@@ -160,20 +160,20 @@ class YouTubeClientImplementationTest implements TestProfile {
 
 
     @Test
-    void fetchChannels_whenChannelIdsAboveMaxRequestCapacity() throws IOException {
+    void fetchChannels_whenChannelIdsAboveMaxRequestCapacity() {
         //given
         List<String> dummyChannelIds = IntStream
                 .range(0, YouTubeApiClientRequest.MAX_ALLOWED_RESULTS_PER_PAGE * 2)
                 .mapToObj(i -> "wdqwdqw")
                 .collect(Collectors.toList());
 
-        ChannelListResponse listResponse = YouTubeApiUtils.createChannelListResponse(channels);
+        ChannelListResponse listResponse = ChannelAndSubscriptionUtils.createChannelListResponse(channels);
 
         when(builder.get(dummyAccessToken))
                 .thenReturn(youTube);
 
 
-        when(getter.getChannelsYouTubeApi(eq(youTube), eq(channelRequestParts), any(String.class)))
+        when(getter.getYouTubeChannels(eq(youTube), eq(channelRequestParts), any(String.class)))
                 .thenReturn(listResponse);
 
         //when
@@ -187,16 +187,16 @@ class YouTubeClientImplementationTest implements TestProfile {
 
 
     @Test
-    void fetchVideos_whenNextTokenEmpty() throws IOException {
+    void fetchVideos_whenNextTokenEmpty() {
         //given
         String nextPageToken = "";
-        VideoListResponse listResponse = YouTubeApiUtils.createVideoListResponse(videos, nextPageToken);
+        VideoListResponse listResponse = VideoUtils.createVideoListResponse(videos, nextPageToken);
 
         when(builder.get(dummyAccessToken))
                 .thenReturn(youTube);
 
 
-        when(getter.getVideosYouTubeApi(youTube, subscriptionRequestParts, rating, nextPageToken))
+        when(getter.getYouTubeVideos(youTube, subscriptionRequestParts, rating, nextPageToken))
                 .thenReturn(listResponse);
 
         //when
@@ -210,18 +210,18 @@ class YouTubeClientImplementationTest implements TestProfile {
 
 
     @Test
-    void fetchVideos_whenNextTokenNotEmpty() throws IOException {
+    void fetchVideos_whenNextTokenNotEmpty() {
         //given
         String nextPageToken = "notEmptyPageToken";
         List<VideoListResponse> listResponses = new ArrayList<>();
-        listResponses.add(YouTubeApiUtils.createVideoListResponse(videos, nextPageToken));
-        listResponses.add(YouTubeApiUtils.createVideoListResponse(videos, null));
+        listResponses.add(VideoUtils.createVideoListResponse(videos, nextPageToken));
+        listResponses.add(VideoUtils.createVideoListResponse(videos, null));
 
         when(builder.get(dummyAccessToken))
                 .thenReturn(youTube);
 
 
-        when(getter.getVideosYouTubeApi(eq(youTube), eq(subscriptionRequestParts), eq(rating), any(String.class)))
+        when(getter.getYouTubeVideos(eq(youTube), eq(subscriptionRequestParts), eq(rating), any(String.class)))
                 .thenAnswer(AdditionalAnswers.returnsElementsOf(listResponses));
 
         //when
@@ -235,16 +235,16 @@ class YouTubeClientImplementationTest implements TestProfile {
 
 
     @Test
-    void fetchVideos_whenNextTokenNull() throws IOException {
+    void fetchVideos_whenNextTokenNull() {
         //given
         String nextPageToken = null;
-        VideoListResponse videoListResponse = YouTubeApiUtils.createVideoListResponse(videos, nextPageToken);
+        VideoListResponse videoListResponse = VideoUtils.createVideoListResponse(videos, nextPageToken);
 
         when(builder.get(dummyAccessToken))
                 .thenReturn(youTube);
 
 
-        when(getter.getVideosYouTubeApi(eq(youTube), eq(subscriptionRequestParts), eq(rating), any(String.class)))
+        when(getter.getYouTubeVideos(eq(youTube), eq(subscriptionRequestParts), eq(rating), any(String.class)))
                 .thenReturn(videoListResponse);
 
         //when
