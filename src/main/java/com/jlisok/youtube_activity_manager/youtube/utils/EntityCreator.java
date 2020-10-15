@@ -1,8 +1,8 @@
 package com.jlisok.youtube_activity_manager.youtube.utils;
 
 import com.google.api.services.youtube.model.*;
-import com.jlisok.youtube_activity_manager.channel.models.Channel;
-import com.jlisok.youtube_activity_manager.channel.models.ChannelBuilder;
+import com.jlisok.youtube_activity_manager.channels.models.Channel;
+import com.jlisok.youtube_activity_manager.channels.models.ChannelBuilder;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.videos.models.Video;
 import com.jlisok.youtube_activity_manager.videos.models.VideoBuilder;

@@ -1,7 +1,7 @@
 package com.jlisok.youtube_activity_manager.youtube.services;
 
-import com.jlisok.youtube_activity_manager.channel.models.Channel;
-import com.jlisok.youtube_activity_manager.channel.repositories.ChannelRepository;
+import com.jlisok.youtube_activity_manager.channels.models.Channel;
+import com.jlisok.youtube_activity_manager.channels.repositories.ChannelRepository;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.testutils.YouTubeApiUtils;
@@ -44,7 +44,7 @@ class ChannelDatabaseServiceImplementationTest {
     private static final Answer<List<Channel>> interceptChannels = invocation -> (List<Channel>) invocation.getArguments()[0];
 
     private User user;
-    private List<com.jlisok.youtube_activity_manager.channel.models.Channel> channels;
+    private List<com.jlisok.youtube_activity_manager.channels.models.Channel> channels;
 
 
     @BeforeEach
