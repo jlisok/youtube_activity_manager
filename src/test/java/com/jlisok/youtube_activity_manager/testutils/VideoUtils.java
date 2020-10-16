@@ -2,7 +2,7 @@ package com.jlisok.youtube_activity_manager.testutils;
 
 import com.google.api.client.util.DateTime;
 import com.google.api.services.youtube.model.*;
-import com.jlisok.youtube_activity_manager.channel.models.Channel;
+import com.jlisok.youtube_activity_manager.channels.models.Channel;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory;
 import com.jlisok.youtube_activity_manager.youtube.utils.EntityCreator;
