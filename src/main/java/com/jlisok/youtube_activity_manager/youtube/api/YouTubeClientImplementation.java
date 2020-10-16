@@ -8,7 +8,6 @@ import com.jlisok.youtube_activity_manager.youtube.utils.YouTubeApiRequestHelper
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,12 +28,12 @@ public class YouTubeClientImplementation implements YouTubeClient {
 
 
     @Override
-    public List<Subscription> fetchSubscriptions(String accessToken, String parts) throws IOException {
+    public List<Subscription> fetchSubscriptions(String accessToken, String parts) {
         YouTube youTube = youTubeBuilder.get(accessToken);
         List<Subscription> subscriptions = new ArrayList<>();
         String pageToken = "";
         do {
-            SubscriptionListResponse response = getter.getSubscriptionsYouTubeApi(youTube, parts, pageToken);
+            SubscriptionListResponse response = getter.getYouTubeSubscriptions(youTube, parts, pageToken);
             subscriptions.addAll(response.getItems());
             pageToken = response.getNextPageToken();
         }
@@ -49,23 +48,34 @@ public class YouTubeClientImplementation implements YouTubeClient {
         List<String> inputChannelIds = YouTubeApiRequestHelper.separateIdsIntoMaxRequestCapacity(channelIds);
         return inputChannelIds
                 .stream()
-                .map(inputIds -> getter.getChannelsYouTubeApi(youTube, parts, inputIds))
+                .map(inputIds -> getter.getYouTubeChannels(youTube, parts, inputIds))
                 .flatMap(items -> items.getItems().stream())
                 .collect(Collectors.toList());
     }
 
 
     @Override
-    public List<Video> fetchRatedVideos(String accessToken, String parts, Rating rating) throws IOException {
+    public List<Video> fetchRatedVideos(String accessToken, String parts, Rating rating) {
         YouTube youTube = youTubeBuilder.get(accessToken);
         List<Video> videos = new ArrayList<>();
         String pageToken = "";
         do {
-            VideoListResponse response = getter.getVideosYouTubeApi(youTube, parts, rating, pageToken);
+            VideoListResponse response = getter.getYouTubeVideos(youTube, parts, rating, pageToken);
             videos.addAll(response.getItems());
             pageToken = response.getNextPageToken();
         }
         while (pageToken != null && !pageToken.isEmpty());
         return videos;
+    }
+
+    @Override
+    public List<VideoCategory> fetchVideoCategories(String accessToken, String parts, List<String> categoryIds) {
+        YouTube youTube = youTubeBuilder.get(accessToken);
+        List<String> inputCategoryIds = YouTubeApiRequestHelper.separateIdsIntoMaxRequestCapacity(categoryIds);
+        return inputCategoryIds
+                .stream()
+                .map(inputIds -> getter.getYouTubeVideoCategories(youTube, parts, inputIds))
+                .flatMap(items -> items.getItems().stream())
+                .collect(Collectors.toList());
     }
 }

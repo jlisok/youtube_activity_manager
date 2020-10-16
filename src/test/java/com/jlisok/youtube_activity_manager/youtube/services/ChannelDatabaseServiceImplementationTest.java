@@ -3,8 +3,9 @@ package com.jlisok.youtube_activity_manager.youtube.services;
 import com.jlisok.youtube_activity_manager.channels.models.Channel;
 import com.jlisok.youtube_activity_manager.channels.repositories.ChannelRepository;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
+import com.jlisok.youtube_activity_manager.testutils.TestProfile;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
-import com.jlisok.youtube_activity_manager.testutils.YouTubeApiUtils;
+import com.jlisok.youtube_activity_manager.testutils.ChannelAndSubscriptionUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,22 +21,22 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static com.jlisok.youtube_activity_manager.testutils.YouTubeApiUtils.createRandomListOfChannels;
+import static com.jlisok.youtube_activity_manager.testutils.ChannelAndSubscriptionUtils.createRandomListOfChannels;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class ChannelDatabaseServiceImplementationTest {
+class ChannelDatabaseServiceImplementationTest implements TestProfile {
 
     @Autowired
-    UserUtils userUtils;
+    private UserUtils userUtils;
 
     @Captor
     private ArgumentCaptor<List<Channel>> captor;
 
     @MockBean
-    ChannelRepository repository;
+    private ChannelRepository repository;
 
     @Autowired
     private ChannelDatabaseService daoService;
@@ -78,7 +79,7 @@ class ChannelDatabaseServiceImplementationTest {
     void updateChannelsInDatabase_whenAllChannelsToUpdate() throws RegistrationException {
         //given
         User userInDatabase = userUtils.createUser(userUtils.createRandomEmail(), userUtils.createRandomPassword());
-        List<Channel> repositoryChannels = YouTubeApiUtils.copyOfMinus30MinutesCreatedAt(channels, userInDatabase);
+        List<Channel> repositoryChannels = ChannelAndSubscriptionUtils.copyOfMinus30MinutesCreatedAt(channels, userInDatabase);
 
         when(repository.findByUsers_Id(user.getId()))
                 .thenReturn(repositoryChannels);

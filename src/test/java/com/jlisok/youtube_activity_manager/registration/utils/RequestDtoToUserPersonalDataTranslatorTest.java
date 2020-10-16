@@ -2,6 +2,7 @@ package com.jlisok.youtube_activity_manager.registration.utils;
 
 import com.jlisok.youtube_activity_manager.registration.dto.RegistrationRequestDto;
 import com.jlisok.youtube_activity_manager.registration.exceptions.PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException;
+import com.jlisok.youtube_activity_manager.testutils.TestProfile;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.userPersonalData.enums.Sex;
 import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalData;
@@ -20,7 +21,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 @SpringBootTest
-class RequestDtoToUserPersonalDataTranslatorTest {
+class RequestDtoToUserPersonalDataTranslatorTest implements TestProfile {
 
     @Autowired
     private UserUtils userUtils;

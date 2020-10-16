@@ -2,6 +2,7 @@ package com.jlisok.youtube_activity_manager.youtube.services;
 
 import com.jlisok.youtube_activity_manager.channels.models.Channel;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
+import com.jlisok.youtube_activity_manager.testutils.TestProfile;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.testutils.YouTubeEntityVerifier;
 import com.jlisok.youtube_activity_manager.users.models.User;
@@ -16,18 +17,18 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.jlisok.youtube_activity_manager.testutils.YouTubeApiUtils.createRandomYouTubeChannelList;
+import static com.jlisok.youtube_activity_manager.testutils.ChannelAndSubscriptionUtils.createRandomYouTubeChannelList;
 import static com.jlisok.youtube_activity_manager.testutils.YouTubeEntityVerifier.assertListOfChannelsEqual;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class ChannelServiceImplementationTest {
+class ChannelServiceImplementationTest implements TestProfile {
 
     @Autowired
     private ChannelService service;
 
     @Autowired
-    UserUtils utils;
+    private UserUtils utils;
 
     @MockBean
     private UserFetcher fetcher;

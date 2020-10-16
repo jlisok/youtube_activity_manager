@@ -6,6 +6,7 @@ import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationE
 import com.jlisok.youtube_activity_manager.registration.exceptions.UnexpectedErrorBadRegistrationRequestException;
 import com.jlisok.youtube_activity_manager.registration.utils.DtoToUserTranslator;
 import com.jlisok.youtube_activity_manager.testutils.RandomRegistrationDto;
+import com.jlisok.youtube_activity_manager.testutils.TestProfile;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
@@ -24,7 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class RegistrationServiceTest {
+class RegistrationServiceTest implements TestProfile {
 
     @Autowired
     private UserUtils userUtils;

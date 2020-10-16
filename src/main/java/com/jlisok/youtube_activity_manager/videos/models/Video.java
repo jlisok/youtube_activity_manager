@@ -1,6 +1,7 @@
 package com.jlisok.youtube_activity_manager.videos.models;
 
 import com.jlisok.youtube_activity_manager.channels.models.Channel;
+import com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory;
 import com.vladmihalcea.hibernate.type.array.ListArrayType;
 import com.vladmihalcea.hibernate.type.interval.PostgreSQLIntervalType;
 import org.hibernate.annotations.Type;
@@ -49,17 +50,21 @@ public class Video {
     @Column(name = "modified_at")
     private Instant modifiedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "channel_id")
     private Channel channel;
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "video_category_id")
+    private VideoCategory videoCategory;
 
     public Video() {
     }
 
-    Video(UUID id, String title, String youTubeId, Duration duration, Instant publishedAt, List<String> hashtag, List<String> uri, Instant createdAt, Instant modifiedAt, Channel channel) {
+    public Video(UUID id, String title, String youTubeVideoId, Duration duration, Instant publishedAt, List<String> hashtag, List<String> uri, Instant createdAt, Instant modifiedAt, Channel channel, VideoCategory videoCategory) {
         this.id = id;
         this.title = title;
-        this.youTubeVideoId = youTubeId;
+        this.youTubeVideoId = youTubeVideoId;
         this.duration = duration;
         this.publishedAt = publishedAt;
         this.hashtag = hashtag;
@@ -67,6 +72,15 @@ public class Video {
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
         this.channel = channel;
+        this.videoCategory = videoCategory;
+    }
+
+    public VideoCategory getVideoCategory() {
+        return videoCategory;
+    }
+
+    public void setVideoCategory(VideoCategory videoCategory) {
+        this.videoCategory = videoCategory;
     }
 
     public String getYouTubeVideoId() {
@@ -163,11 +177,12 @@ public class Video {
                 Objects.equals(uri, video.uri) &&
                 createdAt.equals(video.createdAt) &&
                 modifiedAt.equals(video.modifiedAt) &&
-                channel.equals(video.channel);
+                channel.equals(video.channel) &&
+                videoCategory.equals(video.videoCategory);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, youTubeVideoId, duration, publishedAt, hashtag, uri, createdAt, modifiedAt, channel);
+        return Objects.hash(id, title, youTubeVideoId, duration, publishedAt, hashtag, uri, createdAt, modifiedAt, channel, videoCategory);
     }
 }

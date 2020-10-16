@@ -1,5 +1,6 @@
 package com.jlisok.youtube_activity_manager.youtube.utils;
 
+import com.jlisok.youtube_activity_manager.testutils.TestProfile;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
@@ -20,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class AccessTokenServiceTest {
+class AccessTokenServiceTest implements TestProfile {
 
     @Autowired
     private UserUtils userUtils;

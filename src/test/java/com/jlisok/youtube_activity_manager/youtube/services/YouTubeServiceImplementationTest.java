@@ -4,9 +4,7 @@ import com.google.api.services.youtube.model.Subscription;
 import com.jlisok.youtube_activity_manager.channels.models.Channel;
 import com.jlisok.youtube_activity_manager.channels.repositories.ChannelRepository;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
-import com.jlisok.youtube_activity_manager.testutils.UserUtils;
-import com.jlisok.youtube_activity_manager.testutils.YouTubeApiUtils;
-import com.jlisok.youtube_activity_manager.testutils.YouTubeEntityVerifier;
+import com.jlisok.youtube_activity_manager.testutils.*;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
 import com.jlisok.youtube_activity_manager.videos.enums.Rating;
@@ -40,7 +38,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class YouTubeServiceImplementationTest {
+class YouTubeServiceImplementationTest implements TestProfile {
 
     @Autowired
     private YouTubeService service;
@@ -86,9 +84,9 @@ class YouTubeServiceImplementationTest {
         String email = userUtils.createRandomEmail();
         String password = userUtils.createRandomPassword();
         user = userUtils.createUser(email, password);
-        youtubeSubscriptions = YouTubeApiUtils.createRandomSubscriptionList(random.nextInt(30));
-        youtubeChannels = YouTubeApiUtils.createRandomYouTubeChannelList(youtubeSubscriptions.size());
-        youtubeVideos = YouTubeApiUtils.createRandomYouTubeVideoList(youtubeSubscriptions.size(), youtubeChannels);
+        youtubeSubscriptions = ChannelAndSubscriptionUtils.createRandomSubscriptionList(random.nextInt(30));
+        youtubeChannels = ChannelAndSubscriptionUtils.createRandomYouTubeChannelList(youtubeSubscriptions.size());
+        youtubeVideos = VideoUtils.createRandomYouTubeVideoList(youtubeSubscriptions.size(), youtubeChannels);
         setAuthenticationInContext(dummyGoogleIdToken, user.getId());
     }
 
@@ -237,8 +235,8 @@ class YouTubeServiceImplementationTest {
     void listSubscribedChannels_andAllChannelsAlreadyInDatabase() throws Exception {
         //given
         User userInDatabase = userUtils.createUser(userUtils.createRandomEmail(), userUtils.createRandomPassword());
-        List<Channel> channels = YouTubeApiUtils.createRandomListOfChannels(youtubeChannels.size(), userInDatabase);
-        List<Channel> repositoryChannels = YouTubeApiUtils.copyOfMinus30MinutesCreatedAt(channels, userInDatabase, youtubeChannels);
+        List<Channel> channels = ChannelAndSubscriptionUtils.createRandomListOfChannels(youtubeChannels.size(), userInDatabase);
+        List<Channel> repositoryChannels = ChannelAndSubscriptionUtils.copyOfMinus30MinutesCreatedAt(channels, userInDatabase, youtubeChannels);
 
         when(accessTokenService.getAccessToken())
                 .thenReturn(dummyAccessToken);
