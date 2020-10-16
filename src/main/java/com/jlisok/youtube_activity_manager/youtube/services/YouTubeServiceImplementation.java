@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -85,7 +84,7 @@ public class YouTubeServiceImplementation implements YouTubeService {
     }
 
 
-    private List<Channel> getAndInsertChannels(List<String> ytChannelIds, UUID userId){
+    private List<Channel> getAndInsertChannels(List<String> ytChannelIds, UUID userId) {
         List<com.google.api.services.youtube.model.Channel> youtubeChannels = youTubeClient
                 .fetchChannels(accessTokenService.getAccessToken(), CHANNEL_REQUEST_PARTS, ytChannelIds);
         List<Channel> channels = channelService.createChannels(youtubeChannels, userId);

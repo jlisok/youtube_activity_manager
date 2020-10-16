@@ -50,11 +50,11 @@ public class Video {
     @Column(name = "modified_at")
     private Instant modifiedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "channel_id")
     private Channel channel;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "video_category_id")
     private VideoCategory videoCategory;
 

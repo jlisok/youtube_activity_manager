@@ -49,18 +49,19 @@ public class YouTubeEntityVerifier {
 
     public static void assertListOfChannelsEqual(List<com.google.api.services.youtube.model.Channel> youTubeList, List<Channel> actualChannelList) {
         assertEquals(youTubeList.size(), actualChannelList.size());
-        for (int i = 0; i < actualChannelList.size(); i++) {
-            com.google.api.services.youtube.model.Channel youtubeChannel = youTubeList.get(i);
-            Channel channel = actualChannelList.get(i);
-            assertEquals(youtubeChannel.getSnippet().getCountry(), channel.getCountry());
-            assertEquals(youtubeChannel.getSnippet().getDefaultLanguage(), channel.getLanguage());
-            assertEquals(youtubeChannel.getSnippet().getTitle(), channel.getTitle());
-            assertEquals(youtubeChannel.getStatistics().getVideoCount().intValue(), channel.getVideoNumber());
-            assertEquals(youtubeChannel.getStatistics().getVideoCount().intValue(), channel.getVideoNumber());
-            assertEquals(youtubeChannel.getStatistics().getViewCount().intValue(), channel.getViewNumber());
-            assertEquals(youtubeChannel.getStatistics().getSubscriberCount().intValue(), channel.getSubscriberNumber());
-            assertEquals(youtubeChannel.getContentOwnerDetails().getContentOwner(), channel.getOwner());
-        }
+        IntStream.range(0, actualChannelList.size())
+                 .forEach(i -> {
+                     com.google.api.services.youtube.model.Channel youtubeChannel = youTubeList.get(i);
+                     Channel channel = actualChannelList.get(i);
+                     assertEquals(youtubeChannel.getSnippet().getCountry(), channel.getCountry());
+                     assertEquals(youtubeChannel.getSnippet().getDefaultLanguage(), channel.getLanguage());
+                     assertEquals(youtubeChannel.getSnippet().getTitle(), channel.getTitle());
+                     assertEquals(youtubeChannel.getStatistics().getVideoCount().intValue(), channel.getVideoNumber());
+                     assertEquals(youtubeChannel.getStatistics().getVideoCount().intValue(), channel.getVideoNumber());
+                     assertEquals(youtubeChannel.getStatistics().getViewCount().intValue(), channel.getViewNumber());
+                     assertEquals(youtubeChannel.getStatistics().getSubscriberCount().intValue(), channel.getSubscriberNumber());
+                     assertEquals(youtubeChannel.getContentOwnerDetails().getContentOwner(), channel.getOwner());
+                 });
     }
 
 
@@ -75,16 +76,17 @@ public class YouTubeEntityVerifier {
 
     public static void assertListOfVideosEqual(List<com.google.api.services.youtube.model.Video> youTubeList, List<Video> actualVideoList) {
         assertEquals(youTubeList.size(), actualVideoList.size());
-        for (int i = 0; i < actualVideoList.size(); i++) {
-            com.google.api.services.youtube.model.Video youtubeVideo = youTubeList.get(i);
-            Video video = actualVideoList.get(i);
-            assertChannelNotEmpty(video.getChannel());
-            assertEquals(youtubeVideo.getSnippet().getTitle(), video.getTitle());
-            assertEquals(youtubeVideo.getContentDetails().getDuration(), video.getDuration().toString());
-            assertEquals(youtubeVideo.getSnippet().getTags(), video.getHashtag());
-            assertEquals(youtubeVideo.getSnippet().getChannelId(), video.getChannel().getYouTubeChannelId());
-            assertEquals(youtubeVideo.getSnippet().getCategoryId(), video.getVideoCategory().getYoutubeId());
-        }
+        IntStream.range(0, actualVideoList.size())
+                 .forEach(i -> {
+                     com.google.api.services.youtube.model.Video youtubeVideo = youTubeList.get(i);
+                     Video video = actualVideoList.get(i);
+                     assertChannelNotEmpty(video.getChannel());
+                     assertEquals(youtubeVideo.getSnippet().getTitle(), video.getTitle());
+                     assertEquals(youtubeVideo.getContentDetails().getDuration(), video.getDuration().toString());
+                     assertEquals(youtubeVideo.getSnippet().getTags(), video.getHashtag());
+                     assertEquals(youtubeVideo.getSnippet().getChannelId(), video.getChannel().getYouTubeChannelId());
+                     assertEquals(youtubeVideo.getSnippet().getCategoryId(), video.getVideoCategory().getYoutubeId());
+                 });
     }
 
 

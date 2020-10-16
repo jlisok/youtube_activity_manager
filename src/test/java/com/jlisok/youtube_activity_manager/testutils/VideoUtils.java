@@ -31,18 +31,20 @@ public class VideoUtils {
         if (size == 0) {
             return new ArrayList<>(0);
         }
-        return IntStream.range(0, size).mapToObj(i -> {
-            var channelIndex = i % youTubeChannels.size();
-            var channel = youTubeChannels.get(channelIndex);
-            VideoContentDetails details = createRandomVideoContentDetails();
-            VideoSnippet snippet = createRandomVideoSnippet();
-            snippet.setChannelId(channel.getId());
-            snippet.setCategoryId(createRandomString());
-            return new com.google.api.services.youtube.model.Video()
-                    .setContentDetails(details)
-                    .setSnippet(snippet)
-                    .setId(UUID.randomUUID().toString());
-        }).collect(Collectors.toList());
+        var youTubeChannelsSize = youTubeChannels.size();
+        return IntStream.range(0, size)
+                        .mapToObj(i -> {
+                            var channelIndex = i % youTubeChannelsSize;
+                            var channel = youTubeChannels.get(channelIndex);
+                            VideoContentDetails details = createRandomVideoContentDetails();
+                            VideoSnippet snippet = createRandomVideoSnippet();
+                            snippet.setChannelId(channel.getId());
+                            snippet.setCategoryId(createRandomString());
+                            return new com.google.api.services.youtube.model.Video()
+                                    .setContentDetails(details)
+                                    .setSnippet(snippet)
+                                    .setId(UUID.randomUUID().toString());
+                        }).collect(Collectors.toList());
     }
 
 
@@ -52,20 +54,19 @@ public class VideoUtils {
         }
         List<com.google.api.services.youtube.model.Channel> youTubeChannels = ChannelAndSubscriptionUtils.createRandomYouTubeChannelList(size);
         List<com.google.api.services.youtube.model.VideoCategory> videoCategories = createRandomListOfYouTubeVideoCategories(size);
-        return IntStream
-                .range(0, size)
-                .mapToObj(i -> {
-                    var channel = youTubeChannels.get(i);
-                    var category = videoCategories.get(i);
-                    VideoContentDetails details = createRandomVideoContentDetails();
-                    VideoSnippet snippet = createRandomVideoSnippet();
-                    snippet.setChannelId(channel.getId());
-                    snippet.setCategoryId(category.getId());
-                    return new com.google.api.services.youtube.model.Video()
-                            .setContentDetails(details)
-                            .setSnippet(snippet)
-                            .setId(UUID.randomUUID().toString());
-                }).collect(Collectors.toList());
+        return IntStream.range(0, size)
+                        .mapToObj(i -> {
+                            var channel = youTubeChannels.get(i);
+                            var category = videoCategories.get(i);
+                            VideoContentDetails details = createRandomVideoContentDetails();
+                            VideoSnippet snippet = createRandomVideoSnippet();
+                            snippet.setChannelId(channel.getId());
+                            snippet.setCategoryId(category.getId());
+                            return new com.google.api.services.youtube.model.Video()
+                                    .setContentDetails(details)
+                                    .setSnippet(snippet)
+                                    .setId(UUID.randomUUID().toString());
+                        }).collect(Collectors.toList());
     }
 
 
@@ -73,20 +74,23 @@ public class VideoUtils {
         if (size == 0) {
             return new ArrayList<>(0);
         }
-        return IntStream.range(0, size).mapToObj(i -> {
-            var channelIndex = i % youTubeChannels.size();
-            var channel = youTubeChannels.get(channelIndex);
-            var categoryIndex = i % videoCategories.size();
-            var category = videoCategories.get(categoryIndex);
-            VideoContentDetails details = createRandomVideoContentDetails();
-            VideoSnippet snippet = createRandomVideoSnippet();
-            snippet.setChannelId(channel.getId());
-            snippet.setCategoryId(category.getYoutubeId());
-            return new com.google.api.services.youtube.model.Video()
-                    .setContentDetails(details)
-                    .setSnippet(snippet)
-                    .setId(UUID.randomUUID().toString());
-        }).collect(Collectors.toList());
+        var youTubeChannelsSize = youTubeChannels.size();
+        var videosSize = videoCategories.size();
+        return IntStream.range(0, size)
+                        .mapToObj(i -> {
+                            var channelIndex = i % youTubeChannelsSize;
+                            var channel = youTubeChannels.get(channelIndex);
+                            var categoryIndex = i % videosSize;
+                            var category = videoCategories.get(categoryIndex);
+                            VideoContentDetails details = createRandomVideoContentDetails();
+                            VideoSnippet snippet = createRandomVideoSnippet();
+                            snippet.setChannelId(channel.getId());
+                            snippet.setCategoryId(category.getYoutubeId());
+                            return new com.google.api.services.youtube.model.Video()
+                                    .setContentDetails(details)
+                                    .setSnippet(snippet)
+                                    .setId(UUID.randomUUID().toString());
+                        }).collect(Collectors.toList());
     }
 
 
@@ -137,64 +141,60 @@ public class VideoUtils {
 
 
     public static List<com.google.api.services.youtube.model.VideoCategory> createRandomListOfYouTubeVideoCategories(int size) {
-        return IntStream
-                .range(0, size)
-                .mapToObj(i -> {
-                    var videoCategorySnippet = new VideoCategorySnippet()
-                            .setAssignable(true)
-                            .setChannelId(createRandomString())
-                            .setTitle(createRandomString());
-                    return new com.google.api.services.youtube.model.VideoCategory()
-                            .setEtag(createRandomString())
-                            .setId(createRandomString())
-                            .setKind(createRandomString())
-                            .setSnippet(videoCategorySnippet);
-                })
-                .collect(Collectors.toList());
+        return IntStream.range(0, size)
+                        .mapToObj(i -> {
+                            var videoCategorySnippet = new VideoCategorySnippet()
+                                    .setAssignable(true)
+                                    .setChannelId(createRandomString())
+                                    .setTitle(createRandomString());
+                            return new com.google.api.services.youtube.model.VideoCategory()
+                                    .setEtag(createRandomString())
+                                    .setId(createRandomString())
+                                    .setKind(createRandomString())
+                                    .setSnippet(videoCategorySnippet);
+                        })
+                        .collect(Collectors.toList());
     }
 
 
     public static List<com.google.api.services.youtube.model.VideoCategory> createRandomListOfYouTubeVideoCategoriesById(List<String> ids) {
-        return IntStream
-                .range(0, ids.size())
-                .mapToObj(i -> {
-                    var videoCategorySnippet = new VideoCategorySnippet()
-                            .setAssignable(true)
-                            .setChannelId(createRandomString())
-                            .setTitle(createRandomString());
-                    return new com.google.api.services.youtube.model.VideoCategory()
-                            .setEtag(createRandomString())
-                            .setId(ids.get(i))
-                            .setKind(createRandomString())
-                            .setSnippet(videoCategorySnippet);
-                })
-                .collect(Collectors.toList());
+        return ids.stream()
+                  .map(id -> {
+                      var videoCategorySnippet = new VideoCategorySnippet()
+                              .setAssignable(true)
+                              .setChannelId(createRandomString())
+                              .setTitle(createRandomString());
+                      return new com.google.api.services.youtube.model.VideoCategory()
+                              .setEtag(createRandomString())
+                              .setId(id)
+                              .setKind(createRandomString())
+                              .setSnippet(videoCategorySnippet);
+                  })
+                  .collect(Collectors.toList());
     }
 
 
     public static List<VideoCategory> createRandomListOfVideoCategories(int size) {
-        return IntStream
-                .range(0, size)
-                .mapToObj(i -> new VideoCategory(
-                        UUID.randomUUID(),
-                        createRandomString(),
-                        createRandomString(),
-                        Instant.now(),
-                        Instant.now()))
-                .collect(Collectors.toList());
+        return IntStream.range(0, size)
+                        .mapToObj(i -> new VideoCategory(
+                                UUID.randomUUID(),
+                                createRandomString(),
+                                createRandomString(),
+                                Instant.now(),
+                                Instant.now()))
+                        .collect(Collectors.toList());
     }
 
 
     public static List<VideoCategory> createListOfVideoCategoriesGivenYTIds(List<String> youtubeIds) {
-        return IntStream
-                .range(0, youtubeIds.size())
-                .mapToObj(i -> new VideoCategory(
-                        UUID.randomUUID(),
-                        createRandomString(),
-                        youtubeIds.get(i),
-                        Instant.now(),
-                        Instant.now()))
-                .collect(Collectors.toList());
+        return youtubeIds.stream()
+                         .map(youtubeId -> new VideoCategory(
+                                 UUID.randomUUID(),
+                                 createRandomString(),
+                                 youtubeId,
+                                 Instant.now(),
+                                 Instant.now()))
+                         .collect(Collectors.toList());
     }
 
 

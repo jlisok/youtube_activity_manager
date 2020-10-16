@@ -6,7 +6,6 @@ import com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory;
 import com.jlisok.youtube_activity_manager.videoCategories.repositories.VideoCategoryRepository;
 import com.jlisok.youtube_activity_manager.youtube.api.YouTubeClient;
 import com.jlisok.youtube_activity_manager.youtube.constants.YouTubeApiClientRequest;
-import org.apache.commons.collections4.ListUtils;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,7 +48,7 @@ class VideoCategoryServiceImplementationTest {
                 .mapToObj(i -> VideoUtils.createRandomString())
                 .collect(Collectors.toList());
 
-        dbIds = ListUtils.partition(ids, 2).get(0);
+        dbIds = ids.subList(0, 2);
 
         youTubeCategories = VideoUtils.createRandomListOfYouTubeVideoCategoriesById(ids);
         dbCategories = VideoUtils.createListOfVideoCategoriesGivenYTIds(dbIds);
