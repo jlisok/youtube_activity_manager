@@ -44,7 +44,7 @@ public final class User {
     private UserPersonalData userPersonalData;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "users_channels", joinColumns = @JoinColumn(name = "channel_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @JoinTable(name = "users_channels", inverseJoinColumns = @JoinColumn(name = "channel_id"), joinColumns = @JoinColumn(name = "user_id"))
     private Set<Channel> channels = new HashSet<>();
 
     public User() {

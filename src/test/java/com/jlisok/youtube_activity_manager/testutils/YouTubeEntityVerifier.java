@@ -47,6 +47,32 @@ public class YouTubeEntityVerifier {
     }
 
 
+    public static void assertStatsByCategoryDtoNotNull(MvcResult result) throws Exception {
+        String response = result
+                .getResponse()
+                .getContentAsString();
+
+        assertNotNull(response);
+        assertTrue(response.contains("averageTime"));
+        assertTrue(response.contains("totalTime"));
+        assertTrue(response.contains("numberVideos"));
+        assertTrue(response.contains("categoryName"));
+    }
+
+
+    public static void assertStatsByCreatorDtoNotNull(MvcResult result) throws Exception {
+        String response = result
+                .getResponse()
+                .getContentAsString();
+
+        assertNotNull(response);
+        assertTrue(response.contains("averageTime"));
+        assertTrue(response.contains("totalTime"));
+        assertTrue(response.contains("numberVideos"));
+        assertTrue(response.contains("creatorName"));
+    }
+
+
     public static void assertListOfChannelsEqual(List<com.google.api.services.youtube.model.Channel> youTubeList, List<Channel> actualChannelList) {
         assertEquals(youTubeList.size(), actualChannelList.size());
         IntStream.range(0, actualChannelList.size())

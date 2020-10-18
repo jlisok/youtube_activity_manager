@@ -63,6 +63,17 @@ public class ChannelAndSubscriptionUtils {
         return EntityCreator.createChannel(id, createRandomChannelSnippet(), createChannelStatistics(), createChannelContentOwnerDetails(), users);
     }
 
+    public static List<Channel> createListOfChannelsFromYouTubeChannels(List<com.google.api.services.youtube.model.Channel> youtubeChannels, User user) {
+        return youtubeChannels
+                .stream()
+                .map(channel -> EntityCreator
+                        .createChannel(channel.getId(),
+                                       channel.getSnippet(),
+                                       channel.getStatistics(),
+                                       channel.getContentOwnerDetails(),
+                                       org.mockito.internal.util.collections.Sets.newSet(user)))
+                .collect(Collectors.toList());
+    }
 
     public static List<Channel> copyOfMinus30MinutesCreatedAt(List<Channel> channels, User user) {
         return channels.stream()
