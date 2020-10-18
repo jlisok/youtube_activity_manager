@@ -74,12 +74,12 @@ public class VideoUtils {
             return new ArrayList<>(0);
         }
         var youTubeChannelsSize = youTubeChannels.size();
-        var videosSize = videoCategories.size();
+        var categorySize = videoCategories.size();
         return IntStream.range(0, size)
                         .mapToObj(i -> {
                             var channelIndex = i % youTubeChannelsSize;
                             var channel = youTubeChannels.get(channelIndex);
-                            var categoryIndex = i % videosSize;
+                            var categoryIndex = i % categorySize;
                             var category = videoCategories.get(categoryIndex);
                             VideoContentDetails details = createRandomVideoContentDetails();
                             VideoSnippet snippet = createRandomVideoSnippet();

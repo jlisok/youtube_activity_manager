@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 @Component
@@ -21,15 +20,13 @@ public class YouTubeActivityUtils implements TestProfile {
     @Autowired
     private UserVideoRepository userVideoRepository;
 
-    private final Random random = new Random();
-
 
     @Transactional
     public List<Video> insertUsersYouTubeActivity(User user) {
-        List<com.google.api.services.youtube.model.Channel> youtubeChannels = ChannelAndSubscriptionUtils.createRandomYouTubeChannelList(random.nextInt(20));
+        List<com.google.api.services.youtube.model.Channel> youtubeChannels = ChannelAndSubscriptionUtils.createRandomYouTubeChannelList(20);
         int size = youtubeChannels.size();
         List<VideoCategory> videoCategories = VideoUtils.createRandomListOfVideoCategories(size);
-        List<com.google.api.services.youtube.model.Video> youtubeVideos = VideoUtils.createYouTubeVideoListGivenChannelsAndVideoCategory(random.nextInt(40), youtubeChannels, videoCategories);
+        List<com.google.api.services.youtube.model.Video> youtubeVideos = VideoUtils.createYouTubeVideoListGivenChannelsAndVideoCategory(40, youtubeChannels, videoCategories);
         List<Channel> channels = ChannelAndSubscriptionUtils.createListOfChannelsFromYouTubeChannels(youtubeChannels, user);
         List<Video> videos = VideoUtils.createListOfVideosFromYouTubeVideos(youtubeVideos, channels, videoCategories);
         List<UserVideo> userVideos = videos.stream()
