@@ -12,6 +12,8 @@ import java.util.UUID;
 @Repository
 public interface StatisticsByCreatorRepository extends JpaRepository<Video, UUID> {
 
+    // joins made manually. User-Video entities are connected through two paths, via channels and via UserVideos.
+    // hibernate gets confused when not given explicit route of relation to build query upon
     @Query(value = "SELECT " +
             "new com.jlisok.youtube_activity_manager.statistics.dto.StatisticsByCreator(TO_CHAR(AVG(v.duration),'HH24:MI:SS'), TO_CHAR(SUM(v.duration),'DD:HH24:MI:SS'), COUNT(v.id), v.channel.title) " +
             "FROM Video v " +
