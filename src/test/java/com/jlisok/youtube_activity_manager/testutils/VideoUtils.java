@@ -5,6 +5,8 @@ import com.google.api.services.youtube.model.*;
 import com.jlisok.youtube_activity_manager.channels.models.Channel;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory;
+import com.jlisok.youtube_activity_manager.videos.enums.Rating;
+import com.jlisok.youtube_activity_manager.videos.models.UserVideo;
 import com.jlisok.youtube_activity_manager.youtube.utils.EntityCreator;
 import com.jlisok.youtube_activity_manager.youtube.utils.VideoDescription;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -12,10 +14,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -75,12 +74,12 @@ public class VideoUtils {
             return new ArrayList<>(0);
         }
         var youTubeChannelsSize = youTubeChannels.size();
-        var videosSize = videoCategories.size();
+        var categorySize = videoCategories.size();
         return IntStream.range(0, size)
                         .mapToObj(i -> {
                             var channelIndex = i % youTubeChannelsSize;
                             var channel = youTubeChannels.get(channelIndex);
-                            var categoryIndex = i % videosSize;
+                            var categoryIndex = i % categorySize;
                             var category = videoCategories.get(categoryIndex);
                             VideoContentDetails details = createRandomVideoContentDetails();
                             VideoSnippet snippet = createRandomVideoSnippet();
@@ -91,6 +90,22 @@ public class VideoUtils {
                                     .setSnippet(snippet)
                                     .setId(UUID.randomUUID().toString());
                         }).collect(Collectors.toList());
+    }
+
+
+    public static List<com.jlisok.youtube_activity_manager.videos.models.Video> createListOfVideosFromYouTubeVideos(List<Video> youtubeVideos, List<Channel> channels, List<VideoCategory> videoCategories) {
+        int channelSize = channels.size();
+        int categoriesSize = videoCategories.size();
+        return youtubeVideos
+                .stream()
+                .map(video -> EntityCreator
+                        .createVideo(video.getId(),
+                                     video.getSnippet(),
+                                     video.getContentDetails(),
+                                     Collections.singletonList("dwdqdqdqd"),
+                                     channels.get(random.nextInt(channelSize)),
+                                     videoCategories.get(random.nextInt(categoriesSize))))
+                .collect(Collectors.toList());
     }
 
 
@@ -195,6 +210,12 @@ public class VideoUtils {
                                  Instant.now(),
                                  Instant.now()))
                          .collect(Collectors.toList());
+    }
+
+
+    public static UserVideo createUserVideo(com.jlisok.youtube_activity_manager.videos.models.Video video, User user, Rating rating) {
+        UUID id = UUID.randomUUID();
+        return new UserVideo(id, user, video, rating);
     }
 
 

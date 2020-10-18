@@ -17,7 +17,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "videos")
 @TypeDef(name = "list-array", typeClass = ListArrayType.class)
-@TypeDef(typeClass = PostgreSQLIntervalType.class, defaultForType = Duration.class)
+@TypeDef(name = "interval2duration", typeClass = PostgreSQLIntervalType.class, defaultForType = Duration.class)
 public class Video {
 
     @Id
