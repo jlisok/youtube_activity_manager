@@ -2,7 +2,11 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=youtube_activity_manager
 
+FRONTEND_URL=http://localhost
+
 DB_USERNAME=!!! PROVIDE YOUR OWN VALUE IN .environment.local !!!
 DB_PASSWORD=!!! PROVIDE YOUR OWN VALUE IN .environment.local !!!
 
-FRONTEND_URL=http://localhost
+
+URL_TO_GOOGLE_CREDENTIALS=!!! PROVIDE YOUR OWN VALUE IN .environment.local !!!
+URL_TO_AWS_CREDENTIALS=!!! PROVIDE YOUR OWN VALUE IN .environment.local !!!
