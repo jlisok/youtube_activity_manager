@@ -34,14 +34,14 @@ class WritingAndSendingServiceImplementationTest {
     private UserUtils userUtils;
 
     @Autowired
-    private WritingAndSendingServiceImplementation<List<Video>> service;
+    private WritingAndSendingService<List<Video>> service;
 
     @MockBean
     private KeyNameCreator keyNameCreator;
 
     private final String keyName = "content.json";
 
-    @Value("${aws.bucket_name}")
+    @Value("${aws.s3.bucket_name}")
     private String bucketName;
     private AwsInfo info;
     private List<Video> videos;

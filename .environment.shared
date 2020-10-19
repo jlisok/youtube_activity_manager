@@ -4,9 +4,14 @@ DB_NAME=youtube_activity_manager
 
 FRONTEND_URL=http://localhost
 
+GOOGLE_CLIENT_ID=845161221251-8qcjjnqm3a568p0m9alajv2kaa514jot.apps.googleusercontent.com
+
+AWS_BUCKET_NAME=com.jlisok.youtube-activity-manager.cloud-data
+
+AWS_S3_ACCESS_KEY_ID=!!! PROVIDE YOUR OWN VALUE IN .environment.local !!!
+AWS_S3_SECRET_ACCESS_KEY_ID=!!! PROVIDE YOUR OWN VALUE IN .environment.local !!!
+
 DB_USERNAME=!!! PROVIDE YOUR OWN VALUE IN .environment.local !!!
 DB_PASSWORD=!!! PROVIDE YOUR OWN VALUE IN .environment.local !!!
 
-
 URL_TO_GOOGLE_CREDENTIALS=!!! PROVIDE YOUR OWN VALUE IN .environment.local !!!
-URL_TO_AWS_CREDENTIALS=!!! PROVIDE YOUR OWN VALUE IN .environment.local !!!

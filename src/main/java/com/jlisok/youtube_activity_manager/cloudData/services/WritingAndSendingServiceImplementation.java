@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class WritingAndSendingServiceImplementation<T> implements WritingAndSendingService<T> {
 
-    @Value("${aws.bucket_name}")
+    @Value("${aws.s3.bucket_name}")
     private String bucketName;
     private final ContentWriter<T> contentWriter;
     private final KeyNameCreator keyNameCreator;
