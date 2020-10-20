@@ -42,7 +42,7 @@ class WritingAndSendingServiceImplementationTest implements TestProfile {
 
     private final String keyName = "content.json";
 
-    @Value("${aws.s3.test_bucket_name}")
+    @Value("${aws.s3.bucket_name}")
     private String bucketName;
     private AwsObjectInfo info;
     private List<Video> videos;

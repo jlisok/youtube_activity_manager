@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jlisok.youtube_activity_manager.cloudData.client.AwsObjectInfo;
 import com.jlisok.youtube_activity_manager.testutils.AwsUtils;
+import com.jlisok.youtube_activity_manager.testutils.TestProfile;
 import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class JsonAwsSenderTest {
+class JsonAwsSenderTest implements TestProfile {
 
     @Autowired
     private AmazonS3 client;
@@ -27,7 +28,7 @@ class JsonAwsSenderTest {
 
     private final String jsonName = "content.json";
 
-    @Value("${aws.s3.test_bucket_name}")
+    @Value("${aws.s3.bucket_name}")
     private String bucketName;
     private AwsObjectInfo info;
     private String jsonToSend;
