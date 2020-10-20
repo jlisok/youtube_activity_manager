@@ -2,13 +2,13 @@ package com.jlisok.youtube_activity_manager.cloudData.client;
 
 import java.net.URI;
 
-public class AwsInfo {
+public class AwsObjectInfo {
 
     private final String bucketName;
     private final URI uri;
     private final String keyName;
 
-    public AwsInfo(String bucketName, String keyName) {
+    public AwsObjectInfo(String bucketName, String keyName) {
         this.bucketName = bucketName;
         this.keyName = keyName;
         uri = URI.create("s3://" + this.bucketName + "/" + this.keyName);

@@ -1,7 +1,7 @@
 package com.jlisok.youtube_activity_manager.cloudData.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jlisok.youtube_activity_manager.cloudData.client.AwsInfo;
+import com.jlisok.youtube_activity_manager.cloudData.client.AwsObjectInfo;
 import com.jlisok.youtube_activity_manager.cloudData.utils.KeyNameCreator;
 import com.jlisok.youtube_activity_manager.cloudData.writers.ContentSender;
 import com.jlisok.youtube_activity_manager.cloudData.writers.ContentWriter;
@@ -35,8 +35,8 @@ public class WritingAndSendingServiceImplementation<T> implements WritingAndSend
         String contentToSend = contentWriter.writeContent(data);
         String fileName = keyNameCreator.createKeyName();
         logger.info("WritingAndSendingService fileName: {} - content created", fileName);
-        AwsInfo awsInfo = new AwsInfo(bucketName, fileName);
-        contentSender.sendContent(contentToSend, awsInfo);
-        logger.info("WritingAndSendingService URI: {} - content sent", awsInfo.getURI());
+        AwsObjectInfo awsObjectInfo = new AwsObjectInfo(bucketName, fileName);
+        contentSender.sendContent(contentToSend, awsObjectInfo);
+        logger.info("WritingAndSendingService URI: {} - content sent", awsObjectInfo.getURI());
     }
 }

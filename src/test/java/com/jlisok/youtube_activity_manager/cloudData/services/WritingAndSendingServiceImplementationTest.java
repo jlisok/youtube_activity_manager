@@ -3,9 +3,10 @@ package com.jlisok.youtube_activity_manager.cloudData.services;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jlisok.youtube_activity_manager.cloudData.client.AwsInfo;
+import com.jlisok.youtube_activity_manager.cloudData.client.AwsObjectInfo;
 import com.jlisok.youtube_activity_manager.cloudData.utils.KeyNameCreator;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
+import com.jlisok.youtube_activity_manager.testutils.TestProfile;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.testutils.VideoUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
@@ -25,7 +26,7 @@ import java.util.List;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class WritingAndSendingServiceImplementationTest {
+class WritingAndSendingServiceImplementationTest implements TestProfile {
 
     @Autowired
     private AmazonS3 client;
@@ -41,9 +42,9 @@ class WritingAndSendingServiceImplementationTest {
 
     private final String keyName = "content.json";
 
-    @Value("${aws.s3.bucket_name}")
+    @Value("${aws.s3.test_bucket_name}")
     private String bucketName;
-    private AwsInfo info;
+    private AwsObjectInfo info;
     private List<Video> videos;
 
 
@@ -51,7 +52,7 @@ class WritingAndSendingServiceImplementationTest {
     void createInitialConditions() throws RegistrationException {
         User user = userUtils.createUser(userUtils.createRandomEmail(), userUtils.createRandomPassword());
         videos = VideoUtils.createRandomListOfVideos(10, user);
-        info = new AwsInfo(bucketName, keyName);
+        info = new AwsObjectInfo(bucketName, keyName);
     }
 
 

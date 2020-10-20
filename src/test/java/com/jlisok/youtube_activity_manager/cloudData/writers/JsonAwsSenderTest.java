@@ -3,11 +3,12 @@ package com.jlisok.youtube_activity_manager.cloudData.writers;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jlisok.youtube_activity_manager.cloudData.client.AwsInfo;
+import com.jlisok.youtube_activity_manager.cloudData.client.AwsObjectInfo;
 import com.jlisok.youtube_activity_manager.testutils.AwsUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
@@ -23,15 +24,17 @@ class JsonAwsSenderTest {
     @Autowired
     private AwsUtils awsUtils;
 
-    private final String jsonName = "content.json";
-    private final String bucketName = "com.jlisok.youtube-activity-manager.cloud-data";
 
-    private AwsInfo info;
+    private final String jsonName = "content.json";
+
+    @Value("${aws.s3.test_bucket_name}")
+    private String bucketName;
+    private AwsObjectInfo info;
     private String jsonToSend;
 
     @BeforeEach
     void prepareInitialConditions() throws JsonProcessingException {
-        info = new AwsInfo(bucketName, jsonName);
+        info = new AwsObjectInfo(bucketName, jsonName);
         jsonToSend = awsUtils.createDummyJsonToSend(10);
     }
 

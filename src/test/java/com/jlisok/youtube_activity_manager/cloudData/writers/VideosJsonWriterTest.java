@@ -16,13 +16,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 @SpringBootTest
-class JsonWriterTest {
+class VideosJsonWriterTest {
 
     @Autowired
     private UserUtils userUtils;
 
     @Autowired
-    private JsonWriter writer;
+    private VideosJsonWriter writer;
 
     private List<Video> videos;
 

@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class JsonWriter implements ContentWriter<List<Video>> {
+public class VideosJsonWriter implements ContentWriter<List<Video>> {
 
     private final ObjectMapper mapper;
 
     @Autowired
-    public JsonWriter(ObjectMapper mapper) {
+    public VideosJsonWriter(ObjectMapper mapper) {
         this.mapper = mapper;
     }
 
