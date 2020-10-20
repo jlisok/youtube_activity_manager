@@ -17,6 +17,7 @@ repositories {
 ext {
     apacheCommonsVersion = '3.11'
     auth0Version = '3.4.0'
+    awsSdkVersion = '1.11.882'
     collectionsCommonsVersion = '4.4'
     googleApiVersion = '1.30.10'
     hibernateTypesVersion = '2.9.13'
@@ -70,6 +71,11 @@ dependencies {
     // Google authentication
     implementation group: 'com.google.api-client', name: 'google-api-client', version: "${googleApiVersion}"
     implementation group: 'com.google.apis', name: 'google-api-services-youtube', version: "${youtubeApiVersion}"
+
+
+    //AWS
+    implementation group: 'com.amazonaws', name: 'aws-java-sdk', version: "${awsSdkVersion}"
+
 
     //
     // To run mockito with junit5
