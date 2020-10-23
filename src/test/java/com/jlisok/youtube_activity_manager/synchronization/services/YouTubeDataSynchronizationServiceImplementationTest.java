@@ -37,7 +37,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class YouTubeDataSynchronizationServiceImplementationTest {
+class YouTubeDataSynchronizationServiceImplementationTest implements TestProfile {
 
     @Autowired
     private YouTubeDataSynchronizationServiceImplementation youTubeDataSynchronizationService;

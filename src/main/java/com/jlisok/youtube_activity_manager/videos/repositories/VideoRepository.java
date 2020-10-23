@@ -1,7 +1,6 @@
 package com.jlisok.youtube_activity_manager.videos.repositories;
 
 import com.jlisok.youtube_activity_manager.videos.models.Video;
-import jdk.dynalink.linker.LinkerServices;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

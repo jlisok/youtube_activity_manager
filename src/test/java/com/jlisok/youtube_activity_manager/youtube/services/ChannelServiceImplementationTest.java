@@ -37,7 +37,7 @@ class ChannelServiceImplementationTest implements TestProfile {
     @MethodSource("exampleYouTubeChannels")
     void createListOfChannels(List<com.google.api.services.youtube.model.Channel> youtubeChannelList) throws RegistrationException {
         //given //when
-        User user = utils.createUserWithDataFromToken(utils.createRandomEmail(), utils.createRandomPassword());
+        User user = utils.createUser(utils.createRandomEmail(), utils.createRandomPassword());
 
         when(fetcher.fetchUser(user.getId()))
                 .thenReturn(user);

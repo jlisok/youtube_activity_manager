@@ -2,12 +2,11 @@ package com.jlisok.youtube_activity_manager.statistics.services;
 
 import com.jlisok.youtube_activity_manager.statistics.dto.StatisticsByCategory;
 import com.jlisok.youtube_activity_manager.statistics.dto.StatisticsByCreator;
-
-import java.util.List;
+import com.jlisok.youtube_activity_manager.statistics.dto.StatisticsDto;
 
 public interface StatisticsService {
 
-    List<StatisticsByCategory> groupByCategory();
+    StatisticsDto<StatisticsByCategory> groupByCategory();
 
-    List<StatisticsByCreator> groupByCreator();
+    StatisticsDto<StatisticsByCreator> groupByCreator();
 }

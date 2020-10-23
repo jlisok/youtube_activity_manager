@@ -97,7 +97,7 @@ class GoogleLoginServiceTest implements TestProfile {
     @Test
     void authenticateUser_whenUpdatingValidUser() throws Exception {
         //given
-        User user = userUtils.createUserWithDataFromToken(email, "dummyPassword");
+        User user = userUtils.createUser(email, "dummyPassword");
 
         when(verifier.verify(dto.getGoogleIdToken()))
                 .thenReturn(googleIdToken);
