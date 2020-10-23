@@ -109,9 +109,9 @@ public class VideoUtils {
     }
 
 
-    public static List<com.jlisok.youtube_activity_manager.videos.models.Video> createRandomListOfVideos(int size, User user) {
+    public static List<com.jlisok.youtube_activity_manager.videos.models.Video> createRandomListOfVideos(int size) {
         return IntStream.range(0, size)
-                        .mapToObj(i -> createRandomVideo(user))
+                        .mapToObj(i -> createRandomVideo())
                         .collect(Collectors.toList());
     }
 
@@ -123,11 +123,12 @@ public class VideoUtils {
     }
 
 
-    public static com.jlisok.youtube_activity_manager.videos.models.Video createRandomVideo(User user) {
+    public static com.jlisok.youtube_activity_manager.videos.models.Video createRandomVideo() {
         String videoId = createRandomString();
         List<String> uriList = VideoDescription.toListOfUri(createDescriptionWithRandomUriNumber());
-        Channel channel = createRandomChannel(user);
+        Channel channel = createRandomChannel();
         VideoCategory videoCategory = createRandomVideoCategory();
+
         return EntityCreator.createVideo(videoId, createRandomVideoSnippet(), createRandomVideoContentDetails(), uriList, channel, videoCategory);
     }
 
@@ -219,6 +220,13 @@ public class VideoUtils {
     }
 
 
+    public static List<UserVideo> createListOfUserVideos(List<com.jlisok.youtube_activity_manager.videos.models.Video> videos, User user, Rating rating) {
+        return videos.stream()
+                     .map(video -> new UserVideo(UUID.randomUUID(), user, video, rating))
+                     .collect(Collectors.toList());
+    }
+
+
     private static List<String> createRandomTags() {
         return IntStream.range(0, random.nextInt(10))
                         .mapToObj(i -> createRandomString())
@@ -237,5 +245,19 @@ public class VideoUtils {
 
     public static String createRandomString() {
         return RandomStringUtils.randomAlphanumeric(20);
+    }
+
+    public static List<com.jlisok.youtube_activity_manager.videos.models.Video> createVideos(int size, List<Channel> channels, List<VideoCategory> videoCategories) {
+        int channelSize = channels.size();
+        int categoriesSize = videoCategories.size();
+        return IntStream.range(0, size)
+                .mapToObj(video -> EntityCreator
+                        .createVideo(UUID.randomUUID().toString(),
+                                     createRandomVideoSnippet(),
+                                     createRandomVideoContentDetails(),
+                                     Collections.singletonList("dwdqdqdqd"),
+                                     channels.get(random.nextInt(channelSize)),
+                                     videoCategories.get(random.nextInt(categoriesSize))))
+                .collect(Collectors.toList());
     }
 }

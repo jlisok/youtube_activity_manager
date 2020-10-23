@@ -42,6 +42,7 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: "${springStarterVersion}"
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: "${springStarterVersion}"
 
+
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
@@ -103,7 +104,7 @@ test {
     environment(buildEnvironmentMap())
     useJUnitPlatform()
 
-    testLogging.showStandardStreams = true
+    testLogging.showStandardStreams = false
     testLogging.exceptionFormat = 'full'
 }
 

@@ -157,6 +157,16 @@ public class YouTubeEntityVerifier {
                  });
     }
 
+
+    public static void assertVideoCategoryNotEmpty(com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory videoCategory) {
+        assertFalse(videoCategory.getCategoryName().isEmpty());
+        assertFalse(videoCategory.getYoutubeId().isEmpty());
+        assertNotNull(videoCategory.getId());
+        assertNotNull(videoCategory.getCreatedAt());
+        assertNotNull(videoCategory.getModifiedAt());
+    }
+
+
     public static void assertDbIdsAndInputIdsExistsAndEqual(List<com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory> returnedVideoCategories, List<com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory> dbVideoCategories, List<String> dbIds, List<String> ids) {
         Map<String, com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory> videoCategoriesMap = MapCreator
                 .toMap(returnedVideoCategories, com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory::getYoutubeId, Function

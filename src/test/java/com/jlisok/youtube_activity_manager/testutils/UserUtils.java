@@ -53,7 +53,7 @@ public class UserUtils implements TestProfile {
 
     @Transactional
     public User insertUserInDatabase(String userEmail, String userPassword) throws RegistrationException {
-        User user = createUser(userEmail, userPassword);
+        User user = createUserWithDataFromToken(userEmail, userPassword);
         repository.saveAndFlush(user);
 
         assertTrue(repository.existsByEmail(user.getEmail()));
@@ -62,16 +62,15 @@ public class UserUtils implements TestProfile {
 
 
     @Transactional
-    public User insertUserInDatabase(String token, GoogleIdToken googleIdToken, String accessToken) {
-        User user = createUser(token, googleIdToken, accessToken);
+    public User insertUserFromTokenInDatabase(String token, GoogleIdToken googleIdToken, String accessToken) {
+        User user = createUserWithDataFromToken(token, googleIdToken, accessToken);
         repository.saveAndFlush(user);
-
         assertTrue(repository.existsByEmail(user.getEmail()));
         return user;
     }
 
 
-    public User createUser(String userEmail, String userPassword) throws RegistrationException {
+    public User createUserWithDataFromToken(String userEmail, String userPassword) throws RegistrationException {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         RegistrationRequestDto dto = RandomRegistrationDto.createValidRegistrationDto(userEmail, userPassword);
@@ -79,7 +78,7 @@ public class UserUtils implements TestProfile {
     }
 
 
-    public User createUser(String token, GoogleIdToken googleIdToken, String accessToken) {
+    public User createUserWithDataFromToken(String token, GoogleIdToken googleIdToken, String accessToken) {
         UUID userId = UUID.randomUUID();
         Instant now = Instant.now();
         GoogleIdToken.Payload userData = googleIdToken.getPayload();
@@ -105,34 +104,7 @@ public class UserUtils implements TestProfile {
     }
 
 
-    public User createUserWithDataFromToken(String token, GoogleIdToken googleIdToken, String accessToken) {
-        UUID userId = UUID.randomUUID();
-        Instant now = Instant.now();
-        GoogleIdToken.Payload userData = googleIdToken.getPayload();
-        String fistName = userData
-                .get("given_name")
-                .toString();
-        String googleId = userData.getSubject();
-        UserPersonalData userPersonalData = new UserPersonalDataBuilder()
-                .setId(userId)
-                .setFirstName(fistName)
-                .setCreatedAt(now)
-                .setModifiedAt(now)
-                .createUserPersonalData();
-        return new UserBuilder()
-                .setId(userId)
-                .setEmail(userData.getEmail())
-                .setGoogleId(googleId)
-                .setGoogleIdToken(token)
-                .setAccessToken(accessToken)
-                .setCreatedAt(now)
-                .setModifiedAt(now)
-                .setUserPersonalData(userPersonalData)
-                .createUser();
-    }
-
-
-    public User createUser(UUID userId, String googleIdToken, String accessToken) {
+    public User createUserWithDataFromToken(UUID userId, String googleIdToken, String accessToken) {
         Instant now = Instant.now();
         String googleId = UUID.randomUUID().toString();
         UserPersonalData userPersonalData = new UserPersonalDataBuilder()
@@ -156,6 +128,7 @@ public class UserUtils implements TestProfile {
     public void insertUserInDatabaseSameGoogleIdDifferentEmail(String token, GoogleIdToken googleIdToken, String accessToken) {
         User user = createUserWithDataFromToken(token, googleIdToken, accessToken);
         user.setEmail(createRandomEmail());
+        user.setGoogleId(googleIdToken.getPayload().getSubject());
         repository.saveAndFlush(user);
 
         assertTrue(repository.existsByEmail(user.getEmail()));

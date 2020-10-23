@@ -4,6 +4,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.jlisok.youtube_activity_manager.login.dto.AuthenticationDto;
 import com.jlisok.youtube_activity_manager.login.dto.GoogleLoginRequestDto;
 import com.jlisok.youtube_activity_manager.login.exceptions.EmailNotVerifiedAuthenticationException;
 import com.jlisok.youtube_activity_manager.testutils.MockGoogleIdToken;
@@ -45,7 +46,7 @@ class GoogleLoginServiceTest implements TestProfile {
     private UserUtils userUtils;
 
     @Autowired
-    private GoogleLoginServiceImplementation service;
+    private GoogleLoginService service;
 
     @Captor
     ArgumentCaptor<User> userCapture;
@@ -80,11 +81,12 @@ class GoogleLoginServiceTest implements TestProfile {
                 .thenAnswer(interceptUser);
 
         //when
-        String token = service.authenticateUser(dto);
+        AuthenticationDto authenticationDto = service.authenticateUser(dto);
 
         //then
-        assertNotNull(token);
-        DecodedJWT decodedJWT = jwtVerifier.verify(token);
+        assertNotNull(authenticationDto);
+        assertNotNull(authenticationDto.getJwtToken());
+        DecodedJWT decodedJWT = jwtVerifier.verify(authenticationDto.getJwtToken());
 
         verify(userRepository).saveAndFlush(userCapture.capture());
 
@@ -95,7 +97,7 @@ class GoogleLoginServiceTest implements TestProfile {
     @Test
     void authenticateUser_whenUpdatingValidUser() throws Exception {
         //given
-        User user = userUtils.createUser(email, "dummyPassword");
+        User user = userUtils.createUserWithDataFromToken(email, "dummyPassword");
 
         when(verifier.verify(dto.getGoogleIdToken()))
                 .thenReturn(googleIdToken);
@@ -108,12 +110,13 @@ class GoogleLoginServiceTest implements TestProfile {
 
 
         //when
-        String token = service.authenticateUser(dto);
+        AuthenticationDto authenticationDto = service.authenticateUser(dto);
 
         //then
-        assertNotNull(token);
+        assertNotNull(authenticationDto);
+        assertNotNull(authenticationDto.getJwtToken());
         verify(userRepository).saveAndFlush(userCapture.capture());
-        DecodedJWT decodedJWT = jwtVerifier.verify(token);
+        DecodedJWT decodedJWT = jwtVerifier.verify(authenticationDto.getJwtToken());
         assertEquals(userCapture.getValue().getId().toString(), decodedJWT.getSubject());
     }
 
@@ -132,7 +135,7 @@ class GoogleLoginServiceTest implements TestProfile {
     @Test
     void authenticateUser_whenUserWithGoogleIdPresent() throws Exception {
         //given
-        User user = userUtils.createUser(dummyToken, googleIdToken, dummyAccessToken);
+        User user = userUtils.createUserWithDataFromToken(dummyToken, googleIdToken, dummyAccessToken);
 
         Assertions.assertNotNull(user.getGoogleId());
 
@@ -146,12 +149,13 @@ class GoogleLoginServiceTest implements TestProfile {
                 .thenAnswer(interceptUser);
 
         //when
-        String token = service.authenticateUser(dto);
+        AuthenticationDto authenticationDto = service.authenticateUser(dto);
 
         //then
-        assertNotNull(token);
+        assertNotNull(authenticationDto);
+        assertNotNull(authenticationDto.getJwtToken());
         verify(userRepository).saveAndFlush(userCapture.capture());
-        DecodedJWT decodedJWT = jwtVerifier.verify(token);
+        DecodedJWT decodedJWT = jwtVerifier.verify(authenticationDto.getJwtToken());
         assertEquals(userCapture.getValue().getId().toString(), decodedJWT.getSubject());
     }
 

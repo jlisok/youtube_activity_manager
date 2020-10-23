@@ -4,10 +4,7 @@ import com.jlisok.youtube_activity_manager.users.models.User;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "channels")
@@ -50,7 +47,8 @@ public class Channel {
     @Column(name = "modified_at")
     private Instant modifiedAt;
 
-    @ManyToMany(mappedBy = "channels")
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "users_channels", joinColumns = @JoinColumn(name = "channel_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> users = new HashSet<>();
 
     public Channel() {
@@ -69,7 +67,17 @@ public class Channel {
         this.videoNumber = videoNumber;
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
-        this.users = users;
+        addUsers(users);
+    }
+
+    public void addUsers(Collection<User> users) {
+        this.users.addAll(users);
+        users.forEach(user -> user.getChannels().add(this));
+    }
+
+    public void removeUsers(Collection<User> users) {
+        this.users.removeAll(users);
+        users.forEach(user -> user.getChannels().remove(this));
     }
 
     public Instant getCreatedAt() {
@@ -181,23 +189,11 @@ public class Channel {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Channel channel = (Channel) o;
-        return id.equals(channel.id) &&
-                youTubeChannelId.equals(channel.youTubeChannelId) &&
-                title.equals(channel.title) &&
-                publishedAt.equals(channel.publishedAt) &&
-                Objects.equals(language, channel.language) &&
-                Objects.equals(country, channel.country) &&
-                Objects.equals(owner, channel.owner) &&
-                viewNumber.equals(channel.viewNumber) &&
-                subscriberNumber.equals(channel.subscriberNumber) &&
-                videoNumber.equals(channel.videoNumber) &&
-                createdAt.equals(channel.createdAt) &&
-                modifiedAt.equals(channel.modifiedAt) &&
-                users.equals(channel.users);
+        return id.equals(channel.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, youTubeChannelId, title, publishedAt, language, country, owner, viewNumber, subscriberNumber, videoNumber, createdAt, modifiedAt, users);
+        return Objects.hash(id);
     }
 }

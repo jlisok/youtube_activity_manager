@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jlisok.youtube_activity_manager.cloudData.dto.CloudDataDto;
 import com.jlisok.youtube_activity_manager.cloudData.dto.YouTubeActivityCloudData;
+import com.jlisok.youtube_activity_manager.cloudData.exceptions.ContentParsingException;
 import com.jlisok.youtube_activity_manager.videos.models.Video;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class VideosJsonWriter implements ContentWriter<List<Video>> {
     }
 
     @Override
-    public String writeContent(List<Video> videos) throws JsonProcessingException {
+    public String writeContent(List<Video> videos) {
         if (videos.isEmpty()) {
             return Strings.EMPTY;
         }
@@ -37,6 +38,10 @@ public class VideosJsonWriter implements ContentWriter<List<Video>> {
                 .distinct()
                 .collect(Collectors.toList());
         CloudDataDto dataDto = new CloudDataDto(youTubeActivityCloudData, videoCategories);
-        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(dataDto);
+        try {
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(dataDto);
+        } catch (JsonProcessingException e) {
+            throw new ContentParsingException("Failed while parsing content " + dataDto + " to String.", e);
+        }
     }
 }

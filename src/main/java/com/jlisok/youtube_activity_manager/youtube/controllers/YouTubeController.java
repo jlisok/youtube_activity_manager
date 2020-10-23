@@ -1,9 +1,8 @@
 package com.jlisok.youtube_activity_manager.youtube.controllers;
 
-import com.jlisok.youtube_activity_manager.database.exceptions.ExpectedDataNotFoundInDatabase;
 import com.jlisok.youtube_activity_manager.youtube.dto.ChannelDto;
+import com.jlisok.youtube_activity_manager.youtube.dto.RatingDto;
 import com.jlisok.youtube_activity_manager.youtube.dto.VideoDto;
-import com.jlisok.youtube_activity_manager.youtube.dto.YouTubeRatingDto;
 import com.jlisok.youtube_activity_manager.youtube.services.UserActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -27,14 +25,14 @@ public class YouTubeController {
     }
 
     @GetMapping("/videos")
-    public ResponseEntity<List<VideoDto>> getRatedVideos(@Valid YouTubeRatingDto dto) throws ExpectedDataNotFoundInDatabase, IOException {
+    public ResponseEntity<List<VideoDto>> getRatedVideos(@Valid RatingDto ratingDto) {
         return ResponseEntity
                 .ok()
-                .body(service.getRatedVideos(dto));
+                .body(service.getRatedVideos(ratingDto.getRating()));
     }
 
     @GetMapping("/channels")
-    public ResponseEntity<List<ChannelDto>> getSubscribedChannels() throws Exception {
+    public ResponseEntity<List<ChannelDto>> getSubscribedChannels() {
         return ResponseEntity
                 .ok()
                 .body(service.getSubscribedChannels());

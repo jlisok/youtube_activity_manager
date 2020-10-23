@@ -50,7 +50,7 @@ class TraditionalLoginServiceTest implements TestProfile {
     @Test
     void authenticateUser_whenUserIsPresentInDatabaseAndLoginDataAreValid() throws RegistrationException, FailedLoginException {
         //given
-        User user = userUtils.createUser(userEmail, userPassword);
+        User user = userUtils.createUserWithDataFromToken(userEmail, userPassword);
 
         when(userRepository.findByEmail(userEmail))
                 .thenReturn(Optional.of(user));
@@ -79,7 +79,7 @@ class TraditionalLoginServiceTest implements TestProfile {
     @Test
     void authenticateUser_whenUserIsPresentInDatabaseAndBadPassword() throws RegistrationException {
         //given
-        User user = userUtils.createUser(userEmail, userPassword);
+        User user = userUtils.createUserWithDataFromToken(userEmail, userPassword);
 
         when(userRepository.findByEmail(userEmail))
                 .thenReturn(Optional.of(user));

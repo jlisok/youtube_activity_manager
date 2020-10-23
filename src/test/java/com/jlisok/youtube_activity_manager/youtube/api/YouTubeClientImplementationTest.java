@@ -19,6 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -46,6 +47,7 @@ class YouTubeClientImplementationTest implements TestProfile {
     private final String subscriptionRequestParts = YouTubeApiClientRequest.SUBSCRIPTION_REQUEST_PARTS;
     private final String channelRequestParts = YouTubeApiClientRequest.CHANNEL_REQUEST_PARTS;
     private final Rating rating = Rating.LIKE;
+    private final UUID userId = UUID.randomUUID();
 
 
     private List<Subscription> subscriptions;
@@ -71,11 +73,11 @@ class YouTubeClientImplementationTest implements TestProfile {
                 .thenReturn(youTube);
 
 
-        when(getter.getYouTubeSubscriptions(youTube, subscriptionRequestParts, nextPageToken))
+        when(getter.getYouTubeSubscriptions(youTube, subscriptionRequestParts, nextPageToken, userId))
                 .thenReturn(subscriptionListResponse);
 
         //when
-        List<Subscription> actualSubscriptions = client.fetchSubscriptions(dummyAccessToken, subscriptionRequestParts);
+        List<Subscription> actualSubscriptions = client.fetchSubscriptions(dummyAccessToken, subscriptionRequestParts, userId);
 
         // then
         Assertions.assertNotNull(actualSubscriptions);
@@ -96,11 +98,11 @@ class YouTubeClientImplementationTest implements TestProfile {
                 .thenReturn(youTube);
 
 
-        when(getter.getYouTubeSubscriptions(eq(youTube), eq(subscriptionRequestParts), any(String.class)))
+        when(getter.getYouTubeSubscriptions(eq(youTube), eq(subscriptionRequestParts), any(String.class), eq(userId)))
                 .thenAnswer(AdditionalAnswers.returnsElementsOf(subscriptionResponses));
 
         //when
-        List<Subscription> actualSubscriptions = client.fetchSubscriptions(dummyAccessToken, subscriptionRequestParts);
+        List<Subscription> actualSubscriptions = client.fetchSubscriptions(dummyAccessToken, subscriptionRequestParts, userId);
 
         // then
         Assertions.assertNotNull(actualSubscriptions);
@@ -119,11 +121,11 @@ class YouTubeClientImplementationTest implements TestProfile {
                 .thenReturn(youTube);
 
 
-        when(getter.getYouTubeSubscriptions(eq(youTube), eq(subscriptionRequestParts), any(String.class)))
+        when(getter.getYouTubeSubscriptions(eq(youTube), eq(subscriptionRequestParts), any(String.class), eq(userId)))
                 .thenReturn(subscriptionListResponse);
 
         //when
-        List<Subscription> actualSubscriptions = client.fetchSubscriptions(dummyAccessToken, subscriptionRequestParts);
+        List<Subscription> actualSubscriptions = client.fetchSubscriptions(dummyAccessToken, subscriptionRequestParts, userId);
 
         // then
         Assertions.assertNotNull(actualSubscriptions);
@@ -146,11 +148,11 @@ class YouTubeClientImplementationTest implements TestProfile {
                 .thenReturn(youTube);
 
 
-        when(getter.getYouTubeChannels(eq(youTube), eq(channelRequestParts), any(String.class)))
+        when(getter.getYouTubeChannels(eq(youTube), eq(channelRequestParts), any(String.class), eq(userId)))
                 .thenReturn(listResponse);
 
         //when
-        List<Channel> actualChannels = client.fetchChannels(dummyAccessToken, channelRequestParts, dummyChannelIds);
+        List<Channel> actualChannels = client.fetchChannels(dummyAccessToken, channelRequestParts, dummyChannelIds, userId);
 
         // then
         Assertions.assertNotNull(actualChannels);
@@ -173,11 +175,11 @@ class YouTubeClientImplementationTest implements TestProfile {
                 .thenReturn(youTube);
 
 
-        when(getter.getYouTubeChannels(eq(youTube), eq(channelRequestParts), any(String.class)))
+        when(getter.getYouTubeChannels(eq(youTube), eq(channelRequestParts), any(String.class), eq(userId)))
                 .thenReturn(listResponse);
 
         //when
-        List<Channel> actualChannels = client.fetchChannels(dummyAccessToken, channelRequestParts, dummyChannelIds);
+        List<Channel> actualChannels = client.fetchChannels(dummyAccessToken, channelRequestParts, dummyChannelIds, userId);
 
         // then
         Assertions.assertNotNull(actualChannels);
@@ -196,11 +198,11 @@ class YouTubeClientImplementationTest implements TestProfile {
                 .thenReturn(youTube);
 
 
-        when(getter.getYouTubeVideos(youTube, subscriptionRequestParts, rating, nextPageToken))
+        when(getter.getYouTubeVideos(youTube, subscriptionRequestParts, rating, nextPageToken, userId))
                 .thenReturn(listResponse);
 
         //when
-        List<Video> actualVideos = client.fetchRatedVideos(dummyAccessToken, subscriptionRequestParts, rating);
+        List<Video> actualVideos = client.fetchRatedVideos(dummyAccessToken, subscriptionRequestParts, rating, userId);
 
         // then
         Assertions.assertNotNull(actualVideos);
@@ -221,11 +223,11 @@ class YouTubeClientImplementationTest implements TestProfile {
                 .thenReturn(youTube);
 
 
-        when(getter.getYouTubeVideos(eq(youTube), eq(subscriptionRequestParts), eq(rating), any(String.class)))
+        when(getter.getYouTubeVideos(eq(youTube), eq(subscriptionRequestParts), eq(rating), any(String.class), eq(userId)))
                 .thenAnswer(AdditionalAnswers.returnsElementsOf(listResponses));
 
         //when
-        List<Video> actualVideos = client.fetchRatedVideos(dummyAccessToken, subscriptionRequestParts, rating);
+        List<Video> actualVideos = client.fetchRatedVideos(dummyAccessToken, subscriptionRequestParts, rating, userId);
 
         // then
         Assertions.assertNotNull(actualVideos);
@@ -244,11 +246,11 @@ class YouTubeClientImplementationTest implements TestProfile {
                 .thenReturn(youTube);
 
 
-        when(getter.getYouTubeVideos(eq(youTube), eq(subscriptionRequestParts), eq(rating), any(String.class)))
+        when(getter.getYouTubeVideos(eq(youTube), eq(subscriptionRequestParts), eq(rating), any(String.class), eq(userId)))
                 .thenReturn(videoListResponse);
 
         //when
-        List<Video> actualVideos = client.fetchRatedVideos(dummyAccessToken, subscriptionRequestParts, rating);
+        List<Video> actualVideos = client.fetchRatedVideos(dummyAccessToken, subscriptionRequestParts, rating, userId);
 
         // then
         Assertions.assertNotNull(actualVideos);

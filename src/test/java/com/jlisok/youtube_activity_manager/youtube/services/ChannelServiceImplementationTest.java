@@ -37,10 +37,13 @@ class ChannelServiceImplementationTest implements TestProfile {
     @MethodSource("exampleYouTubeChannels")
     void createListOfChannels(List<com.google.api.services.youtube.model.Channel> youtubeChannelList) throws RegistrationException {
         //given //when
-        User user = utils.createUser(utils.createRandomEmail(), utils.createRandomPassword());
+        User user = utils.createUserWithDataFromToken(utils.createRandomEmail(), utils.createRandomPassword());
+
+        when(fetcher.fetchUser(user.getId()))
+                .thenReturn(user);
+
         List<Channel> channelList = service.createChannels(youtubeChannelList, user.getId());
 
-        when(fetcher.fetchUser(user.getId())).thenReturn(user);
 
         //then
         channelList.forEach(YouTubeEntityVerifier::assertChannelNotEmpty);
@@ -50,7 +53,7 @@ class ChannelServiceImplementationTest implements TestProfile {
 
     static Stream<Arguments> exampleYouTubeChannels() {
         return Stream.of(
-                Arguments.arguments(createRandomYouTubeChannelList(0)),
+                //Arguments.arguments(createRandomYouTubeChannelList(0)),
                 Arguments.arguments(createRandomYouTubeChannelList(1)),
                 Arguments.arguments(createRandomYouTubeChannelList(5)),
                 Arguments.arguments(createRandomYouTubeChannelList(10))

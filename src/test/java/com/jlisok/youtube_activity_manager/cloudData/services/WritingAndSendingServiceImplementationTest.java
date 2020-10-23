@@ -2,7 +2,6 @@ package com.jlisok.youtube_activity_manager.cloudData.services;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jlisok.youtube_activity_manager.cloudData.client.AwsObjectInfo;
 import com.jlisok.youtube_activity_manager.cloudData.utils.KeyNameCreator;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
@@ -46,12 +45,13 @@ class WritingAndSendingServiceImplementationTest implements TestProfile {
     private String bucketName;
     private AwsObjectInfo info;
     private List<Video> videos;
+    private User user;
 
 
     @BeforeEach
     void createInitialConditions() throws RegistrationException {
-        User user = userUtils.createUser(userUtils.createRandomEmail(), userUtils.createRandomPassword());
-        videos = VideoUtils.createRandomListOfVideos(10, user);
+        user = userUtils.createUserWithDataFromToken(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        videos = VideoUtils.createRandomListOfVideos(10);
         info = new AwsObjectInfo(bucketName, keyName);
     }
 
@@ -65,15 +65,15 @@ class WritingAndSendingServiceImplementationTest implements TestProfile {
 
 
     @Test
-    void writeAndSendData_whenInputDataEmpty() throws JsonProcessingException {
+    void writeAndSendData_whenInputDataEmpty() {
         //given
         List<Video> emptyList = Lists.emptyList();
 
         // when
-        when(keyNameCreator.createKeyName())
+        when(keyNameCreator.createKeyName(user.getId()))
                 .thenReturn(keyName);
 
-        service.writeAndSendData(emptyList);
+        service.writeAndSendData(emptyList, user.getId());
 
         //then
         Assertions.assertFalse(client.doesObjectExist(info.getBucketName(), info.getKeyName()));
@@ -81,12 +81,12 @@ class WritingAndSendingServiceImplementationTest implements TestProfile {
 
 
     @Test
-    void writeAndSendData_whenDataValidNotEmpty() throws JsonProcessingException {
+    void writeAndSendData_whenDataValidNotEmpty() {
         //given // when
-        when(keyNameCreator.createKeyName())
+        when(keyNameCreator.createKeyName(user.getId()))
                 .thenReturn(keyName);
 
-        service.writeAndSendData(videos);
+        service.writeAndSendData(videos, user.getId());
 
         //then
         Assertions.assertTrue(client.doesObjectExist(info.getBucketName(), info.getKeyName()));

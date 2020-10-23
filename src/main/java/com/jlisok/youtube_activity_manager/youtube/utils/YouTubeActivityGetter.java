@@ -5,7 +5,6 @@ import com.google.api.services.youtube.model.ChannelListResponse;
 import com.google.api.services.youtube.model.SubscriptionListResponse;
 import com.google.api.services.youtube.model.VideoCategoryListResponse;
 import com.google.api.services.youtube.model.VideoListResponse;
-import com.jlisok.youtube_activity_manager.security.configs.JwtAuthenticationContext;
 import com.jlisok.youtube_activity_manager.videos.enums.Rating;
 import com.jlisok.youtube_activity_manager.youtube.exceptions.YouTubeApiException;
 import org.springframework.stereotype.Component;
@@ -19,7 +18,7 @@ import static com.jlisok.youtube_activity_manager.youtube.constants.YouTubeApiCl
 public class YouTubeActivityGetter {
 
 
-    public SubscriptionListResponse getYouTubeSubscriptions(YouTube youTube, String parts, String pageToken) {
+    public SubscriptionListResponse getYouTubeSubscriptions(YouTube youTube, String parts, String pageToken, UUID userId) {
         try {
             return youTube
                     .subscriptions()
@@ -29,13 +28,12 @@ public class YouTubeActivityGetter {
                     .setMaxResults(MAX_ALLOWED_RESULTS_PER_PAGE.longValue())
                     .execute();
         } catch (IOException e) {
-            UUID userId = JwtAuthenticationContext.getAuthenticationInContext().getAuthenticatedUserId();
             throw new YouTubeApiException("Failed while connecting to YouTubeApi, userId " + userId + " Bad request.", e);
         }
     }
 
 
-    public ChannelListResponse getYouTubeChannels(YouTube youTube, String parts, String inputIds) {
+    public ChannelListResponse getYouTubeChannels(YouTube youTube, String parts, String inputIds, UUID userId) {
         try {
             return youTube
                     .channels()
@@ -44,13 +42,12 @@ public class YouTubeActivityGetter {
                     .setMaxResults(MAX_ALLOWED_RESULTS_PER_PAGE.longValue())
                     .execute();
         } catch (IOException e) {
-            UUID userId = JwtAuthenticationContext.getAuthenticationInContext().getAuthenticatedUserId();
             throw new YouTubeApiException("Failed while connecting to YouTubeApi, userId " + userId + " Bad request.", e);
         }
     }
 
 
-    public VideoCategoryListResponse getYouTubeVideoCategories(YouTube youTube, String parts, String inputIds) {
+    public VideoCategoryListResponse getYouTubeVideoCategories(YouTube youTube, String parts, String inputIds, UUID userId) {
         try {
             return youTube
                     .videoCategories()
@@ -58,13 +55,12 @@ public class YouTubeActivityGetter {
                     .setId(inputIds)
                     .execute();
         } catch (IOException e) {
-            UUID userId = JwtAuthenticationContext.getAuthenticationInContext().getAuthenticatedUserId();
             throw new YouTubeApiException("Failed while connecting to YouTubeApi, userId " + userId + " Bad request.", e);
         }
     }
 
 
-    public VideoListResponse getYouTubeVideos(YouTube youTube, String parts, Rating rating, String pageToken) {
+    public VideoListResponse getYouTubeVideos(YouTube youTube, String parts, Rating rating, String pageToken, UUID userId) {
         try {
             return youTube
                     .videos()
@@ -74,7 +70,6 @@ public class YouTubeActivityGetter {
                     .setMaxResults(MAX_ALLOWED_RESULTS_PER_PAGE.longValue())
                     .execute();
         } catch (IOException e) {
-            UUID userId = JwtAuthenticationContext.getAuthenticationInContext().getAuthenticatedUserId();
             throw new YouTubeApiException("Failed while connecting to YouTubeApi, userId " + userId + " Bad request.", e);
         }
     }

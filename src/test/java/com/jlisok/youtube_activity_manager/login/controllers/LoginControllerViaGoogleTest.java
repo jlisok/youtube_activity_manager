@@ -5,7 +5,9 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.jlisok.youtube_activity_manager.login.dto.GoogleLoginRequestDto;
 import com.jlisok.youtube_activity_manager.login.exceptions.DataInconsistencyAuthenticationException;
 import com.jlisok.youtube_activity_manager.login.exceptions.EmailNotVerifiedAuthenticationException;
+import com.jlisok.youtube_activity_manager.synchronization.services.YouTubeDataSynchronizationService;
 import com.jlisok.youtube_activity_manager.testutils.*;
+import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,8 +21,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
+import javax.security.auth.login.LoginException;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -43,8 +50,14 @@ class LoginControllerViaGoogleTest implements TestProfile {
     @Autowired
     private JwtTokenVerifier jwtTokenVerifier;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @MockBean
     private GoogleIdTokenVerifier googleIdTokenVerifier;
+
+    @MockBean
+    private YouTubeDataSynchronizationService synchronizationService;
 
     private final String dummyAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
     private final String dummyIdToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
@@ -64,10 +77,16 @@ class LoginControllerViaGoogleTest implements TestProfile {
 
 
     @Test
-    void authenticateUserWithGoogle_whenNewValidUser() throws Exception {
+    @Transactional
+    void authenticateUserWithGoogle_whenNewValidUserAndSynchronizationServiceSucceeded() throws Exception {
         //given
+        UUID syncId = UUID.randomUUID();
+
         when(googleIdTokenVerifier.verify(any(String.class)))
                 .thenReturn(googleIdToken);
+
+        when(synchronizationService.synchronizeAndSendToCloud(eq(syncId),eq(dummyAccessToken), any(UUID.class)))
+                .thenReturn(new CompletableFuture<>());
 
         //when //then
         mockMvc
@@ -76,10 +95,37 @@ class LoginControllerViaGoogleTest implements TestProfile {
                 .andExpect(Assertions::assertNotNull)
                 .andExpect(result ->
                                    jwtTokenVerifier.assertEqualsUserIdsAndGoogleIdAndTokenNotNull(userEmail, result));
+
+        Assertions.assertTrue(userRepository.existsByEmail(userEmail));
     }
 
 
     @Test
+    @Transactional
+    void authenticateUserWithGoogle_whenNewValidUserAndSynchronizationServiceFailed() throws Exception {
+        //given
+        UUID syncId = UUID.randomUUID();
+
+        when(googleIdTokenVerifier.verify(any(String.class)))
+                .thenReturn(googleIdToken);
+
+        when(synchronizationService.synchronizeAndSendToCloud(eq(syncId),eq(dummyAccessToken), any(UUID.class)))
+                .thenReturn(CompletableFuture.failedFuture(new LoginException()));
+
+        //when //then
+        mockMvc
+                .perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, googleLoginRequestDto))
+                .andExpect(status().isOk())
+                .andExpect(Assertions::assertNotNull)
+                .andExpect(result ->
+                                   jwtTokenVerifier.assertEqualsUserIdsAndGoogleIdAndTokenNotNull(userEmail, result));
+
+        Assertions.assertTrue(userRepository.existsByEmail(userEmail));
+    }
+
+
+    @Test
+    @Transactional
     void authenticateUserWithGoogle_whenNewValidUserNoFirstName() throws Exception {
         //given
         GoogleIdToken googleIdTokenNoFirstName = MockGoogleIdToken.createDummyGoogleIdToken(userEmail, true, false);
@@ -93,10 +139,14 @@ class LoginControllerViaGoogleTest implements TestProfile {
                 .andExpect(Assertions::assertNotNull)
                 .andExpect(result ->
                                    jwtTokenVerifier.assertEqualsUserIdsAndGoogleIdAndTokenNotNull(userEmail, result));
+
+        Assertions.assertTrue(userRepository.existsByEmail(userEmail));
+
     }
 
 
     @Test
+    @Transactional
     void authenticateUserWithGoogle_whenUpdatingValidUser() throws Exception {
         //given
         userUtils.insertUserInDatabase(userEmail, userUtils.createRandomPassword());
@@ -110,13 +160,16 @@ class LoginControllerViaGoogleTest implements TestProfile {
                 .andExpect(status().isOk())
                 .andExpect(Assertions::assertNotNull)
                 .andExpect(result -> jwtTokenVerifier.assertEqualsUserIdsAndGoogleIdAndTokenNotNull(userEmail, result));
+
+        Assertions.assertTrue(userRepository.existsByEmail(userEmail));
     }
 
 
     @Test
+    @Transactional
     void authenticateUserWithGoogle_whenUpdatingUserThatHasGoogleId() throws Exception {
         //given
-        userUtils.insertUserInDatabase(dummyIdToken, googleIdToken, dummyAccessToken);
+        userUtils.insertUserFromTokenInDatabase(dummyIdToken, googleIdToken, dummyAccessToken);
 
         when(googleIdTokenVerifier.verify(any(String.class)))
                 .thenReturn(googleIdToken);
@@ -126,6 +179,8 @@ class LoginControllerViaGoogleTest implements TestProfile {
                 .perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, googleLoginRequestDto))
                 .andExpect(status().isOk())
                 .andExpect(result -> jwtTokenVerifier.assertEqualsUserIdsAndGoogleIdAndTokenNotNull(userEmail, result));
+
+        Assertions.assertTrue(userRepository.existsByEmail(userEmail));
     }
 
 
@@ -144,7 +199,7 @@ class LoginControllerViaGoogleTest implements TestProfile {
 
 
     @Test
-    void authenticateUserWithGoogle_whenUserExistsButGoogleIdAlreadyExistsInDatabaseUnderDifferentEmail() throws Exception {
+    void authenticateUserWithGoogle_whenGoogleIdAlreadyExistsInDatabaseUnderDifferentEmail() throws Exception {
         //given
         userUtils.insertUserInDatabase(userEmail, userUtils.createRandomPassword());
         userUtils.insertUserInDatabaseSameGoogleIdDifferentEmail(dummyIdToken, googleIdToken, dummyAccessToken);
@@ -172,6 +227,8 @@ class LoginControllerViaGoogleTest implements TestProfile {
                 .perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, googleLoginRequestDto))
                 .andExpect(status().isForbidden())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof EmailNotVerifiedAuthenticationException));
+
+        Assertions.assertFalse(userRepository.existsByEmail(userEmail));
     }
 
 
@@ -184,6 +241,8 @@ class LoginControllerViaGoogleTest implements TestProfile {
                 .perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, dtoTokenNull))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException));
+
+        Assertions.assertFalse(userRepository.existsByEmail(userEmail));
     }
 
 
@@ -196,6 +255,8 @@ class LoginControllerViaGoogleTest implements TestProfile {
                 .perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, dtoTokenNull))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException));
+
+        Assertions.assertFalse(userRepository.existsByEmail(userEmail));
     }
 
     @Test
@@ -207,6 +268,8 @@ class LoginControllerViaGoogleTest implements TestProfile {
                 .perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, dtoTokenNull))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException));
+
+        Assertions.assertFalse(userRepository.existsByEmail(userEmail));
     }
 
 
@@ -219,6 +282,8 @@ class LoginControllerViaGoogleTest implements TestProfile {
                 .perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, dtoTokenNull))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException));
+
+        Assertions.assertFalse(userRepository.existsByEmail(userEmail));
     }
 
 }

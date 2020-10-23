@@ -1,5 +1,6 @@
 package com.jlisok.youtube_activity_manager.users.models;
 
+import com.google.common.collect.Sets;
 import com.jlisok.youtube_activity_manager.channels.models.Channel;
 import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalData;
 
@@ -18,7 +19,7 @@ public class UserBuilder {
     private String googleId;
     private String googleIdToken;
     private String accessToken;
-    private Set<Channel> channels;
+    private Set<Channel> channels = Sets.newHashSet();
 
     public UserBuilder setId(UUID id) {
         this.id = id;

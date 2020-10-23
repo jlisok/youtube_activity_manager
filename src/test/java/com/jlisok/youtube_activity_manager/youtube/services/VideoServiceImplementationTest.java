@@ -16,14 +16,20 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
+import javax.persistence.EntityManager;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.jlisok.youtube_activity_manager.testutils.ChannelAndSubscriptionUtils.createRandomYouTubeChannelList;
 import static com.jlisok.youtube_activity_manager.testutils.YouTubeEntityVerifier.assertListOfVideosEqual;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -33,7 +39,10 @@ class VideoServiceImplementationTest implements TestProfile {
     private UserUtils userUtils;
 
     @Autowired
-    private VideoServiceImplementation service;
+    private VideoService service;
+
+    @MockBean
+    private EntityManager entityManager;
 
     private User user;
     private List<Channel> channels;
@@ -42,8 +51,8 @@ class VideoServiceImplementationTest implements TestProfile {
 
     @BeforeAll
     void prepareInitialConditions() throws RegistrationException {
-        youtubeChannels = createRandomYouTubeChannelList(20);
-        user = userUtils.createUser(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        youtubeChannels = createRandomYouTubeChannelList(1);
+        user = userUtils.createUserWithDataFromToken(userUtils.createRandomEmail(), userUtils.createRandomPassword());
         channels = youtubeChannels
                 .stream()
                 .map(ytChannel -> EntityCreator
@@ -59,7 +68,12 @@ class VideoServiceImplementationTest implements TestProfile {
     @ParameterizedTest
     @MethodSource("exampleYouTubeLists")
     void insertVideos_whenNewVideos(List<com.google.api.services.youtube.model.Video> youTubeVideoList) {
-        //given //when
+        //given
+
+        when(entityManager.getReference(eq(Channel.class), any(UUID.class)))
+                .thenReturn(channels.get(0));
+
+        // when
         List<Video> actualList = service.createVideos(youTubeVideoList, channels, videoCategories);
 
         //then

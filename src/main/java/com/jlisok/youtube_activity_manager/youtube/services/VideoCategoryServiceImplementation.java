@@ -30,8 +30,8 @@ public class VideoCategoryServiceImplementation implements VideoCategoryService 
 
     @Override
     @Transactional
-    public List<VideoCategory> getVideoCategories(String accessToken, String parts, List<String> youtubeCategoryIds) {
-        List<com.google.api.services.youtube.model.VideoCategory> ytVideoCategories = youTubeClient.fetchVideoCategories(accessToken, parts, youtubeCategoryIds);
+    public List<VideoCategory> getVideoCategoriesByIds(String accessToken, String parts, List<String> youtubeCategoryIds, UUID userId) {
+        List<com.google.api.services.youtube.model.VideoCategory> ytVideoCategories = youTubeClient.fetchVideoCategories(accessToken, parts, youtubeCategoryIds, userId);
         return createVideoCategories(ytVideoCategories, youtubeCategoryIds);
     }
 

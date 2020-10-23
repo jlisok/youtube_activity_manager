@@ -5,10 +5,7 @@ import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalD
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
@@ -43,8 +40,7 @@ public final class User {
     @PrimaryKeyJoinColumn
     private UserPersonalData userPersonalData;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "users_channels", inverseJoinColumns = @JoinColumn(name = "channel_id"), joinColumns = @JoinColumn(name = "user_id"))
+    @ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
     private Set<Channel> channels = new HashSet<>();
 
     public User() {
@@ -61,7 +57,18 @@ public final class User {
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
         this.userPersonalData = userPersonalData;
-        this.channels = channels;
+        addChannels(channels);
+    }
+
+    public void addChannels(Collection<Channel> channels) {
+        this.channels.addAll(channels);
+        var thisUser = this;
+        channels.forEach(channel -> channel.getUsers().add(thisUser));
+    }
+
+    public void removeChannels(Collection<Channel> channels) {
+        this.channels.removeAll(channels);
+        channels.forEach(channel -> channel.getUsers().remove(this));
     }
 
     public UserPersonalData getUserPersonalData() {
@@ -150,20 +157,11 @@ public final class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return id.equals(user.id) &&
-                Objects.equals(password, user.password) &&
-                email.equals(user.email) &&
-                Objects.equals(googleIdToken, user.googleIdToken) &&
-                Objects.equals(accessToken, user.accessToken) &&
-                Objects.equals(googleId, user.googleId) &&
-                createdAt.equals(user.createdAt) &&
-                modifiedAt.equals(user.modifiedAt) &&
-                userPersonalData.equals(user.userPersonalData) &&
-                Objects.equals(channels, user.channels);
+        return id.equals(user.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, password, email, googleIdToken, accessToken, googleId, createdAt, modifiedAt, userPersonalData, channels);
+        return Objects.hash(id);
     }
 }
