@@ -7,7 +7,6 @@ import com.jlisok.youtube_activity_manager.synchronization.repositories.Synchron
 import com.jlisok.youtube_activity_manager.testutils.TestProfile;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
-import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
@@ -20,7 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -48,35 +47,33 @@ class SynchronizationStatusGetterTest implements TestProfile {
 
     @ParameterizedTest
     @MethodSource("inputData")
-    void getLastSynchronization(List<SynchronizationStatus> statuses) {
+    void getLastSynchronization(SynchronizationStatus status) {
         // given
 
-        when(repository.findByUserIdOrderByCreatedAtDesc(user.getId()))
-                .thenReturn(statuses);
+        when(repository.findFirstByUserIdOrderByCreatedAtDesc(user.getId()))
+                .thenReturn(Optional.of(status));
 
         // when
         var actualStatus = getter.getLastSynchronization(user.getId());
 
         //then
-        if (!statuses.isEmpty()) {
-            Assertions.assertEquals(statuses.get(0), actualStatus);
-        } else {
-            Assertions.assertNull(actualStatus.getCreatedAt());
-            Assertions.assertNull(actualStatus.getStatus());
-        }
+
+        Assertions.assertEquals(status, actualStatus);
+        Assertions.assertEquals(status.getState(), actualStatus.getState());
+        Assertions.assertEquals(status.getCreatedAt(), actualStatus.getCreatedAt());
     }
 
     Stream<Arguments> inputData() {
         Instant now = Instant.now();
         UUID id = UUID.randomUUID();
         return Stream.of(
-                Arguments.arguments(List.of(new SynchronizationStatus(id, SynchronizationState.SUCCEEDED, now, user))),
-                Arguments.arguments(List.of(new SynchronizationStatus(id, SynchronizationState.IN_PROGRESS, now, user))),
-                Arguments.arguments(List.of(new SynchronizationStatus(id, SynchronizationState.FAILED, now, user))),
-                Arguments.arguments(List.of(new SynchronizationStatus(id, null, now, user))),
-                Arguments.arguments(Lists.emptyList()),
-                Arguments.arguments(List.of(new SynchronizationStatus(id, SynchronizationState.FAILED, now, user), new SynchronizationStatus(id, SynchronizationState.SUCCEEDED, now
-                        .minus(Duration.ofMinutes(30)), user)))
+                Arguments.arguments(new SynchronizationStatus(id, SynchronizationState.SUCCEEDED, now, user)),
+                Arguments.arguments(new SynchronizationStatus(id, SynchronizationState.IN_PROGRESS, now, user)),
+                Arguments.arguments(new SynchronizationStatus(id, SynchronizationState.FAILED, now, user)),
+                Arguments.arguments(new SynchronizationStatus(id, null, now, user)),
+                Arguments.arguments(new SynchronizationStatus()),
+                Arguments.arguments(new SynchronizationStatus(id, SynchronizationState.FAILED, now, user), new SynchronizationStatus(id, SynchronizationState.SUCCEEDED, now
+                        .minus(Duration.ofMinutes(30)), user))
         );
     }
 }

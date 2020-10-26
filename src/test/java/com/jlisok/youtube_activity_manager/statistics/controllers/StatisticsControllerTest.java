@@ -77,7 +77,7 @@ class StatisticsControllerTest implements TestProfile {
         mockMvc
                 .perform(mvcRequestBuilder.setBasicGetRequest(byCategoryEndPoint, jsonHeader))
                 .andExpect(status().isOk())
-                .andExpect(result -> YouTubeEntityVerifier.assertStatsByCategoryDtoNotNull(result, statusLast.getStatus(), statusLast
+                .andExpect(result -> YouTubeEntityVerifier.assertStatsByCategoryDtoNotNull(result, statusLast.getState(), statusLast
                         .getCreatedAt()));
     }
 
@@ -94,7 +94,7 @@ class StatisticsControllerTest implements TestProfile {
         mockMvc
                 .perform(mvcRequestBuilder.setBasicGetRequest(byCategoryEndPoint, jsonHeader))
                 .andExpect(status().isOk())
-                .andExpect(result -> YouTubeEntityVerifier.assertStatsByCategoryDtoNotNull(result, statusThisUser.getStatus(), statusThisUser
+                .andExpect(result -> YouTubeEntityVerifier.assertStatsByCategoryDtoNotNull(result, statusThisUser.getState(), statusThisUser
                         .getCreatedAt()));
     }
 
@@ -110,6 +110,6 @@ class StatisticsControllerTest implements TestProfile {
         mockMvc
                 .perform(mvcRequestBuilder.setBasicGetRequest(byCreatorEndPoint, jsonHeader))
                 .andExpect(status().isOk())
-                .andExpect(result -> YouTubeEntityVerifier.assertStatsByCreatorDtoNotNull(result, emptyStatus.getStatus(), emptyStatus.getCreatedAt()));
+                .andExpect(result -> YouTubeEntityVerifier.assertStatsByCreatorDtoNotNull(result, emptyStatus.getState(), emptyStatus.getCreatedAt()));
     }
 }

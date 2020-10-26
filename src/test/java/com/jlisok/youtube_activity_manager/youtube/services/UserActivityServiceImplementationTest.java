@@ -24,6 +24,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.jlisok.youtube_activity_manager.security.configs.JwtAuthenticationContext.setAuthenticationInContext;
@@ -54,6 +55,7 @@ class UserActivityServiceImplementationTest implements TestProfile {
     private User user;
     private List<Channel> channels;
     private List<UserVideo> userVideos;
+    private SynchronizationStatus status;
 
     @BeforeEach
     void createInitialConditions() throws RegistrationException {
@@ -62,6 +64,8 @@ class UserActivityServiceImplementationTest implements TestProfile {
         var videos = VideoUtils.createRandomListOfVideos(channels.size());
         userVideos = VideoUtils.createListOfUserVideos(videos, user, rating);
         setAuthenticationInContext(dummyToken, user.getId());
+        status = new SynchronizationStatus(UUID.randomUUID(), SynchronizationState.SUCCEEDED, Instant.now(), user);
+
     }
 
 
@@ -71,8 +75,8 @@ class UserActivityServiceImplementationTest implements TestProfile {
         when(userVideoRepository.findByUserIdAndRating(user.getId(), rating))
                 .thenReturn(Lists.emptyList());
 
-        when(synchronizationRepository.findByUserIdOrderByCreatedAtDesc(user.getId()))
-                .thenReturn(Lists.emptyList());
+        when(synchronizationRepository.findFirstByUserIdOrderByCreatedAtDesc(user.getId()))
+                .thenReturn(Optional.empty());
 
         //when
         UserActivityDto<VideoDto> videoDtos = userActivityService.getRatedVideos(rating);
@@ -87,13 +91,11 @@ class UserActivityServiceImplementationTest implements TestProfile {
     @Test
     void getRatedVideos_whenLikeRatingAndStatusSucceeded() {
         //given
-        var status = new SynchronizationStatus(UUID.randomUUID(), SynchronizationState.SUCCEEDED, Instant.now(), user);
-
         when(userVideoRepository.findByUserIdAndRating(user.getId(), rating))
                 .thenReturn(userVideos);
 
-        when(synchronizationRepository.findByUserIdOrderByCreatedAtDesc(user.getId()))
-                .thenReturn(List.of(status));
+        when(synchronizationRepository.findFirstByUserIdOrderByCreatedAtDesc(user.getId()))
+                .thenReturn(Optional.of(status));
 
         //when
         UserActivityDto<VideoDto> videoDtos = userActivityService.getRatedVideos(rating);
@@ -101,7 +103,7 @@ class UserActivityServiceImplementationTest implements TestProfile {
         //then
         Assertions.assertNotNull(videoDtos);
         Assertions.assertNotNull(videoDtos.getLastState());
-        Assertions.assertEquals(status.getStatus(), videoDtos.getLastState());
+        Assertions.assertEquals(status.getState(), videoDtos.getLastState());
         videoDtos.getYouTubeActivities().forEach(YouTubeEntityVerifier::assertVideoDtoNotEmpty);
     }
 
@@ -114,8 +116,8 @@ class UserActivityServiceImplementationTest implements TestProfile {
         when(userVideoRepository.findByUserIdAndRating(user.getId(), Rating.DISLIKE))
                 .thenReturn(userVideos);
 
-        when(synchronizationRepository.findByUserIdOrderByCreatedAtDesc(user.getId()))
-                .thenReturn(List.of(status));
+        when(synchronizationRepository.findFirstByUserIdOrderByCreatedAtDesc(user.getId()))
+                .thenReturn(Optional.of(status));
 
         //when
         UserActivityDto<VideoDto> videoDtos = userActivityService.getRatedVideos(Rating.DISLIKE);
@@ -123,7 +125,7 @@ class UserActivityServiceImplementationTest implements TestProfile {
         //then
         Assertions.assertNotNull(videoDtos);
         Assertions.assertNotNull(videoDtos.getLastState());
-        Assertions.assertEquals(status.getStatus(), videoDtos.getLastState());
+        Assertions.assertEquals(status.getState(), videoDtos.getLastState());
         videoDtos.getYouTubeActivities().forEach(YouTubeEntityVerifier::assertVideoDtoNotEmpty);
     }
 
@@ -131,15 +133,14 @@ class UserActivityServiceImplementationTest implements TestProfile {
     @Test
     void getSubscribedChannels_whenDatabaseEmpty() {
         //given
-        var statusFist = new SynchronizationStatus(UUID.randomUUID(), SynchronizationState.FAILED, Instant.now(), user);
         var statusLast = new SynchronizationStatus(UUID.randomUUID(), SynchronizationState.SUCCEEDED, Instant.now(), user);
 
 
         when(channelRepository.findByUsers_Id(user.getId()))
                 .thenReturn(Lists.emptyList());
 
-        when(synchronizationRepository.findByUserIdOrderByCreatedAtDesc(user.getId()))
-                .thenReturn(List.of(statusLast, statusFist));
+        when(synchronizationRepository.findFirstByUserIdOrderByCreatedAtDesc(user.getId()))
+                .thenReturn(Optional.of(statusLast));
 
         //when
         UserActivityDto<ChannelDto> channelDtos = userActivityService.getSubscribedChannels();
@@ -147,7 +148,7 @@ class UserActivityServiceImplementationTest implements TestProfile {
         //then
         Assertions.assertNotNull(channelDtos);
         Assertions.assertNotNull(channelDtos.getLastState());
-        Assertions.assertEquals(statusLast.getStatus(), channelDtos.getLastState());
+        Assertions.assertEquals(statusLast.getState(), channelDtos.getLastState());
         Assertions.assertTrue(channelDtos.getYouTubeActivities().isEmpty());
     }
 
@@ -160,8 +161,8 @@ class UserActivityServiceImplementationTest implements TestProfile {
         when(channelRepository.findByUsers_Id(user.getId()))
                 .thenReturn(channels);
 
-        when(synchronizationRepository.findByUserIdOrderByCreatedAtDesc(user.getId()))
-                .thenReturn(List.of(status));
+        when(synchronizationRepository.findFirstByUserIdOrderByCreatedAtDesc(user.getId()))
+                .thenReturn(Optional.of(status));
 
         //when
         UserActivityDto<ChannelDto> channelDtos = userActivityService.getSubscribedChannels();
@@ -169,7 +170,7 @@ class UserActivityServiceImplementationTest implements TestProfile {
         //then
         Assertions.assertNotNull(channelDtos);
         Assertions.assertNotNull(channelDtos.getLastState());
-        Assertions.assertEquals(status.getStatus(), channelDtos.getLastState());
+        Assertions.assertEquals(status.getState(), channelDtos.getLastState());
         channelDtos.getYouTubeActivities().forEach(YouTubeEntityVerifier::assertChannelDtoNotEmpty);
     }
 

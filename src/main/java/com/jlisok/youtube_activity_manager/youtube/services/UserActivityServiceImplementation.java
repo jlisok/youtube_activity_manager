@@ -47,7 +47,7 @@ public class UserActivityServiceImplementation implements UserActivityService {
                 })
                 .collect(Collectors.toList());
         var lastStatus = synchronizationStatusGetter.getLastSynchronization(userId);
-        return new UserActivityDto<>(videoDto, lastStatus.getStatus(), lastStatus.getCreatedAt());
+        return new UserActivityDto<>(videoDto, lastStatus.getState(), lastStatus.getCreatedAt());
     }
 
 
@@ -60,6 +60,6 @@ public class UserActivityServiceImplementation implements UserActivityService {
                 .map(EntityCreator::createChannelDto)
                 .collect(Collectors.toList());
         var lastStatus = synchronizationStatusGetter.getLastSynchronization(userId);
-        return new UserActivityDto<>(channelDto, lastStatus.getStatus(), lastStatus.getCreatedAt());
+        return new UserActivityDto<>(channelDto, lastStatus.getState(), lastStatus.getCreatedAt());
     }
 }

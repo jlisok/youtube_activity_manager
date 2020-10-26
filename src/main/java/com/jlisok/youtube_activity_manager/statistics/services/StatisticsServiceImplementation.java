@@ -33,7 +33,7 @@ public class StatisticsServiceImplementation implements StatisticsService {
         UUID userId = getAuthenticationInContext().getAuthenticatedUserId();
         var stats = repositoryByCategory.groupByCategory(userId);
         var status = synchronizationStatusGetter.getLastSynchronization(userId);
-        return new StatisticsDto<>(stats, status.getStatus(), status.getCreatedAt());
+        return new StatisticsDto<>(stats, status.getState(), status.getCreatedAt());
     }
 
     @Override
@@ -41,6 +41,6 @@ public class StatisticsServiceImplementation implements StatisticsService {
         UUID userId = getAuthenticationInContext().getAuthenticatedUserId();
         var stats = repositoryByCreator.groupByCreator(userId);
         var status = synchronizationStatusGetter.getLastSynchronization(userId);
-        return new StatisticsDto<>(stats, status.getStatus(), status.getCreatedAt());
+        return new StatisticsDto<>(stats, status.getState(), status.getCreatedAt());
     }
 }

@@ -4,7 +4,7 @@ import com.jlisok.youtube_activity_manager.synchronization.domain.Synchronizatio
 import com.jlisok.youtube_activity_manager.synchronization.repositories.SynchronizationRepository;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -17,11 +17,7 @@ public class SynchronizationStatusGetter {
     }
 
     public SynchronizationStatus getLastSynchronization(UUID userId) {
-        List<SynchronizationStatus> status = synchronizationRepository.findByUserIdOrderByCreatedAtDesc(userId);
-        if (!status.isEmpty()) {
-            return status.get(0);
-        } else {
-            return new SynchronizationStatus();
-        }
+        Optional<SynchronizationStatus> status = synchronizationRepository.findFirstByUserIdOrderByCreatedAtDesc(userId);
+        return status.orElseGet(SynchronizationStatus::new);
     }
 }

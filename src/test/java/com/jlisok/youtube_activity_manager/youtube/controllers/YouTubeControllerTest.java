@@ -90,7 +90,7 @@ class YouTubeControllerTest implements TestProfile {
                 .perform(mvcRequestBuilder.setGetRequestWithParams(endPointUrlVideos, jsonHeader, parameterName, Rating.LIKE
                         .toString()))
                 .andExpect(status().isOk())
-                .andExpect(result -> YouTubeEntityVerifier.assertUserActivityDtoVideoNotNull(result, statusLast.getStatus(), statusLast
+                .andExpect(result -> YouTubeEntityVerifier.assertUserActivityDtoVideoNotNull(result, statusLast.getState(), statusLast
                         .getCreatedAt()));
     }
 
@@ -108,7 +108,7 @@ class YouTubeControllerTest implements TestProfile {
                 .perform(mvcRequestBuilder.setGetRequestWithParams(endPointUrlVideos, jsonHeader, parameterName, Rating.DISLIKE
                         .toString()))
                 .andExpect(status().isOk())
-                .andExpect(result -> YouTubeEntityVerifier.assertUserActivityDtoVideoNotNull(result, statusThisUser.getStatus(), statusThisUser
+                .andExpect(result -> YouTubeEntityVerifier.assertUserActivityDtoVideoNotNull(result, statusThisUser.getState(), statusThisUser
                         .getCreatedAt()));
     }
 
@@ -132,7 +132,7 @@ class YouTubeControllerTest implements TestProfile {
         mockMvc
                 .perform(mvcRequestBuilder.setBasicGetRequest(endPointUrlChannels, jsonHeader))
                 .andExpect(status().isOk())
-                .andExpect(result -> YouTubeEntityVerifier.assertUserActivityDtoChannelNotNull(result, emptyStatus.getStatus(), emptyStatus
+                .andExpect(result -> YouTubeEntityVerifier.assertUserActivityDtoChannelNotNull(result, emptyStatus.getState(), emptyStatus
                         .getCreatedAt()));
     }
 

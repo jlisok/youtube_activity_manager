@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,7 +13,7 @@ public interface SynchronizationRepository extends JpaRepository<Synchronization
 
     Optional<SynchronizationStatus> findByUserId(UUID userId);
 
-    List<SynchronizationStatus> findByUserIdOrderByCreatedAtDesc(UUID userId);
+    Optional<SynchronizationStatus> findFirstByUserIdOrderByCreatedAtDesc(UUID userId);
 
     @Transactional
     void deleteByUserId(UUID id);
