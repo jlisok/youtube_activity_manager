@@ -41,6 +41,7 @@ public class VideoServiceImplementation implements VideoService {
                 .stream()
                 .map(ytVideo -> {
                     var channelId = dbChannelMap.get(ytVideo.getSnippet().getChannelId()).getId();
+                    // using channel reference is necessary (instead of channel entity), because hibernate cannot find a reference to channels-users @many2many relation in async process whilst propagating changes from users_videos
                     var channel = entityManager.getReference(Channel.class, channelId);
                     var videoCategory = dbVideoCategoryMap.get(ytVideo.getSnippet().getCategoryId());
                     return createOrUpdateVideo(ytVideo, dbVideoMap, channel, videoCategory);
