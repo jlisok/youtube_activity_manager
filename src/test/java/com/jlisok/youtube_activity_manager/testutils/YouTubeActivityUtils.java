@@ -6,7 +6,6 @@ import com.jlisok.youtube_activity_manager.videos.models.Video;
 import com.jlisok.youtube_activity_manager.videos.repositories.UserVideoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,7 +16,6 @@ public class YouTubeActivityUtils implements TestProfile {
     private UserVideoRepository userVideoRepository;
 
 
-    @Transactional
     public List<Video> insertUsersYouTubeActivity(User user) {
         int size = 10;
         var channels = ChannelAndSubscriptionUtils.createRandomListOfChannels(size);

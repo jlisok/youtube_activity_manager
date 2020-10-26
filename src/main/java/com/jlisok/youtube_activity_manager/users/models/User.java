@@ -62,8 +62,7 @@ public final class User {
 
     public void addChannels(Collection<Channel> channels) {
         this.channels.addAll(channels);
-        var thisUser = this;
-        channels.forEach(channel -> channel.getUsers().add(thisUser));
+        channels.forEach(channel -> channel.getUsers().add(this));
     }
 
     public void removeChannels(Collection<Channel> channels) {

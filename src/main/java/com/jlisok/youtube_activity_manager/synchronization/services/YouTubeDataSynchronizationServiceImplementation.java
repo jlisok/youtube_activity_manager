@@ -14,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.time.Instant;
@@ -44,15 +46,16 @@ public class YouTubeDataSynchronizationServiceImplementation implements YouTubeD
 
 
     @Override
-    public CompletableFuture<Void> synchronizeAndSendToCloud(UUID synchronizationId, String accessToken, UUID userId) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public CompletableFuture<Void> synchronizeAndSendToCloud(String accessToken, UUID userId) {
         logger.debug("Synchronization service - initialization");
+        UUID synchronizationId = UUID.randomUUID();
         return synchronizeYouTubeData(synchronizationId, accessToken, userId)
                 .thenCompose(i -> sendDataToCloud(userId));
     }
 
 
     public CompletableFuture<Void> synchronizeYouTubeData(UUID synchronizationId, String accessToken, UUID userId) {
-        logger.debug("Synchronization service - fetching data");
         return CompletableFuture.supplyAsync(() -> insertStatus(synchronizationId, userId, SynchronizationState.IN_PROGRESS))
                                 .thenApply(i -> fetchAndInsertYouTubeData(accessToken, userId))
                                 .thenAccept(i -> insertStatus(synchronizationId, userId, SynchronizationState.SUCCEEDED))
@@ -62,7 +65,6 @@ public class YouTubeDataSynchronizationServiceImplementation implements YouTubeD
 
 
     public CompletableFuture<Void> sendDataToCloud(UUID userId) {
-        logger.debug("Synchronization service - sending data to AWS");
         return CompletableFuture.supplyAsync(() -> prepareAndSendDataToCloud(userId))
                                 .exceptionally(e -> {
                                     logger.error("Failed while sending data to Aws for userId: {}", userId, e);
@@ -73,9 +75,10 @@ public class YouTubeDataSynchronizationServiceImplementation implements YouTubeD
 
 
     private Void fetchAndInsertYouTubeData(String accessToken, UUID userId) {
-        youTubeService.getRatedVideos(accessToken, userId, Rating.LIKE);
-        youTubeService.getRatedVideos(accessToken, userId, Rating.DISLIKE);
-        youTubeService.getSubscribedChannels(accessToken, userId);
+        logger.debug("Synchronization service - fetching data");
+        youTubeService.synchronizeRatedVideos(accessToken, userId, Rating.LIKE);
+        youTubeService.synchronizeRatedVideos(accessToken, userId, Rating.DISLIKE);
+        youTubeService.synchronizeSubscribedChannels(accessToken, userId);
         logger.debug("Synchronization service - fetching data - success");
         return null;
     }
@@ -98,13 +101,14 @@ public class YouTubeDataSynchronizationServiceImplementation implements YouTubeD
 
 
     private Void prepareAndSendDataToCloud(UUID userId) {
+        logger.debug("Synchronization service - preparing and sending data to AWS");
         List<UserVideo> userVideos = userVideoRepository.findByUserId(userId);
         List<Video> videos = userVideos
                 .stream()
                 .map(UserVideo::getVideo)
                 .collect(Collectors.toList());
         awsService.writeAndSendData(videos, userId);
-        logger.debug("Synchronization service - sending data to AWS - success");
+        logger.debug("Synchronization service - preparing and sending data to AWS - success");
         return null;
     }
 }

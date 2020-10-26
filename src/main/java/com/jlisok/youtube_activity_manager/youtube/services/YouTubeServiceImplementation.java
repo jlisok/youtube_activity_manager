@@ -43,23 +43,23 @@ public class YouTubeServiceImplementation implements YouTubeService {
 
     @Override
     @Transactional
-    public void getSubscribedChannels(String accessToken, UUID userId) {
+    public void synchronizeSubscribedChannels(String accessToken, UUID userId) {
         List<Subscription> subscriptions = youTubeClient.fetchSubscriptions(accessToken, SUBSCRIPTION_REQUEST_PARTS, userId);
-        List<String> youtubeChannelIds = IdsFetcher.getIdsFrom(subscriptions, subscription -> subscription.getSnippet()
-                                                                                                          .getResourceId()
-                                                                                                          .getChannelId());
-        List<Channel> channels = getChannelsById(youtubeChannelIds, accessToken, userId);
+        List<String> youtubeChannelIds = IdsFetcher.getIdsFrom(subscriptions, s -> s.getSnippet()
+                                                                                    .getResourceId()
+                                                                                    .getChannelId());
+        synchronizeChannelsById(youtubeChannelIds, accessToken, userId);
         logger.debug("YouTubeService - fetching and inserting channels in database for userId {} - success.", userId);
     }
 
 
     @Override
     @Transactional
-    public void getRatedVideos(String accessToken, UUID userId, Rating rating) {
+    public void synchronizeRatedVideos(String accessToken, UUID userId, Rating rating) {
         List<com.google.api.services.youtube.model.Video> youtubeVideos = youTubeClient.fetchRatedVideos(accessToken, VIDEO_REQUEST_PARTS, rating, userId);
         List<String> ytChannelIds = IdsFetcher.getIdsFrom(youtubeVideos, video -> video.getSnippet().getChannelId());
         List<String> ytCategoryIds = IdsFetcher.getIdsFrom(youtubeVideos, video -> video.getSnippet().getCategoryId());
-        List<Channel> channels = getChannelsById(ytChannelIds, accessToken, null);
+        List<Channel> channels = synchronizeChannelsById(ytChannelIds, accessToken, null);
         List<VideoCategory> videoCategories = videoCategoryService.getVideoCategoriesByIds(accessToken, VIDEO_CATEGORY_REQUEST_PARTS, ytCategoryIds, userId);
         List<Video> videos = videoService.createVideos(youtubeVideos, channels, videoCategories);
         userVideoService.insertVideosVideoCategoriesAndChannels(videos, rating, userId);
@@ -67,7 +67,7 @@ public class YouTubeServiceImplementation implements YouTubeService {
     }
 
 
-    private List<Channel> getChannelsById(List<String> ytChannelIds, String accessToken, UUID userId) {
+    private List<Channel> synchronizeChannelsById(List<String> ytChannelIds, String accessToken, UUID userId) {
         List<com.google.api.services.youtube.model.Channel> youtubeChannels = youTubeClient
                 .fetchChannels(accessToken, CHANNEL_REQUEST_PARTS, ytChannelIds, userId);
         var channels = channelService.createChannels(youtubeChannels, userId);

@@ -21,7 +21,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
-import javax.security.auth.login.LoginException;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -80,12 +79,10 @@ class LoginControllerViaGoogleTest implements TestProfile {
     @Transactional
     void authenticateUserWithGoogle_whenNewValidUserAndSynchronizationServiceSucceeded() throws Exception {
         //given
-        UUID syncId = UUID.randomUUID();
-
         when(googleIdTokenVerifier.verify(any(String.class)))
                 .thenReturn(googleIdToken);
 
-        when(synchronizationService.synchronizeAndSendToCloud(eq(syncId),eq(dummyAccessToken), any(UUID.class)))
+        when(synchronizationService.synchronizeAndSendToCloud(eq(dummyAccessToken), any(UUID.class)))
                 .thenReturn(new CompletableFuture<>());
 
         //when //then
@@ -104,13 +101,11 @@ class LoginControllerViaGoogleTest implements TestProfile {
     @Transactional
     void authenticateUserWithGoogle_whenNewValidUserAndSynchronizationServiceFailed() throws Exception {
         //given
-        UUID syncId = UUID.randomUUID();
-
         when(googleIdTokenVerifier.verify(any(String.class)))
                 .thenReturn(googleIdToken);
 
-        when(synchronizationService.synchronizeAndSendToCloud(eq(syncId),eq(dummyAccessToken), any(UUID.class)))
-                .thenReturn(CompletableFuture.failedFuture(new LoginException()));
+        when(synchronizationService.synchronizeAndSendToCloud(eq(dummyAccessToken), any(UUID.class)))
+                .thenReturn(CompletableFuture.failedFuture(new RuntimeException()));
 
         //when //then
         mockMvc

@@ -11,15 +11,14 @@ public class RatingDto {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private final com.jlisok.youtube_activity_manager.videos.enums.Rating rating;
+    private final Rating rating;
 
     @JsonCreator
-    public RatingDto(com.jlisok.youtube_activity_manager.videos.enums.Rating rating) {
+    public RatingDto(Rating rating) {
         this.rating = rating;
     }
 
-    public com.jlisok.youtube_activity_manager.videos.enums.Rating getRating() {
+    public Rating getRating() {
         return rating;
     }
-
 }

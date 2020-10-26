@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,7 +43,7 @@ public class VideoCategoryServiceImplementation implements VideoCategoryService 
 
     private Map<String, VideoCategory> findDbVideoCategoriesBy(List<String> youtubeCategoryIds) {
         List<VideoCategory> categories = repository.findAllByYoutubeIdIn(youtubeCategoryIds);
-        return MapCreator.toMap(categories, VideoCategory::getYoutubeId, Function.identity());
+        return MapCreator.toMap(categories, VideoCategory::getYoutubeId);
     }
 
 

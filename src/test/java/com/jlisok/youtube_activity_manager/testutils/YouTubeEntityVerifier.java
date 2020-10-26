@@ -11,7 +11,6 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -85,7 +84,9 @@ public class YouTubeEntityVerifier {
                      assertEquals(youtubeChannel.getStatistics().getVideoCount().intValue(), channel.getVideoNumber());
                      assertEquals(youtubeChannel.getStatistics().getVideoCount().intValue(), channel.getVideoNumber());
                      assertEquals(youtubeChannel.getStatistics().getViewCount().intValue(), channel.getViewNumber());
-                     assertEquals(youtubeChannel.getStatistics().getSubscriberCount().intValue(), channel.getSubscriberNumber());
+                     assertEquals(youtubeChannel.getStatistics()
+                                                .getSubscriberCount()
+                                                .intValue(), channel.getSubscriberNumber());
                      assertEquals(youtubeChannel.getContentOwnerDetails().getContentOwner(), channel.getOwner());
                  });
     }
@@ -169,8 +170,7 @@ public class YouTubeEntityVerifier {
 
     public static void assertDbIdsAndInputIdsExistsAndEqual(List<com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory> returnedVideoCategories, List<com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory> dbVideoCategories, List<String> dbIds, List<String> ids) {
         Map<String, com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory> videoCategoriesMap = MapCreator
-                .toMap(returnedVideoCategories, com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory::getYoutubeId, Function
-                        .identity());
+                .toMap(returnedVideoCategories, com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory::getYoutubeId);
 
         IntStream.range(0, dbIds.size())
                  .forEach(i -> {

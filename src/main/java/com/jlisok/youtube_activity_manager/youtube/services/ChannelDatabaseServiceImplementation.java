@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,7 +26,7 @@ public class ChannelDatabaseServiceImplementation implements ChannelDatabaseServ
     @Transactional
     public List<Channel> updateChannelsInDatabase(List<Channel> channels, UUID userId) {
         List<String> channelIds = IdsFetcher.getIdsFrom(channels, Channel::getYouTubeChannelId);
-        Map<String, Channel> repositoryChannels = fetchAllChannelsRelatedTo(channelIds);
+        Map<String, Channel> repositoryChannels = fetchChannels(channelIds);
         List<Channel> readyToInsertChannels = channels
                 .stream()
                 .map(channel -> createOrUpdateChannel(channel, repositoryChannels))
@@ -39,9 +38,9 @@ public class ChannelDatabaseServiceImplementation implements ChannelDatabaseServ
     }
 
 
-    private Map<String, Channel> fetchAllChannelsRelatedTo(List<String> channelIds) {
+    private Map<String, Channel> fetchChannels(List<String> channelIds) {
         List<Channel> channelList = channelRepository.findAllByYouTubeChannelIdIn(channelIds);
-        return MapCreator.toMap(channelList, Channel::getYouTubeChannelId, Function.identity());
+        return MapCreator.toMap(channelList, Channel::getYouTubeChannelId);
     }
 
 

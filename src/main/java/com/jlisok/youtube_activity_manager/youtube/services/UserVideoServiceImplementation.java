@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,7 +44,7 @@ public class UserVideoServiceImplementation implements UserVideoService {
 
     private Map<UUID, UserVideo> fetchUserVideosFromDatabase(UUID userId) {
         List<UserVideo> dbUserVideos = userVideoRepository.findByUserId(userId);
-        return MapCreator.toMap(dbUserVideos, uv -> uv.getVideo().getId(), Function.identity());
+        return MapCreator.toMap(dbUserVideos, uv -> uv.getVideo().getId());
     }
 
 

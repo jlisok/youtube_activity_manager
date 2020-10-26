@@ -6,7 +6,6 @@ import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.transaction.Transactional;
 import java.util.UUID;
 
 @Component
@@ -19,11 +18,10 @@ public class UserFetcher {
         this.repository = repository;
     }
 
-    @Transactional
+
     public User fetchUser(UUID userId) throws ExpectedDataNotFoundInDatabase {
         return repository
                 .findById(userId)
                 .orElseThrow(() -> new ExpectedDataNotFoundInDatabase("Error while fetching User from database. Expected user userId: " + userId + " not found."));
     }
-
 }

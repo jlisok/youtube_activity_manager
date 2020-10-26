@@ -16,7 +16,6 @@ import javax.security.auth.login.FailedLoginException;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("api/v1/login")
@@ -39,11 +38,11 @@ public class LoginController {
         return traditionalLoginService.authenticateUser(loginRequestDto);
     }
 
+    // Note, that authentication and synchronization processes are run within two separate transactions
     @PostMapping("/viaGoogle")
     public String authenticateUser(@Valid @RequestBody GoogleLoginRequestDto loginRequestDto) throws GeneralSecurityException, IOException {
         AuthenticationDto dto = googleLoginService.authenticateUser(loginRequestDto);
-        UUID synchronizationId = UUID.randomUUID();
-        synchronizationService.synchronizeAndSendToCloud(synchronizationId, loginRequestDto.getAccessToken(), dto.getUserId()); //asynchronous call
+        synchronizationService.synchronizeAndSendToCloud(loginRequestDto.getAccessToken(), dto.getUserId()); //asynchronous call
         return dto.getJwtToken();
     }
 }

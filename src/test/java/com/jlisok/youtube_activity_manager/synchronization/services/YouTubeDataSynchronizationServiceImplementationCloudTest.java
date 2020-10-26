@@ -1,7 +1,7 @@
 package com.jlisok.youtube_activity_manager.synchronization.services;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.amazonaws.services.s3.model.PutObjectResult;
 import com.jlisok.youtube_activity_manager.channels.models.Channel;
 import com.jlisok.youtube_activity_manager.channels.repositories.ChannelRepository;
 import com.jlisok.youtube_activity_manager.cloudData.client.AwsObjectInfo;
@@ -21,7 +21,6 @@ import com.jlisok.youtube_activity_manager.videos.models.Video;
 import com.jlisok.youtube_activity_manager.videos.repositories.UserVideoRepository;
 import com.jlisok.youtube_activity_manager.videos.repositories.VideoRepository;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +30,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.List;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class YouTubeDataSynchronizationServiceImplementationCloudTest implements TestProfile {
 
-    @Autowired
+    @MockBean
     private AmazonS3 client;
 
     @Autowired
@@ -87,9 +88,6 @@ class YouTubeDataSynchronizationServiceImplementationCloudTest implements TestPr
      */
     @AfterEach
     void removeObjectFromAws() {
-        if (client.doesObjectExist(info.getBucketName(), info.getKeyName())) {
-            client.deleteObject(new DeleteObjectRequest(info.getBucketName(), keyName));
-        }
         if (userVideos != null) {
             videoCategoryRepository.deleteAll(videoCategories);
             channelRepository.deleteAll(channels);
@@ -106,10 +104,13 @@ class YouTubeDataSynchronizationServiceImplementationCloudTest implements TestPr
         when(keyNameCreator.createKeyName(user.getId()))
                 .thenReturn(keyName);
 
+        when(client.putObject(eq(info.getBucketName()), eq(info.getKeyName()), any(String.class)))
+                .thenReturn(new PutObjectResult());
+
         service.sendDataToCloud(user.getId()).join();
 
         //then
-        Assertions.assertFalse(client.doesObjectExist(info.getBucketName(), info.getKeyName()));
+        verify(client, never()).putObject(eq(info.getBucketName()), eq(info.getKeyName()), any(String.class));
     }
 
 
@@ -121,10 +122,13 @@ class YouTubeDataSynchronizationServiceImplementationCloudTest implements TestPr
         when(keyNameCreator.createKeyName(user.getId()))
                 .thenReturn(keyName);
 
+        when(client.putObject(eq(info.getBucketName()), eq(info.getKeyName()), any(String.class)))
+                .thenReturn(new PutObjectResult());
+
         service.sendDataToCloud(user.getId()).join();
 
         //then
-        Assertions.assertTrue(client.doesObjectExist(info.getBucketName(), info.getKeyName()));
+        verify(client).putObject(eq(info.getBucketName()), eq(info.getKeyName()), any(String.class));
     }
 
 

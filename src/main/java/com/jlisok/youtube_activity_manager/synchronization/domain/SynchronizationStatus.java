@@ -12,20 +12,20 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "synchronization_statuses")
-@TypeDef(name = "status", typeClass = SynchronizationStateEnumTypePostgreSql.class)
+@TypeDef(name = "state", typeClass = SynchronizationStateEnumTypePostgreSql.class)
 public class SynchronizationStatus {
 
     @Id
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "status")
+    @Column(name = "state")
     @Enumerated(EnumType.STRING)
-    @Type(type = "status")
-    private SynchronizationState status;
+    @Type(type = "state")
+    private SynchronizationState state;
 
-    @Column(name = "modified_at")
-    private Instant modifiedAt;
+    @Column(name = "created_at")
+    private Instant createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -34,10 +34,10 @@ public class SynchronizationStatus {
     public SynchronizationStatus() {
     }
 
-    public SynchronizationStatus(UUID id, SynchronizationState status, Instant modifiedAt, User user) {
+    public SynchronizationStatus(UUID id, SynchronizationState state, Instant createdAt, User user) {
         this.id = id;
-        this.status = status;
-        this.modifiedAt = modifiedAt;
+        this.state = state;
+        this.createdAt = createdAt;
         this.user = user;
     }
 
@@ -57,20 +57,20 @@ public class SynchronizationStatus {
         this.user = user;
     }
 
-    public SynchronizationState getStatus() {
-        return status;
+    public SynchronizationState getState() {
+        return state;
     }
 
-    public void setStatus(SynchronizationState status) {
-        this.status = status;
+    public void setState(SynchronizationState state) {
+        this.state = state;
     }
 
-    public Instant getModifiedAt() {
-        return modifiedAt;
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 
-    public void setModifiedAt(Instant modifiedAt) {
-        this.modifiedAt = modifiedAt;
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
     @Override

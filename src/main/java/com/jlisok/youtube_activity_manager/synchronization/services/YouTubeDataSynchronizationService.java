@@ -5,6 +5,6 @@ import java.util.concurrent.CompletableFuture;
 
 public interface YouTubeDataSynchronizationService {
 
-    CompletableFuture<Void> synchronizeAndSendToCloud(UUID synchronizationId, String googleAccessToken, UUID userId);
+    CompletableFuture<Void> synchronizeAndSendToCloud(String googleAccessToken, UUID userId);
 
 }

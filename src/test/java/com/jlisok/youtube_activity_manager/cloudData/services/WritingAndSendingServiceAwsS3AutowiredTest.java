@@ -1,7 +1,7 @@
 package com.jlisok.youtube_activity_manager.cloudData.services;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.PutObjectResult;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.jlisok.youtube_activity_manager.cloudData.client.AwsObjectInfo;
 import com.jlisok.youtube_activity_manager.cloudData.utils.KeyNameCreator;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
@@ -11,8 +11,7 @@ import com.jlisok.youtube_activity_manager.testutils.VideoUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.videos.models.Video;
 import org.assertj.core.util.Lists;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,14 +19,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class WritingAndSendingServiceImplementationTest implements TestProfile {
+@Disabled("Real communication with AWS S3 needs to be disabled not to clutter free tier.")
+class WritingAndSendingServiceAwsS3AutowiredTest implements TestProfile {
 
-    @MockBean
+    @Autowired
     private AmazonS3 client;
 
     @Autowired
@@ -56,6 +54,14 @@ class WritingAndSendingServiceImplementationTest implements TestProfile {
     }
 
 
+    @AfterEach
+    void removeObjectFromAws() {
+        if (client.doesObjectExist(info.getBucketName(), info.getKeyName())) {
+            client.deleteObject(new DeleteObjectRequest(info.getBucketName(), keyName));
+        }
+    }
+
+
     @Test
     void writeAndSendData_whenInputDataEmpty() {
         //given
@@ -65,13 +71,10 @@ class WritingAndSendingServiceImplementationTest implements TestProfile {
         when(keyNameCreator.createKeyName(user.getId()))
                 .thenReturn(keyName);
 
-        when(client.putObject(eq(info.getBucketName()), eq(info.getKeyName()), any(String.class)))
-                .thenReturn(new PutObjectResult());
-
         service.writeAndSendData(emptyList, user.getId());
 
         //then
-        verify(client, never()).putObject(eq(info.getBucketName()), eq(info.getKeyName()), any(String.class));
+        Assertions.assertFalse(client.doesObjectExist(info.getBucketName(), info.getKeyName()));
     }
 
 
@@ -81,13 +84,10 @@ class WritingAndSendingServiceImplementationTest implements TestProfile {
         when(keyNameCreator.createKeyName(user.getId()))
                 .thenReturn(keyName);
 
-        when(client.putObject(eq(info.getBucketName()), eq(info.getKeyName()), any(String.class)))
-                .thenReturn(new PutObjectResult());
-
         service.writeAndSendData(videos, user.getId());
 
         //then
-        verify(client).putObject(eq(info.getBucketName()), eq(info.getKeyName()), any(String.class));
+        Assertions.assertTrue(client.doesObjectExist(info.getBucketName(), info.getKeyName()));
     }
 
 }

@@ -16,7 +16,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,10 +33,9 @@ public class VideoServiceImplementation implements VideoService {
     @Override
     public List<Video> createVideos(List<com.google.api.services.youtube.model.Video> youTubeVideos, List<Channel> dbChannels, List<VideoCategory> videoCategories) {
         List<String> youtubeVideoIds = IdsFetcher.getIdsFrom(youTubeVideos, com.google.api.services.youtube.model.Video::getId);
-        Map<String, Video> dbVideoMap = fetchAllVideosRelatedTo(youtubeVideoIds);
-        Map<String, Channel> dbChannelMap = MapCreator.toMap(dbChannels, Channel::getYouTubeChannelId, Function.identity());
-        Map<String, VideoCategory> dbVideoCategoryMap = MapCreator.toMap(videoCategories, VideoCategory::getYoutubeId, Function
-                .identity());
+        Map<String, Video> dbVideoMap = fetchVideos(youtubeVideoIds);
+        Map<String, Channel> dbChannelMap = MapCreator.toMap(dbChannels, Channel::getYouTubeChannelId);
+        Map<String, VideoCategory> dbVideoCategoryMap = MapCreator.toMap(videoCategories, VideoCategory::getYoutubeId);
 
         return youTubeVideos
                 .stream()
@@ -51,9 +49,9 @@ public class VideoServiceImplementation implements VideoService {
     }
 
 
-    private Map<String, Video> fetchAllVideosRelatedTo(List<String> youtubeVideoIds) {
+    private Map<String, Video> fetchVideos(List<String> youtubeVideoIds) {
         List<Video> videos = repository.findAllByYouTubeVideoIdIn(youtubeVideoIds);
-        return MapCreator.toMap(videos, Video::getYouTubeVideoId, Function.identity());
+        return MapCreator.toMap(videos, Video::getYouTubeVideoId);
     }
 
 
@@ -73,8 +71,7 @@ public class VideoServiceImplementation implements VideoService {
     private Video updateVideo(Video video, Channel channel, VideoCategory videoCategory) {
         video.setChannel(channel);
         video.setVideoCategory(videoCategory);
-        Instant now = Instant.now();
-        video.setModifiedAt(now);
+        video.setModifiedAt(Instant.now());
         return video;
     }
 

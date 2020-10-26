@@ -7,10 +7,7 @@ import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationE
 import com.jlisok.youtube_activity_manager.synchronization.domain.SynchronizationState;
 import com.jlisok.youtube_activity_manager.synchronization.domain.SynchronizationStatus;
 import com.jlisok.youtube_activity_manager.synchronization.repositories.SynchronizationRepository;
-import com.jlisok.youtube_activity_manager.testutils.ChannelAndSubscriptionUtils;
-import com.jlisok.youtube_activity_manager.testutils.UserUtils;
-import com.jlisok.youtube_activity_manager.testutils.VideoUtils;
-import com.jlisok.youtube_activity_manager.testutils.YouTubeEntityVerifier;
+import com.jlisok.youtube_activity_manager.testutils.*;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
 import com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory;
@@ -52,7 +49,13 @@ class YouTubeDataSynchronizationServiceImplementationTest {
     private UserVideoRepository userVideoRepository;
 
     @Autowired
+    private TestUserVideoRepository testUserVideoRepository;
+
+    @Autowired
     private ChannelRepository channelRepository;
+
+    @Autowired
+    private TestChannelRepository testChannelRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -111,8 +114,8 @@ class YouTubeDataSynchronizationServiceImplementationTest {
     @AfterEach
     void removeDataFromDatabase() {
         synchronizationRepository.deleteByUserId(user.getId());
-        userVideoRepository.deleteAllByUserId(user.getId());
-        channelRepository.deleteAllByUsers_Id(user.getId());
+        testUserVideoRepository.deleteAllByUserId(user.getId());
+        testChannelRepository.deleteAllByUsers_Id(user.getId());
         userRepository.delete(user);
     }
 
@@ -133,7 +136,7 @@ class YouTubeDataSynchronizationServiceImplementationTest {
         //then
         SynchronizationState actualState = synchronizationRepository
                 .findByUserId(user.getId())
-                .map(SynchronizationStatus::getStatus)
+                .map(SynchronizationStatus::getState)
                 .orElse(null);
 
         Assertions.assertNotNull(actualState);
@@ -172,7 +175,7 @@ class YouTubeDataSynchronizationServiceImplementationTest {
         //then
         SynchronizationState actualState = synchronizationRepository
                 .findByUserId(user.getId())
-                .map(SynchronizationStatus::getStatus)
+                .map(SynchronizationStatus::getState)
                 .orElse(null);
 
         List<Channel> dbChannels = channelRepository.findByUsers_Id(user.getId());
@@ -220,7 +223,7 @@ class YouTubeDataSynchronizationServiceImplementationTest {
         //then
         SynchronizationState actualState = synchronizationRepository
                 .findByUserId(user.getId())
-                .map(SynchronizationStatus::getStatus)
+                .map(SynchronizationStatus::getState)
                 .orElse(null);
 
         List<Channel> dbChannels = channelRepository.findByUsers_Id(user.getId());
@@ -274,7 +277,7 @@ class YouTubeDataSynchronizationServiceImplementationTest {
         //then
         SynchronizationState actualState = synchronizationRepository
                 .findByUserId(user.getId())
-                .map(SynchronizationStatus::getStatus)
+                .map(SynchronizationStatus::getState)
                 .orElse(null);
 
         List<UserVideo> usersVideos = userVideoRepository.findByUserId(user.getId());
@@ -352,7 +355,7 @@ class YouTubeDataSynchronizationServiceImplementationTest {
         //then
         SynchronizationState actualState = synchronizationRepository
                 .findByUserId(user.getId())
-                .map(SynchronizationStatus::getStatus)
+                .map(SynchronizationStatus::getState)
                 .orElse(null);
 
         List<UserVideo> usersVideos = userVideoRepository.findByUserId(user.getId());
@@ -438,7 +441,7 @@ class YouTubeDataSynchronizationServiceImplementationTest {
         //then
         SynchronizationState actualState = synchronizationRepository
                 .findByUserId(user.getId())
-                .map(SynchronizationStatus::getStatus)
+                .map(SynchronizationStatus::getState)
                 .orElse(null);
 
         List<UserVideo> usersVideos = userVideoRepository.findByUserId(user.getId());

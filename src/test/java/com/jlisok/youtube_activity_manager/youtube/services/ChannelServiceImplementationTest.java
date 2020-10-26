@@ -53,7 +53,7 @@ class ChannelServiceImplementationTest implements TestProfile {
 
     static Stream<Arguments> exampleYouTubeChannels() {
         return Stream.of(
-                //Arguments.arguments(createRandomYouTubeChannelList(0)),
+                Arguments.arguments(createRandomYouTubeChannelList(0)),
                 Arguments.arguments(createRandomYouTubeChannelList(1)),
                 Arguments.arguments(createRandomYouTubeChannelList(5)),
                 Arguments.arguments(createRandomYouTubeChannelList(10))
