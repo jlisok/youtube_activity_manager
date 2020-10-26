@@ -51,7 +51,7 @@ class ChannelDatabaseServiceImplementationTest implements TestProfile {
 
     @BeforeEach
     void createBoundaryConditions() throws RegistrationException {
-        user = userUtils.createUserWithDataFromToken(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        user = userUtils.createUser(userUtils.createRandomEmail(), userUtils.createRandomPassword());
         channels = ChannelAndSubscriptionUtils.createRandomListOfChannels(2, user);
         channelIds = IdsFetcher.getIdsFrom(channels, Channel::getYouTubeChannelId);
     }
@@ -79,7 +79,7 @@ class ChannelDatabaseServiceImplementationTest implements TestProfile {
     @Test
     void updateChannelsInDatabase_whenAllChannelsToUpdate() throws RegistrationException {
         //given
-        User userInDatabase = userUtils.createUserWithDataFromToken(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        User userInDatabase = userUtils.createUser(userUtils.createRandomEmail(), userUtils.createRandomPassword());
         List<Channel> repositoryChannels = ChannelAndSubscriptionUtils.copyOfMinus30MinutesCreatedAt(channels, userInDatabase);
 
         when(repository.findAllByYouTubeChannelIdIn(channelIds))

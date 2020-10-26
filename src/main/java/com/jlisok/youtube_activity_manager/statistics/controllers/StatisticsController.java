@@ -2,6 +2,7 @@ package com.jlisok.youtube_activity_manager.statistics.controllers;
 
 import com.jlisok.youtube_activity_manager.statistics.dto.StatisticsByCategory;
 import com.jlisok.youtube_activity_manager.statistics.dto.StatisticsByCreator;
+import com.jlisok.youtube_activity_manager.statistics.dto.StatisticsDto;
 import com.jlisok.youtube_activity_manager.statistics.services.StatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,14 +24,14 @@ public class StatisticsController {
     }
 
     @GetMapping("/category")
-    public ResponseEntity<List<StatisticsByCategory>> getStatsGroupedByCategory() {
+    public ResponseEntity<StatisticsDto<StatisticsByCategory>> getStatsGroupedByCategory() {
         return ResponseEntity
                 .ok()
                 .body(service.groupByCategory());
     }
 
     @GetMapping("/creator")
-    public ResponseEntity<List<StatisticsByCreator>> getStatsGroupedByCreator() {
+    public ResponseEntity<StatisticsDto<StatisticsByCreator>> getStatsGroupedByCreator() {
         return ResponseEntity
                 .ok()
                 .body(service.groupByCreator());

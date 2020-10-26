@@ -52,7 +52,7 @@ class VideoServiceImplementationTest implements TestProfile {
     @BeforeAll
     void prepareInitialConditions() throws RegistrationException {
         youtubeChannels = createRandomYouTubeChannelList(1);
-        user = userUtils.createUserWithDataFromToken(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        user = userUtils.createUser(userUtils.createRandomEmail(), userUtils.createRandomPassword());
         channels = youtubeChannels
                 .stream()
                 .map(ytChannel -> EntityCreator

@@ -53,7 +53,7 @@ public class UserUtils implements TestProfile {
 
     @Transactional
     public User insertUserInDatabase(String userEmail, String userPassword) throws RegistrationException {
-        User user = createUserWithDataFromToken(userEmail, userPassword);
+        User user = createUser(userEmail, userPassword);
         repository.saveAndFlush(user);
 
         assertTrue(repository.existsByEmail(user.getEmail()));
@@ -70,7 +70,7 @@ public class UserUtils implements TestProfile {
     }
 
 
-    public User createUserWithDataFromToken(String userEmail, String userPassword) throws RegistrationException {
+    public User createUser(String userEmail, String userPassword) throws RegistrationException {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         RegistrationRequestDto dto = RandomRegistrationDto.createValidRegistrationDto(userEmail, userPassword);

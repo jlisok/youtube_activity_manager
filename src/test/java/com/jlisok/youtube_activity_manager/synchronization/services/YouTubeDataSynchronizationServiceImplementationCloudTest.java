@@ -78,7 +78,7 @@ class YouTubeDataSynchronizationServiceImplementationCloudTest implements TestPr
 
     @BeforeEach
     void createInitialConditions() throws RegistrationException {
-        user = userUtils.createUserWithDataFromToken(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        user = userUtils.createUser(userUtils.createRandomEmail(), userUtils.createRandomPassword());
         info = new AwsObjectInfo(bucketName, keyName);
     }
 

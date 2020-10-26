@@ -50,7 +50,7 @@ class WritingAndSendingServiceImplementationTest implements TestProfile {
 
     @BeforeEach
     void createInitialConditions() throws RegistrationException {
-        user = userUtils.createUserWithDataFromToken(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        user = userUtils.createUser(userUtils.createRandomEmail(), userUtils.createRandomPassword());
         videos = VideoUtils.createRandomListOfVideos(10);
         info = new AwsObjectInfo(bucketName, keyName);
     }

@@ -1,5 +1,6 @@
 package com.jlisok.youtube_activity_manager.youtube.services;
 
+import com.jlisok.youtube_activity_manager.testutils.TestProfile;
 import com.jlisok.youtube_activity_manager.testutils.VideoUtils;
 import com.jlisok.youtube_activity_manager.testutils.YouTubeEntityVerifier;
 import com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory;
@@ -23,7 +24,7 @@ import java.util.stream.IntStream;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class VideoCategoryServiceImplementationTest {
+class VideoCategoryServiceImplementationTest implements TestProfile {
 
     @Autowired
     private VideoCategoryService service;

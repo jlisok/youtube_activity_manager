@@ -28,7 +28,7 @@ class VideosJsonWriterTest {
 
     @BeforeEach
     void createInitialConditions() throws RegistrationException {
-        User user = userUtils.createUserWithDataFromToken(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        User user = userUtils.createUser(userUtils.createRandomEmail(), userUtils.createRandomPassword());
         videos = VideoUtils.createRandomListOfVideos(10);
     }
 

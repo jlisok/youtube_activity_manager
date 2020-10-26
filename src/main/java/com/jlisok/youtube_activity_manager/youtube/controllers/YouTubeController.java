@@ -2,6 +2,7 @@ package com.jlisok.youtube_activity_manager.youtube.controllers;
 
 import com.jlisok.youtube_activity_manager.youtube.dto.ChannelDto;
 import com.jlisok.youtube_activity_manager.youtube.dto.RatingDto;
+import com.jlisok.youtube_activity_manager.youtube.dto.UserActivityDto;
 import com.jlisok.youtube_activity_manager.youtube.dto.VideoDto;
 import com.jlisok.youtube_activity_manager.youtube.services.UserActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
-
 @RestController
 @RequestMapping("api/v1/youtube")
 public class YouTubeController {
@@ -25,14 +25,14 @@ public class YouTubeController {
     }
 
     @GetMapping("/videos")
-    public ResponseEntity<List<VideoDto>> getRatedVideos(@Valid RatingDto ratingDto) {
+    public ResponseEntity<UserActivityDto<VideoDto>> getRatedVideos(@Valid RatingDto ratingDto) {
         return ResponseEntity
                 .ok()
                 .body(service.getRatedVideos(ratingDto.getRating()));
     }
 
     @GetMapping("/channels")
-    public ResponseEntity<List<ChannelDto>> getSubscribedChannels() {
+    public ResponseEntity<UserActivityDto<ChannelDto>> getSubscribedChannels() {
         return ResponseEntity
                 .ok()
                 .body(service.getSubscribedChannels());
