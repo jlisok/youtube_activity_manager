@@ -38,9 +38,12 @@ class ChannelServiceImplementationTest implements TestProfile {
     void createListOfChannels(List<com.google.api.services.youtube.model.Channel> youtubeChannelList) throws RegistrationException {
         //given //when
         User user = utils.createUser(utils.createRandomEmail(), utils.createRandomPassword());
+
+        when(fetcher.fetchUser(user.getId()))
+                .thenReturn(user);
+
         List<Channel> channelList = service.createChannels(youtubeChannelList, user.getId());
 
-        when(fetcher.fetchUser(user.getId())).thenReturn(user);
 
         //then
         channelList.forEach(YouTubeEntityVerifier::assertChannelNotEmpty);

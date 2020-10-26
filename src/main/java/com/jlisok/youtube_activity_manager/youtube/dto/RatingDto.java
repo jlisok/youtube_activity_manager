@@ -7,19 +7,18 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.NotNull;
 
-public class YouTubeRatingDto {
+public class RatingDto {
 
     @NotNull
     @Enumerated(EnumType.STRING)
     private final Rating rating;
 
     @JsonCreator
-    public YouTubeRatingDto(Rating rating) {
+    public RatingDto(Rating rating) {
         this.rating = rating;
     }
 
     public Rating getRating() {
         return rating;
     }
-
 }

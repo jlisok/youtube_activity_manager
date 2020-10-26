@@ -1,6 +1,5 @@
 package com.jlisok.youtube_activity_manager.cloudData.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jlisok.youtube_activity_manager.cloudData.client.AwsObjectInfo;
 import com.jlisok.youtube_activity_manager.cloudData.utils.KeyNameCreator;
 import com.jlisok.youtube_activity_manager.cloudData.writers.ContentSender;
@@ -10,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class WritingAndSendingServiceImplementation<T> implements WritingAndSendingService<T> {
@@ -31,9 +32,9 @@ public class WritingAndSendingServiceImplementation<T> implements WritingAndSend
     }
 
     @Override
-    public void writeAndSendData(T data) throws JsonProcessingException {
+    public void writeAndSendData(T data, UUID userId) {
         String contentToSend = contentWriter.writeContent(data);
-        String fileName = keyNameCreator.createKeyName();
+        String fileName = keyNameCreator.createKeyName(userId);
         logger.info("WritingAndSendingService fileName: {} - content created", fileName);
         AwsObjectInfo awsObjectInfo = new AwsObjectInfo(bucketName, fileName);
         contentSender.sendContent(contentToSend, awsObjectInfo);

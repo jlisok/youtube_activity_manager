@@ -1,14 +1,15 @@
 package com.jlisok.youtube_activity_manager.youtube.services;
 
 import com.jlisok.youtube_activity_manager.channels.models.Channel;
-import com.jlisok.youtube_activity_manager.database.exceptions.ExpectedDataNotFoundInDatabase;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.users.utils.UserFetcher;
+import com.jlisok.youtube_activity_manager.youtube.utils.EntityCreator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -33,10 +34,15 @@ public class ChannelServiceImplementation implements ChannelService {
     }
 
 
-    private Channel translateToChannel(com.google.api.services.youtube.model.Channel youtubeChannel, UUID userId) throws ExpectedDataNotFoundInDatabase {
-        User user = userFetcher.fetchUser(userId);
-        return createChannel(youtubeChannel.getId(), youtubeChannel.getSnippet(), youtubeChannel
-                .getStatistics(), youtubeChannel.getContentOwnerDetails(), Collections.singleton(user));
+    private Channel translateToChannel(com.google.api.services.youtube.model.Channel youtubeChannel, UUID userId) {
+        Set<User> users = Optional
+                .ofNullable(userId)
+                .stream()
+                .map(userFetcher::fetchUser)
+                .collect(Collectors.toSet());
+
+        return EntityCreator.createChannel(youtubeChannel.getId(), youtubeChannel.getSnippet(), youtubeChannel
+                .getStatistics(), youtubeChannel.getContentOwnerDetails(), users);
     }
 
 }

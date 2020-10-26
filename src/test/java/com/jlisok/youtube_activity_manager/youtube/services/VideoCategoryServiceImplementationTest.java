@@ -1,5 +1,6 @@
 package com.jlisok.youtube_activity_manager.youtube.services;
 
+import com.jlisok.youtube_activity_manager.testutils.TestProfile;
 import com.jlisok.youtube_activity_manager.testutils.VideoUtils;
 import com.jlisok.youtube_activity_manager.testutils.YouTubeEntityVerifier;
 import com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory;
@@ -16,17 +17,17 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class VideoCategoryServiceImplementationTest {
+class VideoCategoryServiceImplementationTest implements TestProfile {
 
     @Autowired
     private VideoCategoryService service;
-
 
     @MockBean
     private VideoCategoryRepository repository;
@@ -35,6 +36,7 @@ class VideoCategoryServiceImplementationTest {
     private YouTubeClient client;
 
     private final String dummyAccessToken = "dummyaccesstokendummyaccesstokendummyaccesstokendummyaccesstoken";
+    private final UUID userId = UUID.randomUUID();
 
     private List<String> ids;
     private List<String> dbIds;
@@ -58,13 +60,13 @@ class VideoCategoryServiceImplementationTest {
     @Test
     void getVideoCategories_whenNothingInDatabase() {
         //given //when
-        when(client.fetchVideoCategories(dummyAccessToken, YouTubeApiClientRequest.VIDEO_CATEGORY_REQUEST_PARTS, ids))
+        when(client.fetchVideoCategories(dummyAccessToken, YouTubeApiClientRequest.VIDEO_CATEGORY_REQUEST_PARTS, ids, userId))
                 .thenReturn(youTubeCategories);
 
         when(repository.findAllByYoutubeIdIn(ids))
                 .thenReturn(Lists.emptyList());
 
-        List<VideoCategory> videoCategories = service.getVideoCategories(dummyAccessToken, YouTubeApiClientRequest.VIDEO_CATEGORY_REQUEST_PARTS, ids);
+        List<VideoCategory> videoCategories = service.getVideoCategoriesByIds(dummyAccessToken, YouTubeApiClientRequest.VIDEO_CATEGORY_REQUEST_PARTS, ids, userId);
 
         //then
         Assertions.assertNotNull(videoCategories);
@@ -76,13 +78,13 @@ class VideoCategoryServiceImplementationTest {
     @Test
     void getVideoCategories_whenEntitiesInDatabase() {
         //given //when
-        when(client.fetchVideoCategories(dummyAccessToken, YouTubeApiClientRequest.VIDEO_CATEGORY_REQUEST_PARTS, ids))
+        when(client.fetchVideoCategories(dummyAccessToken, YouTubeApiClientRequest.VIDEO_CATEGORY_REQUEST_PARTS, ids, userId))
                 .thenReturn(youTubeCategories);
 
         when(repository.findAllByYoutubeIdIn(ids))
                 .thenReturn(dbCategories);
 
-        List<VideoCategory> videoCategories = service.getVideoCategories(dummyAccessToken, YouTubeApiClientRequest.VIDEO_CATEGORY_REQUEST_PARTS, ids);
+        List<VideoCategory> videoCategories = service.getVideoCategoriesByIds(dummyAccessToken, YouTubeApiClientRequest.VIDEO_CATEGORY_REQUEST_PARTS, ids, userId);
 
         //then
         Assertions.assertNotNull(videoCategories);
@@ -95,13 +97,13 @@ class VideoCategoryServiceImplementationTest {
     @Test
     void getVideoCategories_whenNoSuchCategoryApi() {
         //given //when
-        when(client.fetchVideoCategories(dummyAccessToken, YouTubeApiClientRequest.VIDEO_CATEGORY_REQUEST_PARTS, ids))
+        when(client.fetchVideoCategories(dummyAccessToken, YouTubeApiClientRequest.VIDEO_CATEGORY_REQUEST_PARTS, ids, userId))
                 .thenReturn(Lists.emptyList());
 
         when(repository.findAllByYoutubeIdIn(ids))
                 .thenReturn(Lists.emptyList());
 
-        List<VideoCategory> videoCategories = service.getVideoCategories(dummyAccessToken, YouTubeApiClientRequest.VIDEO_CATEGORY_REQUEST_PARTS, ids);
+        List<VideoCategory> videoCategories = service.getVideoCategoriesByIds(dummyAccessToken, YouTubeApiClientRequest.VIDEO_CATEGORY_REQUEST_PARTS, ids, userId);
 
         //then
         Assertions.assertNotNull(videoCategories);
@@ -114,13 +116,13 @@ class VideoCategoryServiceImplementationTest {
         //given //when
         List<String> ids = Collections.emptyList();
 
-        when(client.fetchVideoCategories(dummyAccessToken, YouTubeApiClientRequest.VIDEO_CATEGORY_REQUEST_PARTS, ids))
+        when(client.fetchVideoCategories(dummyAccessToken, YouTubeApiClientRequest.VIDEO_CATEGORY_REQUEST_PARTS, ids, userId))
                 .thenReturn(Lists.emptyList());
 
         when(repository.findAllByYoutubeIdIn(ids))
                 .thenReturn(Lists.emptyList());
 
-        List<VideoCategory> videoCategories = service.getVideoCategories(dummyAccessToken, YouTubeApiClientRequest.VIDEO_CATEGORY_REQUEST_PARTS, ids);
+        List<VideoCategory> videoCategories = service.getVideoCategoriesByIds(dummyAccessToken, YouTubeApiClientRequest.VIDEO_CATEGORY_REQUEST_PARTS, ids, userId);
 
         //then
         Assertions.assertNotNull(videoCategories);

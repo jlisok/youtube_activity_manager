@@ -168,21 +168,11 @@ public class Video {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Video video = (Video) o;
-        return id.equals(video.id) &&
-                title.equals(video.title) &&
-                youTubeVideoId.equals(video.youTubeVideoId) &&
-                duration.equals(video.duration) &&
-                publishedAt.equals(video.publishedAt) &&
-                Objects.equals(hashtag, video.hashtag) &&
-                Objects.equals(uri, video.uri) &&
-                createdAt.equals(video.createdAt) &&
-                modifiedAt.equals(video.modifiedAt) &&
-                channel.equals(video.channel) &&
-                videoCategory.equals(video.videoCategory);
+        return id.equals(video.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, youTubeVideoId, duration, publishedAt, hashtag, uri, createdAt, modifiedAt, channel, videoCategory);
+        return Objects.hash(id);
     }
 }

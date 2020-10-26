@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,8 +29,8 @@ public class VideoCategoryServiceImplementation implements VideoCategoryService 
 
     @Override
     @Transactional
-    public List<VideoCategory> getVideoCategories(String accessToken, String parts, List<String> youtubeCategoryIds) {
-        List<com.google.api.services.youtube.model.VideoCategory> ytVideoCategories = youTubeClient.fetchVideoCategories(accessToken, parts, youtubeCategoryIds);
+    public List<VideoCategory> getVideoCategoriesByIds(String accessToken, String parts, List<String> youtubeCategoryIds, UUID userId) {
+        List<com.google.api.services.youtube.model.VideoCategory> ytVideoCategories = youTubeClient.fetchVideoCategories(accessToken, parts, youtubeCategoryIds, userId);
         return createVideoCategories(ytVideoCategories, youtubeCategoryIds);
     }
 
@@ -44,7 +43,7 @@ public class VideoCategoryServiceImplementation implements VideoCategoryService 
 
     private Map<String, VideoCategory> findDbVideoCategoriesBy(List<String> youtubeCategoryIds) {
         List<VideoCategory> categories = repository.findAllByYoutubeIdIn(youtubeCategoryIds);
-        return MapCreator.toMap(categories, VideoCategory::getYoutubeId, Function.identity());
+        return MapCreator.toMap(categories, VideoCategory::getYoutubeId);
     }
 
 

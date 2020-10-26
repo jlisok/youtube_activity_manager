@@ -18,10 +18,10 @@ public class UserFetcher {
         this.repository = repository;
     }
 
+
     public User fetchUser(UUID userId) throws ExpectedDataNotFoundInDatabase {
         return repository
                 .findById(userId)
                 .orElseThrow(() -> new ExpectedDataNotFoundInDatabase("Error while fetching User from database. Expected user userId: " + userId + " not found."));
     }
-
 }

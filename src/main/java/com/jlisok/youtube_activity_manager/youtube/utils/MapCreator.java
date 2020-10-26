@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 
 public class MapCreator {
 
-    public static <T, K, V> Map<K, V> toMap(Collection<T> collection, Function<T, K> toKey, Function<T, V> toValue) {
+    public static <T, K> Map<K, T> toMap(Collection<T> collection, Function<T, K> toKey) {
         return collection
                 .stream()
-                .collect(Collectors.toMap(toKey, toValue));
+                .collect(Collectors.toMap(toKey, Function.identity()));
     }
 }

@@ -2,6 +2,7 @@ package com.jlisok.youtube_activity_manager.testutils;
 
 import com.google.api.services.youtube.model.VideoCategory;
 import com.jlisok.youtube_activity_manager.channels.models.Channel;
+import com.jlisok.youtube_activity_manager.synchronization.domain.SynchronizationState;
 import com.jlisok.youtube_activity_manager.videos.models.Video;
 import com.jlisok.youtube_activity_manager.youtube.dto.ChannelDto;
 import com.jlisok.youtube_activity_manager.youtube.dto.VideoDto;
@@ -9,16 +10,16 @@ import com.jlisok.youtube_activity_manager.youtube.utils.MapCreator;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class YouTubeEntityVerifier {
 
-    public static void assertVideoDtoNotNull(MvcResult result) throws Exception {
+    public static void assertUserActivityDtoVideoNotNull(MvcResult result, SynchronizationState state, Instant instant) throws Exception {
         String response = result
                 .getResponse()
                 .getContentAsString();
@@ -29,10 +30,16 @@ public class YouTubeEntityVerifier {
         assertTrue(response.contains("channelTitle"));
         assertTrue(response.contains("duration"));
         assertTrue(response.contains("publishedAt"));
+        if (state != null) {
+            assertTrue(response.contains(state.toString()));
+            assertTrue(response.contains(instant.toString()));
+        }
+        assertTrue(response.contains("state"));
+        assertTrue(response.contains("stateCreatedAt"));
     }
 
 
-    public static void assertChannelDtoNotNull(MvcResult result) throws Exception {
+    public static void assertUserActivityDtoChannelNotNull(MvcResult result, SynchronizationState state, Instant instant) throws Exception {
         String response = result
                 .getResponse()
                 .getContentAsString();
@@ -44,10 +51,16 @@ public class YouTubeEntityVerifier {
         assertTrue(response.contains("subscriberNumber"));
         assertTrue(response.contains("videoNumber"));
         assertTrue(response.contains("publishedAt"));
+        if (state != null) {
+            assertTrue(response.contains(state.toString()));
+            assertTrue(response.contains(instant.toString()));
+        }
+        assertTrue(response.contains("state"));
+        assertTrue(response.contains("stateCreatedAt"));
     }
 
 
-    public static void assertStatsByCategoryDtoNotNull(MvcResult result) throws Exception {
+    public static void assertStatsByCategoryDtoNotNull(MvcResult result, SynchronizationState state, Instant instant) throws Exception {
         String response = result
                 .getResponse()
                 .getContentAsString();
@@ -57,10 +70,16 @@ public class YouTubeEntityVerifier {
         assertTrue(response.contains("totalTime"));
         assertTrue(response.contains("numberVideos"));
         assertTrue(response.contains("categoryName"));
+        if (state != null) {
+            assertTrue(response.contains(state.toString()));
+            assertTrue(response.contains(instant.toString()));
+        }
+        assertTrue(response.contains("state"));
+        assertTrue(response.contains("stateCreatedAt"));
     }
 
 
-    public static void assertStatsByCreatorDtoNotNull(MvcResult result) throws Exception {
+    public static void assertStatsByCreatorDtoNotNull(MvcResult result, SynchronizationState state, Instant instant) throws Exception {
         String response = result
                 .getResponse()
                 .getContentAsString();
@@ -70,6 +89,12 @@ public class YouTubeEntityVerifier {
         assertTrue(response.contains("totalTime"));
         assertTrue(response.contains("numberVideos"));
         assertTrue(response.contains("creatorName"));
+        if (state != null) {
+            assertTrue(response.contains(state.toString()));
+            assertTrue(response.contains(instant.toString()));
+        }
+        assertTrue(response.contains("state"));
+        assertTrue(response.contains("stateCreatedAt"));
     }
 
 
@@ -85,7 +110,9 @@ public class YouTubeEntityVerifier {
                      assertEquals(youtubeChannel.getStatistics().getVideoCount().intValue(), channel.getVideoNumber());
                      assertEquals(youtubeChannel.getStatistics().getVideoCount().intValue(), channel.getVideoNumber());
                      assertEquals(youtubeChannel.getStatistics().getViewCount().intValue(), channel.getViewNumber());
-                     assertEquals(youtubeChannel.getStatistics().getSubscriberCount().intValue(), channel.getSubscriberNumber());
+                     assertEquals(youtubeChannel.getStatistics()
+                                                .getSubscriberCount()
+                                                .intValue(), channel.getSubscriberNumber());
                      assertEquals(youtubeChannel.getContentOwnerDetails().getContentOwner(), channel.getOwner());
                  });
     }
@@ -157,10 +184,19 @@ public class YouTubeEntityVerifier {
                  });
     }
 
+
+    public static void assertVideoCategoryNotEmpty(com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory videoCategory) {
+        assertFalse(videoCategory.getCategoryName().isEmpty());
+        assertFalse(videoCategory.getYoutubeId().isEmpty());
+        assertNotNull(videoCategory.getId());
+        assertNotNull(videoCategory.getCreatedAt());
+        assertNotNull(videoCategory.getModifiedAt());
+    }
+
+
     public static void assertDbIdsAndInputIdsExistsAndEqual(List<com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory> returnedVideoCategories, List<com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory> dbVideoCategories, List<String> dbIds, List<String> ids) {
         Map<String, com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory> videoCategoriesMap = MapCreator
-                .toMap(returnedVideoCategories, com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory::getYoutubeId, Function
-                        .identity());
+                .toMap(returnedVideoCategories, com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory::getYoutubeId);
 
         IntStream.range(0, dbIds.size())
                  .forEach(i -> {

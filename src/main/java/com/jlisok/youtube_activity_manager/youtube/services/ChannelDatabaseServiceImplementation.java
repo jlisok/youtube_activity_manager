@@ -3,13 +3,13 @@ package com.jlisok.youtube_activity_manager.youtube.services;
 import com.jlisok.youtube_activity_manager.channels.models.Channel;
 import com.jlisok.youtube_activity_manager.channels.repositories.ChannelRepository;
 import com.jlisok.youtube_activity_manager.users.models.User;
+import com.jlisok.youtube_activity_manager.youtube.utils.IdsFetcher;
 import com.jlisok.youtube_activity_manager.youtube.utils.MapCreator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,20 +25,22 @@ public class ChannelDatabaseServiceImplementation implements ChannelDatabaseServ
     @Override
     @Transactional
     public List<Channel> updateChannelsInDatabase(List<Channel> channels, UUID userId) {
-        Map<String, Channel> repositoryChannels = fetchAllChannelsRelatedTo(userId);
+        List<String> channelIds = IdsFetcher.getIdsFrom(channels, Channel::getYouTubeChannelId);
+        Map<String, Channel> repositoryChannels = fetchChannels(channelIds);
         List<Channel> readyToInsertChannels = channels
                 .stream()
                 .map(channel -> createOrUpdateChannel(channel, repositoryChannels))
                 .collect(Collectors.toList());
+
         List<Channel> savedChannels = channelRepository.saveAll(readyToInsertChannels);
         channelRepository.flush();
         return savedChannels;
     }
 
 
-    private Map<String, Channel> fetchAllChannelsRelatedTo(UUID userId) {
-        List<Channel> channelList = channelRepository.findByUsers_Id(userId);
-        return MapCreator.toMap(channelList, Channel::getYouTubeChannelId, Function.identity());
+    private Map<String, Channel> fetchChannels(List<String> channelIds) {
+        List<Channel> channelList = channelRepository.findAllByYouTubeChannelIdIn(channelIds);
+        return MapCreator.toMap(channelList, Channel::getYouTubeChannelId);
     }
 
 

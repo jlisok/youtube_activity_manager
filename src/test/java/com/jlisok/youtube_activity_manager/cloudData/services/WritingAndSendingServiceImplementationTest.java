@@ -1,8 +1,7 @@
 package com.jlisok.youtube_activity_manager.cloudData.services;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.amazonaws.services.s3.model.PutObjectResult;
 import com.jlisok.youtube_activity_manager.cloudData.client.AwsObjectInfo;
 import com.jlisok.youtube_activity_manager.cloudData.utils.KeyNameCreator;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
@@ -12,8 +11,6 @@ import com.jlisok.youtube_activity_manager.testutils.VideoUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.videos.models.Video;
 import org.assertj.core.util.Lists;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +20,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.List;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class WritingAndSendingServiceImplementationTest implements TestProfile {
 
-    @Autowired
+    @MockBean
     private AmazonS3 client;
 
     @Autowired
@@ -46,50 +45,49 @@ class WritingAndSendingServiceImplementationTest implements TestProfile {
     private String bucketName;
     private AwsObjectInfo info;
     private List<Video> videos;
+    private User user;
 
 
     @BeforeEach
     void createInitialConditions() throws RegistrationException {
-        User user = userUtils.createUser(userUtils.createRandomEmail(), userUtils.createRandomPassword());
-        videos = VideoUtils.createRandomListOfVideos(10, user);
+        user = userUtils.createUser(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        videos = VideoUtils.createRandomListOfVideos(10);
         info = new AwsObjectInfo(bucketName, keyName);
     }
 
 
-    @AfterEach
-    void removeObjectFromAws() {
-        if (client.doesObjectExist(info.getBucketName(), info.getKeyName())) {
-            client.deleteObject(new DeleteObjectRequest(info.getBucketName(), keyName));
-        }
-    }
-
-
     @Test
-    void writeAndSendData_whenInputDataEmpty() throws JsonProcessingException {
+    void writeAndSendData_whenInputDataEmpty() {
         //given
         List<Video> emptyList = Lists.emptyList();
 
         // when
-        when(keyNameCreator.createKeyName())
+        when(keyNameCreator.createKeyName(user.getId()))
                 .thenReturn(keyName);
 
-        service.writeAndSendData(emptyList);
+        when(client.putObject(eq(info.getBucketName()), eq(info.getKeyName()), any(String.class)))
+                .thenReturn(new PutObjectResult());
+
+        service.writeAndSendData(emptyList, user.getId());
 
         //then
-        Assertions.assertFalse(client.doesObjectExist(info.getBucketName(), info.getKeyName()));
+        verify(client, never()).putObject(eq(info.getBucketName()), eq(info.getKeyName()), any(String.class));
     }
 
 
     @Test
-    void writeAndSendData_whenDataValidNotEmpty() throws JsonProcessingException {
+    void writeAndSendData_whenDataValidNotEmpty() {
         //given // when
-        when(keyNameCreator.createKeyName())
+        when(keyNameCreator.createKeyName(user.getId()))
                 .thenReturn(keyName);
 
-        service.writeAndSendData(videos);
+        when(client.putObject(eq(info.getBucketName()), eq(info.getKeyName()), any(String.class)))
+                .thenReturn(new PutObjectResult());
+
+        service.writeAndSendData(videos, user.getId());
 
         //then
-        Assertions.assertTrue(client.doesObjectExist(info.getBucketName(), info.getKeyName()));
+        verify(client).putObject(eq(info.getBucketName()), eq(info.getKeyName()), any(String.class));
     }
 
 }

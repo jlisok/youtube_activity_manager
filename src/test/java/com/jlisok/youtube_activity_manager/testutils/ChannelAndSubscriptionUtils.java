@@ -80,25 +80,11 @@ public class ChannelAndSubscriptionUtils {
                        .map(channel -> {
                            Channel repositoryChannel = ChannelAndSubscriptionUtils.copyOf(channel);
                            repositoryChannel.setId(UUID.randomUUID());
-                           repositoryChannel.setCreatedAt(Instant.now().minus(Duration.ofMinutes(30)));
-                           repositoryChannel.setModifiedAt(Instant.now().minus(Duration.ofMinutes(30)));
+                           repositoryChannel.setCreatedAt(channel.getCreatedAt().minus(Duration.ofMinutes(30)));
+                           repositoryChannel.setModifiedAt(channel.getModifiedAt().minus(Duration.ofMinutes(30)));
                            repositoryChannel.setUsers(Sets.newHashSet(user));
                            return repositoryChannel;
                        }).collect(Collectors.toList());
-    }
-
-
-    public static List<Channel> copyOfMinus30MinutesCreatedAt(List<Channel> channels, User user, List<com.google.api.services.youtube.model.Channel> youtubeChannels) {
-        return IntStream.range(0, channels.size())
-                        .mapToObj(i -> {
-                            Channel repositoryChannel = ChannelAndSubscriptionUtils.copyOf(channels.get(i));
-                            repositoryChannel.setId(UUID.randomUUID());
-                            repositoryChannel.setYouTubeChannelId(youtubeChannels.get(i).getId());
-                            repositoryChannel.setCreatedAt(Instant.now().minus(Duration.ofMinutes(30)));
-                            repositoryChannel.setModifiedAt(Instant.now().minus(Duration.ofMinutes(30)));
-                            repositoryChannel.setUsers(Sets.newHashSet(user));
-                            return repositoryChannel;
-                        }).collect(Collectors.toList());
     }
 
 

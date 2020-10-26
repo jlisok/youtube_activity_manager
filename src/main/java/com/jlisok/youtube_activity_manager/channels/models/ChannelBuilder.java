@@ -1,5 +1,6 @@
 package com.jlisok.youtube_activity_manager.channels.models;
 
+import com.google.api.client.util.Sets;
 import com.jlisok.youtube_activity_manager.users.models.User;
 
 import java.time.Instant;
@@ -19,7 +20,7 @@ public class ChannelBuilder {
     private Integer videoNumber;
     private Instant createdAt;
     private Instant modifiedAt;
-    private Set<User> users;
+    private Set<User> users = Sets.newHashSet();
 
     public ChannelBuilder setId(UUID id) {
         this.id = id;

@@ -38,7 +38,7 @@ class UserVideoServiceImplementationTest implements TestProfile {
     private UserUtils utils;
 
     @Autowired
-    private UserVideoServiceImplementation service;
+    private UserVideoService service;
 
     private User user;
     private UUID id;
@@ -48,32 +48,32 @@ class UserVideoServiceImplementationTest implements TestProfile {
     void createBoundaryConditions() {
         id = UUID.randomUUID();
         String dummyToken = "jhgfbdsxnjhgbfvcdsxnjhgbfdcsx";
-        user = utils.createUser(id, dummyToken, dummyToken);
+        user = utils.createUserWithDataFromToken(id, dummyToken, dummyToken);
     }
 
     @Test
     void insertVideos_whenUserDoesNotExistInDatabase() {
         //given
-        List<Video> videoList = VideoUtils.createRandomListOfVideos(1, user);
+        List<Video> videoList = VideoUtils.createRandomListOfVideos(1);
 
         when(userRepository.findById(id))
                 .thenReturn(Optional.empty());
 
         //when //then
-        assertThrows(ExpectedDataNotFoundInDatabase.class, () -> service.insertVideosInDatabase(videoList, rating, id));
+        assertThrows(ExpectedDataNotFoundInDatabase.class, () -> service.insertVideosVideoCategoriesAndChannels(videoList, rating, id));
     }
 
 
     @Test
-    void insertVideos_whenListOfVideosEmpty() throws ExpectedDataNotFoundInDatabase {
+    void insertVideos_whenListOfVideosEmpty() {
         //given
-        List<Video> videoList = VideoUtils.createRandomListOfVideos(0, user);
+        List<Video> videoList = VideoUtils.createRandomListOfVideos(0);
 
         when(userRepository.findById(id))
                 .thenReturn(Optional.of(user));
 
         //when
-        service.insertVideosInDatabase(videoList, rating, id);
+        service.insertVideosVideoCategoriesAndChannels(videoList, rating, id);
 
         //then
         verify(userVideoRepository).saveAll(ArgumentMatchers.anyList());
@@ -81,15 +81,15 @@ class UserVideoServiceImplementationTest implements TestProfile {
 
 
     @Test
-    void insertVideos_whenListOfVideosValid() throws ExpectedDataNotFoundInDatabase {
+    void insertVideos_whenListOfVideosValid() {
         //given
-        List<Video> videoList = VideoUtils.createRandomListOfVideos(5, user);
+        List<Video> videoList = VideoUtils.createRandomListOfVideos(5);
 
         when(userRepository.findById(id))
                 .thenReturn(Optional.of(user));
 
         //when
-        service.insertVideosInDatabase(videoList, rating, id);
+        service.insertVideosVideoCategoriesAndChannels(videoList, rating, id);
 
         //then
         verify(userVideoRepository).saveAll(ArgumentMatchers.anyList());

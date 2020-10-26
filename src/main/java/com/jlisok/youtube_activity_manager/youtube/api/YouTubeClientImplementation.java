@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -28,12 +29,12 @@ public class YouTubeClientImplementation implements YouTubeClient {
 
 
     @Override
-    public List<Subscription> fetchSubscriptions(String accessToken, String parts) {
+    public List<Subscription> fetchSubscriptions(String accessToken, String parts, UUID userId) {
         YouTube youTube = youTubeBuilder.get(accessToken);
         List<Subscription> subscriptions = new ArrayList<>();
         String pageToken = "";
         do {
-            SubscriptionListResponse response = getter.getYouTubeSubscriptions(youTube, parts, pageToken);
+            SubscriptionListResponse response = getter.getYouTubeSubscriptions(youTube, parts, pageToken, userId);
             subscriptions.addAll(response.getItems());
             pageToken = response.getNextPageToken();
         }
@@ -43,24 +44,24 @@ public class YouTubeClientImplementation implements YouTubeClient {
 
 
     @Override
-    public List<Channel> fetchChannels(String accessToken, String parts, List<String> channelIds) {
+    public List<Channel> fetchChannels(String accessToken, String parts, List<String> channelIds, UUID userId) {
         YouTube youTube = youTubeBuilder.get(accessToken);
         List<String> inputChannelIds = YouTubeApiRequestHelper.separateIdsIntoMaxRequestCapacity(channelIds);
         return inputChannelIds
                 .stream()
-                .map(inputIds -> getter.getYouTubeChannels(youTube, parts, inputIds))
+                .map(inputIds -> getter.getYouTubeChannels(youTube, parts, inputIds, userId))
                 .flatMap(items -> items.getItems().stream())
                 .collect(Collectors.toList());
     }
 
 
     @Override
-    public List<Video> fetchRatedVideos(String accessToken, String parts, Rating rating) {
+    public List<Video> fetchRatedVideos(String accessToken, String parts, Rating rating, UUID userId) {
         YouTube youTube = youTubeBuilder.get(accessToken);
         List<Video> videos = new ArrayList<>();
         String pageToken = "";
         do {
-            VideoListResponse response = getter.getYouTubeVideos(youTube, parts, rating, pageToken);
+            VideoListResponse response = getter.getYouTubeVideos(youTube, parts, rating, pageToken, userId);
             videos.addAll(response.getItems());
             pageToken = response.getNextPageToken();
         }
@@ -69,12 +70,12 @@ public class YouTubeClientImplementation implements YouTubeClient {
     }
 
     @Override
-    public List<VideoCategory> fetchVideoCategories(String accessToken, String parts, List<String> categoryIds) {
+    public List<VideoCategory> fetchVideoCategories(String accessToken, String parts, List<String> categoryIds, UUID userId) {
         YouTube youTube = youTubeBuilder.get(accessToken);
         List<String> inputCategoryIds = YouTubeApiRequestHelper.separateIdsIntoMaxRequestCapacity(categoryIds);
         return inputCategoryIds
                 .stream()
-                .map(inputIds -> getter.getYouTubeVideoCategories(youTube, parts, inputIds))
+                .map(inputIds -> getter.getYouTubeVideoCategories(youTube, parts, inputIds, userId))
                 .flatMap(items -> items.getItems().stream())
                 .collect(Collectors.toList());
     }

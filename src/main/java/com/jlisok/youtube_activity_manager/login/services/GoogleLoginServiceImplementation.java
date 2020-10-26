@@ -3,6 +3,7 @@ package com.jlisok.youtube_activity_manager.login.services;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.jlisok.youtube_activity_manager.login.dto.AuthenticationDto;
 import com.jlisok.youtube_activity_manager.login.dto.GoogleLoginRequestDto;
 import com.jlisok.youtube_activity_manager.login.exceptions.DataInconsistencyAuthenticationException;
 import com.jlisok.youtube_activity_manager.login.exceptions.EmailNotVerifiedAuthenticationException;
@@ -46,11 +47,13 @@ public class GoogleLoginServiceImplementation implements GoogleLoginService {
 
     @Override
     @Transactional
-    public String authenticateUser(GoogleLoginRequestDto loginRequestDto) throws GeneralSecurityException, IOException, AuthenticationException {
-        GoogleIdToken googleIdToken = verifyGoogleIdToken(loginRequestDto.getGoogleIdToken());
-        User user = verifyIfUserInDatabaseOrCreateNewUser(loginRequestDto.getGoogleIdToken(), loginRequestDto.getAccessToken(), googleIdToken
+    public AuthenticationDto authenticateUser(GoogleLoginRequestDto loginRequestDto) throws GeneralSecurityException, IOException, AuthenticationException {
+        String stringGoogleIdToken = loginRequestDto.getGoogleIdToken();
+        GoogleIdToken googleIdToken = verifyGoogleIdToken(stringGoogleIdToken);
+        User user = verifyIfUserInDatabaseOrCreateNewUser(stringGoogleIdToken, loginRequestDto.getAccessToken(), googleIdToken
                 .getPayload());
-        return createTokenIfAuthorized(user.getId());
+        var jwtToken = createTokenIfAuthorized(user.getId());
+        return new AuthenticationDto(user.getId(), jwtToken);
     }
 
 

@@ -1,45 +1,65 @@
 package com.jlisok.youtube_activity_manager.youtube.services;
 
 import com.jlisok.youtube_activity_manager.channels.models.Channel;
-import com.jlisok.youtube_activity_manager.videos.models.Video;
+import com.jlisok.youtube_activity_manager.channels.repositories.ChannelRepository;
+import com.jlisok.youtube_activity_manager.security.configs.JwtAuthenticationContext;
+import com.jlisok.youtube_activity_manager.synchronization.utils.SynchronizationStatusGetter;
+import com.jlisok.youtube_activity_manager.videos.enums.Rating;
+import com.jlisok.youtube_activity_manager.videos.models.UserVideo;
+import com.jlisok.youtube_activity_manager.videos.repositories.UserVideoRepository;
 import com.jlisok.youtube_activity_manager.youtube.dto.ChannelDto;
+import com.jlisok.youtube_activity_manager.youtube.dto.UserActivityDto;
 import com.jlisok.youtube_activity_manager.youtube.dto.VideoDto;
-import com.jlisok.youtube_activity_manager.youtube.dto.YouTubeRatingDto;
 import com.jlisok.youtube_activity_manager.youtube.utils.EntityCreator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static com.jlisok.youtube_activity_manager.security.configs.JwtAuthenticationContext.getAuthenticationInContext;
 
 @Service
 public class UserActivityServiceImplementation implements UserActivityService {
 
-    private final YouTubeService service;
+    private final UserVideoRepository userVideoRepository;
+    private final ChannelRepository channelRepository;
+    private final SynchronizationStatusGetter synchronizationStatusGetter;
 
     @Autowired
-    public UserActivityServiceImplementation(YouTubeService service) {
-        this.service = service;
+    public UserActivityServiceImplementation(UserVideoRepository userVideoRepository, ChannelRepository channelRepository, SynchronizationStatusGetter synchronizationStatusGetter) {
+        this.userVideoRepository = userVideoRepository;
+        this.channelRepository = channelRepository;
+        this.synchronizationStatusGetter = synchronizationStatusGetter;
     }
 
 
     @Override
-    public List<VideoDto> getRatedVideos(YouTubeRatingDto dto) throws IOException {
-        List<Video> videos = service.listRatedVideos(dto);
-        return videos
+    public UserActivityDto<VideoDto> getRatedVideos(Rating rating) {
+        UUID userId = JwtAuthenticationContext.getAuthenticationInContext().getAuthenticatedUserId();
+        List<UserVideo> userVideos = userVideoRepository.findByUserIdAndRating(userId, rating);
+        var videoDto = userVideos
                 .stream()
-                .map(EntityCreator::createVideoDto)
+                .map(userVideo -> {
+                    var video = userVideo.getVideo();
+                    return EntityCreator.createVideoDto(video);
+                })
                 .collect(Collectors.toList());
+        var lastStatus = synchronizationStatusGetter.getLastSynchronization(userId);
+        return new UserActivityDto<>(videoDto, lastStatus.getState(), lastStatus.getCreatedAt());
     }
 
 
     @Override
-    public List<ChannelDto> getSubscribedChannels() throws IOException {
-        List<Channel> channels = service.listSubscribedChannels();
-        return channels
+    public UserActivityDto<ChannelDto> getSubscribedChannels() {
+        UUID userId = getAuthenticationInContext().getAuthenticatedUserId();
+        List<Channel> channels = channelRepository.findByUsers_Id(userId);
+        var channelDto = channels
                 .stream()
                 .map(EntityCreator::createChannelDto)
                 .collect(Collectors.toList());
+        var lastStatus = synchronizationStatusGetter.getLastSynchronization(userId);
+        return new UserActivityDto<>(channelDto, lastStatus.getState(), lastStatus.getCreatedAt());
     }
 }

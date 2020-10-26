@@ -9,14 +9,16 @@ import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory;
 import com.jlisok.youtube_activity_manager.videos.models.Video;
 import com.jlisok.youtube_activity_manager.youtube.utils.MapCreator;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @SpringBootTest
@@ -50,7 +52,7 @@ class StatisticsByVideoCategoryRepositoryTest implements TestProfile {
                 .map(Video::getVideoCategory)
                 .distinct()
                 .collect(Collectors.toList());
-        categoryMap = MapCreator.toMap(categoriesInVideos, VideoCategory::getCategoryName, Function.identity());
+        categoryMap = MapCreator.toMap(categoriesInVideos, VideoCategory::getCategoryName);
     }
 
 
@@ -96,7 +98,7 @@ class StatisticsByVideoCategoryRepositoryTest implements TestProfile {
                 .stream()
                 .map(StatisticsByCategory::getNumberVideos)
                 .reduce(0L, Long::sum);
-        
+
         //then
         Assertions.assertEquals(sumNumberVideos, videos.size());
         Assertions.assertEquals(categoriesInVideos.size(), stats.size());

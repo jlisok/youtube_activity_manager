@@ -9,14 +9,16 @@ import com.jlisok.youtube_activity_manager.testutils.YouTubeActivityUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.videos.models.Video;
 import com.jlisok.youtube_activity_manager.youtube.utils.MapCreator;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @SpringBootTest
@@ -50,7 +52,7 @@ class StatisticsByCreatorRepositoryTest implements TestProfile {
                 .map(Video::getChannel)
                 .distinct()
                 .collect(Collectors.toList());
-        channelMap = MapCreator.toMap(channelsInVideos, Channel::getTitle, Function.identity());
+        channelMap = MapCreator.toMap(channelsInVideos, Channel::getTitle);
     }
 
 
