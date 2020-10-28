@@ -83,7 +83,7 @@ class UserActivityServiceImplementationTest implements TestProfile {
 
         //then
         Assertions.assertNotNull(videoDtos);
-        Assertions.assertNull(videoDtos.getLastState());
+        Assertions.assertNull(videoDtos.getState());
         Assertions.assertTrue(videoDtos.getYouTubeActivities().isEmpty());
     }
 
@@ -102,8 +102,8 @@ class UserActivityServiceImplementationTest implements TestProfile {
 
         //then
         Assertions.assertNotNull(videoDtos);
-        Assertions.assertNotNull(videoDtos.getLastState());
-        Assertions.assertEquals(status.getState(), videoDtos.getLastState());
+        Assertions.assertNotNull(videoDtos.getState());
+        Assertions.assertEquals(status.getState(), videoDtos.getState());
         videoDtos.getYouTubeActivities().forEach(YouTubeEntityVerifier::assertVideoDtoNotEmpty);
     }
 
@@ -124,8 +124,8 @@ class UserActivityServiceImplementationTest implements TestProfile {
 
         //then
         Assertions.assertNotNull(videoDtos);
-        Assertions.assertNotNull(videoDtos.getLastState());
-        Assertions.assertEquals(status.getState(), videoDtos.getLastState());
+        Assertions.assertNotNull(videoDtos.getState());
+        Assertions.assertEquals(status.getState(), videoDtos.getState());
         videoDtos.getYouTubeActivities().forEach(YouTubeEntityVerifier::assertVideoDtoNotEmpty);
     }
 
@@ -147,8 +147,8 @@ class UserActivityServiceImplementationTest implements TestProfile {
 
         //then
         Assertions.assertNotNull(channelDtos);
-        Assertions.assertNotNull(channelDtos.getLastState());
-        Assertions.assertEquals(statusLast.getState(), channelDtos.getLastState());
+        Assertions.assertNotNull(channelDtos.getState());
+        Assertions.assertEquals(statusLast.getState(), channelDtos.getState());
         Assertions.assertTrue(channelDtos.getYouTubeActivities().isEmpty());
     }
 
@@ -169,8 +169,8 @@ class UserActivityServiceImplementationTest implements TestProfile {
 
         //then
         Assertions.assertNotNull(channelDtos);
-        Assertions.assertNotNull(channelDtos.getLastState());
-        Assertions.assertEquals(status.getState(), channelDtos.getLastState());
+        Assertions.assertNotNull(channelDtos.getState());
+        Assertions.assertEquals(status.getState(), channelDtos.getState());
         channelDtos.getYouTubeActivities().forEach(YouTubeEntityVerifier::assertChannelDtoNotEmpty);
     }
 

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Assertions;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
@@ -78,6 +79,16 @@ public class YouTubeEntityVerifier {
         assertTrue(response.contains("stateCreatedAt"));
     }
 
+
+    public static void assertSynchronizationInstantEquals(MvcResult result, Instant instant) throws Exception {
+        String response = result
+                .getResponse()
+                .getContentAsString();
+
+        String truncatedInstant = instant.truncatedTo(ChronoUnit.MINUTES).toString();
+
+        assertTrue(response.contains(truncatedInstant));
+    }
 
     public static void assertStatsByCreatorDtoNotNull(MvcResult result, SynchronizationState state, Instant instant) throws Exception {
         String response = result

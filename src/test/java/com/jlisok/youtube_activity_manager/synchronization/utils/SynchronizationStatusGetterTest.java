@@ -9,6 +9,7 @@ import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -17,8 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -71,9 +72,51 @@ class SynchronizationStatusGetterTest implements TestProfile {
                 Arguments.arguments(new SynchronizationStatus(id, SynchronizationState.IN_PROGRESS, now, user)),
                 Arguments.arguments(new SynchronizationStatus(id, SynchronizationState.FAILED, now, user)),
                 Arguments.arguments(new SynchronizationStatus(id, null, now, user)),
-                Arguments.arguments(new SynchronizationStatus()),
-                Arguments.arguments(new SynchronizationStatus(id, SynchronizationState.FAILED, now, user), new SynchronizationStatus(id, SynchronizationState.SUCCEEDED, now
-                        .minus(Duration.ofMinutes(30)), user))
+                Arguments.arguments(new SynchronizationStatus())
         );
     }
+
+
+    @ParameterizedTest
+    @MethodSource("inputDataWithState")
+    void getLastSynchronizationWithState(SynchronizationStatus status) {
+        // given
+        var state = SynchronizationState.SUCCEEDED;
+
+        when(repository.findFirstByUserIdAndStateOrderByCreatedAtDesc(user.getId(), state))
+                .thenReturn(Optional.of(status));
+
+        // when
+        var actualInstant = getter.getLastSynchronizationWithState(user.getId(), state);
+
+        //then
+
+        Assertions.assertEquals(status.getCreatedAt().truncatedTo(ChronoUnit.MINUTES), actualInstant);
+    }
+
+    Stream<Arguments> inputDataWithState() {
+        Instant now = Instant.now();
+        UUID id = UUID.randomUUID();
+        return Stream.of(
+                Arguments.arguments(new SynchronizationStatus(id, SynchronizationState.SUCCEEDED, now, user)),
+                Arguments.arguments(new SynchronizationStatus(id, null, now, user))
+        );
+    }
+
+    @Test
+    void getLastSynchronizationWithState_NoSync() {
+        // given
+        var state = SynchronizationState.SUCCEEDED;
+
+        when(repository.findFirstByUserIdAndStateOrderByCreatedAtDesc(user.getId(), state))
+                .thenReturn(Optional.empty());
+
+        // when
+        var actualInstant = getter.getLastSynchronizationWithState(user.getId(), state);
+
+        //then
+
+        Assertions.assertNull(actualInstant);
+    }
+
 }
