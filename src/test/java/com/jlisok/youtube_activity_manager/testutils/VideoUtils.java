@@ -216,13 +216,15 @@ public class VideoUtils {
 
     public static UserVideo createUserVideo(com.jlisok.youtube_activity_manager.videos.models.Video video, User user, Rating rating) {
         UUID id = UUID.randomUUID();
-        return new UserVideo(id, user, video, rating);
+        Instant now = Instant.now();
+        return new UserVideo(id, user, video, rating, now, now);
     }
 
 
     public static List<UserVideo> createListOfUserVideos(List<com.jlisok.youtube_activity_manager.videos.models.Video> videos, User user, Rating rating) {
+        Instant now = Instant.now();
         return videos.stream()
-                     .map(video -> new UserVideo(UUID.randomUUID(), user, video, rating))
+                     .map(video -> new UserVideo(UUID.randomUUID(), user, video, rating, now, now))
                      .collect(Collectors.toList());
     }
 
@@ -247,17 +249,18 @@ public class VideoUtils {
         return RandomStringUtils.randomAlphanumeric(20);
     }
 
+
     public static List<com.jlisok.youtube_activity_manager.videos.models.Video> createVideos(int size, List<Channel> channels, List<VideoCategory> videoCategories) {
         int channelSize = channels.size();
         int categoriesSize = videoCategories.size();
         return IntStream.range(0, size)
-                .mapToObj(video -> EntityCreator
-                        .createVideo(UUID.randomUUID().toString(),
-                                     createRandomVideoSnippet(),
-                                     createRandomVideoContentDetails(),
-                                     Collections.singletonList("dwdqdqdqd"),
-                                     channels.get(random.nextInt(channelSize)),
-                                     videoCategories.get(random.nextInt(categoriesSize))))
-                .collect(Collectors.toList());
+                        .mapToObj(video -> EntityCreator
+                                .createVideo(UUID.randomUUID().toString(),
+                                             createRandomVideoSnippet(),
+                                             createRandomVideoContentDetails(),
+                                             Collections.singletonList("dwdqdqdqd"),
+                                             channels.get(random.nextInt(channelSize)),
+                                             videoCategories.get(random.nextInt(categoriesSize))))
+                        .collect(Collectors.toList());
     }
 }

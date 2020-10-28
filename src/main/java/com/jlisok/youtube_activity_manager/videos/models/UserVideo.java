@@ -7,6 +7,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -32,16 +33,39 @@ public class UserVideo {
     @Type(type = "video_rating")
     private Rating rating;
 
+    @Column(name = "createdAt")
+    private Instant createdAt;
+
+    @Column(name = "modifiedAt")
+    private Instant modifiedAt;
+
     public UserVideo() {
     }
 
-    public UserVideo(UUID id, User user, Video video, Rating rating) {
+    public UserVideo(UUID id, User user, Video video, Rating rating, Instant createdAt, Instant modifiedAt) {
         this.id = id;
         this.user = user;
         this.video = video;
         this.rating = rating;
+        this.createdAt = createdAt;
+        this.modifiedAt = modifiedAt;
     }
 
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getModifiedAt() {
+        return modifiedAt;
+    }
+
+    public void setModifiedAt(Instant modifiedAt) {
+        this.modifiedAt = modifiedAt;
+    }
 
     public UUID getId() {
         return id;

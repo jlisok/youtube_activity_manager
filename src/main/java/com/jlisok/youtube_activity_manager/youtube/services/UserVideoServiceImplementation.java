@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -57,12 +58,14 @@ public class UserVideoServiceImplementation implements UserVideoService {
 
     private UserVideo updateUserVideo(UserVideo userVideo, Rating rating) {
         userVideo.setRating(rating);
+        userVideo.setModifiedAt(Instant.now());
         return userVideo;
     }
 
 
     private UserVideo createNewUserVideo(User user, Video video, Rating rating) {
         UUID id = UUID.randomUUID();
-        return new UserVideo(id, user, video, rating);
+        Instant now = Instant.now();
+        return new UserVideo(id, user, video, rating, now, now);
     }
 }

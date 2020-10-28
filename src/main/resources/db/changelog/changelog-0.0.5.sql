@@ -11,8 +11,10 @@ CREATE TABLE public.video_categories (
 
 CREATE INDEX video_categories_youtube_id_idx ON public.video_categories (youtube_id);
 
+INSERT INTO public.video_categories (id, youtube_id, category_name, created_at, modified_at) VALUES ('8a2b58ae-41c5-46d1-b655-38bd25ed306b', 'NO_CATEGORY', 'NO_CATEGORY', now(), now());
+
 ALTER TABLE public.videos
-    ADD video_category_id uuid NOT NULL,
+    ADD video_category_id uuid NOT NULL DEFAULT '8a2b58ae-41c5-46d1-b655-38bd25ed306b',
     ADD CONSTRAINT video_category_id_fkey FOREIGN KEY (video_category_id) REFERENCES public.video_categories(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE;
