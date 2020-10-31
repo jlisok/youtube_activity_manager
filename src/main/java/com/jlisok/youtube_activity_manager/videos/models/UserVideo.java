@@ -5,7 +5,6 @@ import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.videos.enums.Rating;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
-import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.time.Instant;

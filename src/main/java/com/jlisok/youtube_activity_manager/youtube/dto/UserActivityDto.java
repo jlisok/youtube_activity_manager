@@ -9,12 +9,12 @@ import java.util.Objects;
 public class UserActivityDto<T> {
 
     private final List<T> youTubeActivities;
-    private final SynchronizationState lastState;
+    private final SynchronizationState state;
     private final Instant stateCreatedAt;
 
-    public UserActivityDto(List<T> youTubeActivities, SynchronizationState lastState, Instant stateCreatedAt) {
+    public UserActivityDto(List<T> youTubeActivities, SynchronizationState state, Instant stateCreatedAt) {
         this.youTubeActivities = youTubeActivities;
-        this.lastState = lastState;
+        this.state = state;
         this.stateCreatedAt = stateCreatedAt;
     }
 
@@ -22,8 +22,8 @@ public class UserActivityDto<T> {
         return youTubeActivities;
     }
 
-    public SynchronizationState getLastState() {
-        return lastState;
+    public SynchronizationState getState() {
+        return state;
     }
 
     public Instant getStateCreatedAt() {
@@ -36,12 +36,12 @@ public class UserActivityDto<T> {
         if (o == null || getClass() != o.getClass()) return false;
         UserActivityDto<?> that = (UserActivityDto<?>) o;
         return Objects.equals(youTubeActivities, that.youTubeActivities) &&
-                lastState == that.lastState &&
+                state == that.state &&
                 Objects.equals(stateCreatedAt, that.stateCreatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(youTubeActivities, lastState, stateCreatedAt);
+        return Objects.hash(youTubeActivities, state, stateCreatedAt);
     }
 }

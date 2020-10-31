@@ -249,6 +249,7 @@ public class VideoUtils {
         return RandomStringUtils.randomAlphanumeric(20);
     }
 
+
     public static List<com.jlisok.youtube_activity_manager.videos.models.Video> createVideos(int size, List<Channel> channels, List<VideoCategory> videoCategories) {
         int channelSize = channels.size();
         int categoriesSize = videoCategories.size();
