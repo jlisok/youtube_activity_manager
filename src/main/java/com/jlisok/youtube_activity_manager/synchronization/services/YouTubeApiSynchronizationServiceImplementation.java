@@ -22,6 +22,6 @@ public class YouTubeApiSynchronizationServiceImplementation implements YouTubeAp
     @Override
     public Instant getLastSuccessfulSynchronization() {
         UUID userId = JwtAuthenticationContext.getAuthenticationInContext().getAuthenticatedUserId();
-        return getter.getLastSynchronizationWithState(userId, SynchronizationState.SUCCEEDED);
+        return getter.getLastSynchronizationTimeWithState(userId, SynchronizationState.SUCCEEDED);
     }
 }

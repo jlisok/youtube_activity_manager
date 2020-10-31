@@ -24,7 +24,7 @@ public class SynchronizationStatusGetter {
         return status.orElseGet(SynchronizationStatus::new);
     }
 
-    public Instant getLastSynchronizationWithState(UUID userId, SynchronizationState state) {
+    public Instant getLastSynchronizationTimeWithState(UUID userId, SynchronizationState state) {
         Optional<SynchronizationStatus> status = synchronizationRepository.findFirstByUserIdAndStateOrderByCreatedAtDesc(userId, state);
         return status
                 .map(s -> s.getCreatedAt().truncatedTo(ChronoUnit.MINUTES))

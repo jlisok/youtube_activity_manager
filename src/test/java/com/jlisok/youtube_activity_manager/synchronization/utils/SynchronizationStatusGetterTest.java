@@ -87,7 +87,7 @@ class SynchronizationStatusGetterTest implements TestProfile {
                 .thenReturn(Optional.of(status));
 
         // when
-        var actualInstant = getter.getLastSynchronizationWithState(user.getId(), state);
+        var actualInstant = getter.getLastSynchronizationTimeWithState(user.getId(), state);
 
         //then
 
@@ -112,7 +112,7 @@ class SynchronizationStatusGetterTest implements TestProfile {
                 .thenReturn(Optional.empty());
 
         // when
-        var actualInstant = getter.getLastSynchronizationWithState(user.getId(), state);
+        var actualInstant = getter.getLastSynchronizationTimeWithState(user.getId(), state);
 
         //then
 
