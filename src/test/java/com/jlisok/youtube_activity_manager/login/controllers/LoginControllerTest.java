@@ -72,7 +72,8 @@ class LoginControllerTest implements TestProfile {
                 .perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, validLoginRequestDto))
                 .andExpect(status().isOk())
                 .andExpect(Assertions::assertNotNull)
-                .andExpect(result -> jwtTokenVerifier.assertEqualsTokenSubject(expectedTokenSubject, result));
+                .andExpect(result -> jwtTokenVerifier.assertEqualsTokenSubject(expectedTokenSubject, result))
+                .andExpect(result -> jwtTokenVerifier.assertEqualsTokenClaimAuthorized(user.checkIfEverAuthorized(), result));
     }
 
 

@@ -27,14 +27,15 @@ public class TokenCreator {
     }
 
 
-    public String create(String subject, Instant now) {
+    public String create(String subject, Instant now, Boolean ifEverAuthorized) {
         Instant expirationTime = now.plus(duration);
         return JWT.create()
-                .withIssuer(issuer)
-                .withIssuedAt(Date.from(now))
-                .withSubject(subject)
-                .withExpiresAt(Date.from(expirationTime))
-                .sign(algorithm);
+                  .withIssuer(issuer)
+                  .withIssuedAt(Date.from(now))
+                  .withSubject(subject)
+                  .withClaim(JwtClaimNames.AUTHORIZED, ifEverAuthorized)
+                  .withExpiresAt(Date.from(expirationTime))
+                  .sign(algorithm);
     }
 
 }

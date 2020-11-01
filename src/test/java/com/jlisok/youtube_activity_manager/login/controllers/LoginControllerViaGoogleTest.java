@@ -90,8 +90,9 @@ class LoginControllerViaGoogleTest implements TestProfile {
                 .perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, googleLoginRequestDto))
                 .andExpect(status().isOk())
                 .andExpect(Assertions::assertNotNull)
-                .andExpect(result ->
-                                   jwtTokenVerifier.assertEqualsUserIdsAndGoogleIdAndTokenNotNull(userEmail, result));
+                .andExpect(result -> jwtTokenVerifier.assertEqualsUserIdsAndGoogleIdAndTokenNotNull(userEmail, result))
+                .andExpect(result -> jwtTokenVerifier.assertEqualsTokenClaimAuthorized(true, result));
+
 
         Assertions.assertTrue(userRepository.existsByEmail(userEmail));
     }
@@ -112,8 +113,9 @@ class LoginControllerViaGoogleTest implements TestProfile {
                 .perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, googleLoginRequestDto))
                 .andExpect(status().isOk())
                 .andExpect(Assertions::assertNotNull)
-                .andExpect(result ->
-                                   jwtTokenVerifier.assertEqualsUserIdsAndGoogleIdAndTokenNotNull(userEmail, result));
+                .andExpect(result -> jwtTokenVerifier.assertEqualsUserIdsAndGoogleIdAndTokenNotNull(userEmail, result))
+                .andExpect(result -> jwtTokenVerifier.assertEqualsTokenClaimAuthorized(true, result));
+
 
         Assertions.assertTrue(userRepository.existsByEmail(userEmail));
     }
@@ -132,8 +134,9 @@ class LoginControllerViaGoogleTest implements TestProfile {
                 .perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, googleLoginRequestDto))
                 .andExpect(status().isOk())
                 .andExpect(Assertions::assertNotNull)
-                .andExpect(result ->
-                                   jwtTokenVerifier.assertEqualsUserIdsAndGoogleIdAndTokenNotNull(userEmail, result));
+                .andExpect(result -> jwtTokenVerifier.assertEqualsUserIdsAndGoogleIdAndTokenNotNull(userEmail, result))
+                .andExpect(result -> jwtTokenVerifier.assertEqualsTokenClaimAuthorized(true, result));
+
 
         Assertions.assertTrue(userRepository.existsByEmail(userEmail));
 
@@ -154,7 +157,9 @@ class LoginControllerViaGoogleTest implements TestProfile {
                 .perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, googleLoginRequestDto))
                 .andExpect(status().isOk())
                 .andExpect(Assertions::assertNotNull)
-                .andExpect(result -> jwtTokenVerifier.assertEqualsUserIdsAndGoogleIdAndTokenNotNull(userEmail, result));
+                .andExpect(result -> jwtTokenVerifier.assertEqualsUserIdsAndGoogleIdAndTokenNotNull(userEmail, result))
+                .andExpect(result -> jwtTokenVerifier.assertEqualsTokenClaimAuthorized(true, result));
+
 
         Assertions.assertTrue(userRepository.existsByEmail(userEmail));
     }
@@ -173,7 +178,9 @@ class LoginControllerViaGoogleTest implements TestProfile {
         mockMvc
                 .perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, googleLoginRequestDto))
                 .andExpect(status().isOk())
-                .andExpect(result -> jwtTokenVerifier.assertEqualsUserIdsAndGoogleIdAndTokenNotNull(userEmail, result));
+                .andExpect(result -> jwtTokenVerifier.assertEqualsUserIdsAndGoogleIdAndTokenNotNull(userEmail, result))
+                .andExpect(result -> jwtTokenVerifier.assertEqualsTokenClaimAuthorized(true, result));
+
 
         Assertions.assertTrue(userRepository.existsByEmail(userEmail));
     }

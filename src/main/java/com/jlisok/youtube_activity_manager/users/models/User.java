@@ -142,13 +142,16 @@ public final class User {
         this.accessToken = accessToken;
     }
 
-
     public Set<Channel> getChannels() {
         return channels;
     }
 
     public void setChannels(Set<Channel> channels) {
         this.channels = channels;
+    }
+
+    public boolean checkIfEverAuthorized() {
+        return googleIdToken != null && !googleIdToken.isBlank();
     }
 
     @Override

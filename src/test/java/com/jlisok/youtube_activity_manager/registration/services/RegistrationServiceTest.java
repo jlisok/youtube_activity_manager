@@ -1,17 +1,21 @@
 package com.jlisok.youtube_activity_manager.registration.services;
 
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.jlisok.youtube_activity_manager.registration.dto.RegistrationRequestDto;
 import com.jlisok.youtube_activity_manager.registration.exceptions.FieldViolationBadRegistrationRequestException;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
 import com.jlisok.youtube_activity_manager.registration.exceptions.UnexpectedErrorBadRegistrationRequestException;
-import com.jlisok.youtube_activity_manager.registration.utils.DtoToUserTranslator;
 import com.jlisok.youtube_activity_manager.testutils.RandomRegistrationDto;
 import com.jlisok.youtube_activity_manager.testutils.TestProfile;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.postgresql.util.PSQLException;
 import org.postgresql.util.PSQLState;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,29 +35,36 @@ class RegistrationServiceTest implements TestProfile {
     private UserUtils userUtils;
 
     @Autowired
-    private DtoToUserTranslator userTranslator;
+    private RegistrationService registrationService;
+
+    @Autowired
+    private JWTVerifier jwtVerifier;
 
     @MockBean
     private UserRepository userRepository;
 
+    @Captor
+    private ArgumentCaptor<User> userCaptor;
+
     private RegistrationRequestDto dto;
-    private RegistrationService registrationService;
 
     @BeforeEach
     void createRandomUser() {
         String userEmail = userUtils.createRandomEmail();
         dto = RandomRegistrationDto.createValidRegistrationDto(userEmail);
-        registrationService = new RegistrationService(userRepository, userTranslator);
     }
 
 
     @Test
     void registerUser_whenRegistrationDtoIsValid() throws RegistrationException {
         //given //when
-        registrationService.addUserToDatabase(dto);
+        String jwToken = registrationService.addUserToDatabase(dto);
+        DecodedJWT decodedJWT = jwtVerifier.verify(jwToken);
 
         //then
-        verify(userRepository).saveAndFlush(any(User.class));
+        verify(userRepository).saveAndFlush(userCaptor.capture());
+        String expectedUserId = userCaptor.getValue().getId().toString();
+        Assertions.assertEquals(expectedUserId, decodedJWT.getSubject());
     }
 
 

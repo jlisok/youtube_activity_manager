@@ -52,7 +52,7 @@ public class GoogleLoginServiceImplementation implements GoogleLoginService {
         GoogleIdToken googleIdToken = verifyGoogleIdToken(stringGoogleIdToken);
         User user = verifyIfUserInDatabaseOrCreateNewUser(stringGoogleIdToken, loginRequestDto.getAccessToken(), googleIdToken
                 .getPayload());
-        var jwtToken = createTokenIfAuthorized(user.getId());
+        var jwtToken = createTokenIfAuthorized(user.getId(), user.checkIfEverAuthorized());
         return new AuthenticationDto(user.getId(), jwtToken);
     }
 
@@ -126,9 +126,9 @@ public class GoogleLoginServiceImplementation implements GoogleLoginService {
     }
 
 
-    private String createTokenIfAuthorized(UUID userId) {
+    private String createTokenIfAuthorized(UUID userId, boolean ifEverAuthorized) {
         Instant now = Instant.now();
-        String token = tokenCreator.create(userId.toString(), now);
+        String token = tokenCreator.create(userId.toString(), now, ifEverAuthorized);
         logger.info("GoogleLoginService - success.");
         return token;
     }

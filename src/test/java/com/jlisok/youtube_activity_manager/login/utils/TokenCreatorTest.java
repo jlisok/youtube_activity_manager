@@ -29,14 +29,15 @@ class TokenCreatorTest {
     private String issuer;
 
     @Test
-    void createToken_whenClaimsAreValid() {
+    void createToken_whenClaimsAreValid_andIfEverAuthorizedTrue() {
         //given
         Instant expectedIssuedAt = Instant.now();
         String expectedUserId = UUID.randomUUID().toString();
         Instant expectedExpirationTime = expectedIssuedAt.plus(duration);
+        boolean ifEverAuthorized = true;
 
         //when
-        String token = tokenCreator.create(expectedUserId, expectedIssuedAt);
+        String token = tokenCreator.create(expectedUserId, expectedIssuedAt, ifEverAuthorized);
         DecodedJWT decodedJWT = jwtVerifier.verify(token);
 
         //then
@@ -46,7 +47,30 @@ class TokenCreatorTest {
         Assertions.assertEquals(expectedIssuedAt.truncatedTo(ChronoUnit.SECONDS), decodedJWT.getIssuedAt().toInstant());
         Assertions.assertEquals(expectedExpirationTime.truncatedTo(ChronoUnit.SECONDS), decodedJWT.getExpiresAt().toInstant());
         Assertions.assertEquals(issuer, decodedJWT.getIssuer());
+        Assertions.assertEquals(ifEverAuthorized, decodedJWT.getClaim(JwtClaimNames.AUTHORIZED).asBoolean());
     }
 
+
+    @Test
+    void createToken_whenClaimsAreValid_andIfEverAuthorizedFalse() {
+        //given
+        Instant expectedIssuedAt = Instant.now();
+        String expectedUserId = UUID.randomUUID().toString();
+        Instant expectedExpirationTime = expectedIssuedAt.plus(duration);
+        boolean ifEverAuthorized = false;
+
+        //when
+        String token = tokenCreator.create(expectedUserId, expectedIssuedAt, ifEverAuthorized);
+        DecodedJWT decodedJWT = jwtVerifier.verify(token);
+
+        //then
+        Assertions.assertEquals(expectedUserId, decodedJWT.getSubject());
+
+        //Method decodedJWT.getIssuedAt().toInstant() returns Instant with a precision set to seconds thus expected value must be truncated
+        Assertions.assertEquals(expectedIssuedAt.truncatedTo(ChronoUnit.SECONDS), decodedJWT.getIssuedAt().toInstant());
+        Assertions.assertEquals(expectedExpirationTime.truncatedTo(ChronoUnit.SECONDS), decodedJWT.getExpiresAt().toInstant());
+        Assertions.assertEquals(issuer, decodedJWT.getIssuer());
+        Assertions.assertEquals(ifEverAuthorized, decodedJWT.getClaim(JwtClaimNames.AUTHORIZED).asBoolean());
+    }
 
 }
