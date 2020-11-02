@@ -61,7 +61,7 @@ class YouTubeDataSynchronizationServiceImplementationTest implements TestProfile
     private UserRepository userRepository;
 
     @Autowired
-    private UserUtils userUtils;
+    private UserTestUtils userTestUtils;
 
     @MockBean
     private YouTubeClient client;
@@ -84,7 +84,7 @@ class YouTubeDataSynchronizationServiceImplementationTest implements TestProfile
 
     @BeforeEach
     void createInitialConditions() throws RegistrationException {
-        user = userUtils.insertUserInDatabase(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        user = userTestUtils.insertUserInDatabase(userTestUtils.createRandomEmail(), userTestUtils.createRandomPassword());
 
         //rated Videos
         youtubeChannelsRatedVideos = ChannelAndSubscriptionUtils.createRandomYouTubeChannelList(1);

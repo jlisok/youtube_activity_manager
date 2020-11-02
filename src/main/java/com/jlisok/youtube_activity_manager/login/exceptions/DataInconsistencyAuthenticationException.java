@@ -7,4 +7,8 @@ public class DataInconsistencyAuthenticationException extends AuthenticationExce
     public DataInconsistencyAuthenticationException(String message, Throwable throwable) {
         super(message, throwable);
     }
+
+    public DataInconsistencyAuthenticationException(String message) {
+        super(message);
+    }
 }

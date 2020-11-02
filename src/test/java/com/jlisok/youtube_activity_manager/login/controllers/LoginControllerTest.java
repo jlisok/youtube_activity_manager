@@ -37,7 +37,7 @@ class LoginControllerTest implements TestProfile {
     private MockMvcBasicRequestBuilder mvcBasicRequestBuilder;
 
     @Autowired
-    private UserUtils userUtils;
+    private UserTestUtils userTestUtils;
 
     @Autowired
     private MvcResponseVerifier responseVerifier;
@@ -52,8 +52,8 @@ class LoginControllerTest implements TestProfile {
 
     @BeforeEach
     void createRandomUser() {
-        userEmail = userUtils.createRandomEmail();
-        userPassword = userUtils.createRandomPassword();
+        userEmail = userTestUtils.createRandomEmail();
+        userPassword = userTestUtils.createRandomPassword();
     }
 
 
@@ -61,7 +61,7 @@ class LoginControllerTest implements TestProfile {
     @Transactional
     void authenticateUserTraditionally_whenUserExistsAndRequestIsValid() throws Exception {
         //given
-        User user = userUtils.insertUserInDatabase(userEmail, userPassword);
+        User user = userTestUtils.insertUserInDatabase(userEmail, userPassword);
         LoginRequestDto validLoginRequestDto = new LoginRequestDto(userPassword, userEmail);
         String expectedTokenSubject = user
                 .getId()
@@ -97,7 +97,7 @@ class LoginControllerTest implements TestProfile {
     @Transactional
     void authenticateUserTraditionally_whenUserSendsBadPassword() throws Exception {
         //given
-        userUtils.insertUserInDatabase(userEmail, userPassword);
+        userTestUtils.insertUserInDatabase(userEmail, userPassword);
         LoginRequestDto loginRequestDtoBadPassword = new LoginRequestDto("some_other_password", userEmail);
         ResponseCode expected = ResponseCode.LOGIN_FAILED_PARAMETERS_DO_NOT_MATCH_DATABASE;
 

@@ -1,8 +1,9 @@
 package com.jlisok.youtube_activity_manager.login.controllers;
 
 import com.jlisok.youtube_activity_manager.login.dto.AuthenticationDto;
-import com.jlisok.youtube_activity_manager.login.dto.GoogleLoginRequestDto;
+import com.jlisok.youtube_activity_manager.login.dto.GoogleRequestDto;
 import com.jlisok.youtube_activity_manager.login.dto.LoginRequestDto;
+import com.jlisok.youtube_activity_manager.login.services.GoogleAuthorizationService;
 import com.jlisok.youtube_activity_manager.login.services.GoogleLoginService;
 import com.jlisok.youtube_activity_manager.login.services.TraditionalLoginService;
 import com.jlisok.youtube_activity_manager.synchronization.services.YouTubeDataSynchronizationService;
@@ -24,13 +25,15 @@ public class LoginController {
 
     private final TraditionalLoginService traditionalLoginService;
     private final GoogleLoginService googleLoginService;
+    private final GoogleAuthorizationService googleAuthorizationService;
     private final YouTubeDataSynchronizationService synchronizationService;
 
 
     @Autowired
-    public LoginController(TraditionalLoginService traditionalLoginService, GoogleLoginService googleLoginService, YouTubeDataSynchronizationService synchronizationService) {
+    public LoginController(TraditionalLoginService traditionalLoginService, GoogleLoginService googleLoginService, GoogleAuthorizationService googleAuthorizationService, YouTubeDataSynchronizationService synchronizationService) {
         this.traditionalLoginService = traditionalLoginService;
         this.googleLoginService = googleLoginService;
+        this.googleAuthorizationService = googleAuthorizationService;
         this.synchronizationService = synchronizationService;
     }
 
@@ -43,8 +46,18 @@ public class LoginController {
 
     // Note, that authentication and synchronization processes are run within two separate transactions
     @PostMapping("/viaGoogle")
-    public ResponseEntity<String> authenticateUser(@Valid @RequestBody GoogleLoginRequestDto loginRequestDto) throws GeneralSecurityException, IOException {
+    public ResponseEntity<String> authenticateUser(@Valid @RequestBody GoogleRequestDto loginRequestDto) throws GeneralSecurityException, IOException {
         AuthenticationDto dto = googleLoginService.authenticateUser(loginRequestDto);
+        synchronizationService.synchronizeAndSendToCloud(loginRequestDto.getAccessToken(), dto.getUserId()); //asynchronous call
+        return ResponseEntity
+                .ok()
+                .body(dto.getJwtToken());
+    }
+
+    // Note, that authentication and synchronization processes are run within two separate transactions
+    @PostMapping("/authorize")
+    public ResponseEntity<String> authorizeUser(@Valid @RequestBody GoogleRequestDto loginRequestDto) throws GeneralSecurityException, IOException {
+        AuthenticationDto dto = googleAuthorizationService.authorizeUser(loginRequestDto);
         synchronizationService.synchronizeAndSendToCloud(loginRequestDto.getAccessToken(), dto.getUserId()); //asynchronous call
         return ResponseEntity
                 .ok()

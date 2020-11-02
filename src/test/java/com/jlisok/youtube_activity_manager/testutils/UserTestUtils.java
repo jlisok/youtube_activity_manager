@@ -21,13 +21,13 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Component
-public class UserUtils implements TestProfile {
+public class UserTestUtils implements TestProfile {
 
     private final DtoToUserTranslator dtoToUserTranslator;
     private final UserRepository repository;
 
     @Autowired
-    public UserUtils(DtoToUserTranslator dtoToUserTranslator, UserRepository userRepository) {
+    public UserTestUtils(DtoToUserTranslator dtoToUserTranslator, UserRepository userRepository) {
         this.dtoToUserTranslator = dtoToUserTranslator;
         this.repository = userRepository;
     }

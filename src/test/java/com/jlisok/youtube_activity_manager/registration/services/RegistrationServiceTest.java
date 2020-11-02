@@ -8,7 +8,7 @@ import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationE
 import com.jlisok.youtube_activity_manager.registration.exceptions.UnexpectedErrorBadRegistrationRequestException;
 import com.jlisok.youtube_activity_manager.testutils.RandomRegistrationDto;
 import com.jlisok.youtube_activity_manager.testutils.TestProfile;
-import com.jlisok.youtube_activity_manager.testutils.UserUtils;
+import com.jlisok.youtube_activity_manager.testutils.UserTestUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
 import org.junit.jupiter.api.Assertions;
@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 class RegistrationServiceTest implements TestProfile {
 
     @Autowired
-    private UserUtils userUtils;
+    private UserTestUtils userTestUtils;
 
     @Autowired
     private RegistrationService registrationService;
@@ -50,7 +50,7 @@ class RegistrationServiceTest implements TestProfile {
 
     @BeforeEach
     void createRandomUser() {
-        String userEmail = userUtils.createRandomEmail();
+        String userEmail = userTestUtils.createRandomEmail();
         dto = RandomRegistrationDto.createValidRegistrationDto(userEmail);
     }
 

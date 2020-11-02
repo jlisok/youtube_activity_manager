@@ -5,7 +5,7 @@ import com.jlisok.youtube_activity_manager.synchronization.domain.Synchronizatio
 import com.jlisok.youtube_activity_manager.synchronization.domain.SynchronizationStatus;
 import com.jlisok.youtube_activity_manager.synchronization.repositories.SynchronizationRepository;
 import com.jlisok.youtube_activity_manager.testutils.TestProfile;
-import com.jlisok.youtube_activity_manager.testutils.UserUtils;
+import com.jlisok.youtube_activity_manager.testutils.UserTestUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +37,7 @@ class SynchronizationStatusGetterTest implements TestProfile {
     private SynchronizationRepository repository;
 
     @Autowired
-    private UserUtils utils;
+    private UserTestUtils utils;
 
     private User user;
 

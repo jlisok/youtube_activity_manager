@@ -6,7 +6,7 @@ import com.jlisok.youtube_activity_manager.login.dto.LoginRequestDto;
 import com.jlisok.youtube_activity_manager.login.utils.JwtClaimNames;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
 import com.jlisok.youtube_activity_manager.testutils.TestProfile;
-import com.jlisok.youtube_activity_manager.testutils.UserUtils;
+import com.jlisok.youtube_activity_manager.testutils.UserTestUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
 import org.junit.jupiter.api.Assertions;
@@ -28,7 +28,7 @@ class TraditionalLoginServiceTest implements TestProfile {
     private JWTVerifier jwtVerifier;
 
     @Autowired
-    private UserUtils userUtils;
+    private UserTestUtils userTestUtils;
 
     @MockBean
     private UserRepository userRepository;
@@ -44,8 +44,8 @@ class TraditionalLoginServiceTest implements TestProfile {
 
     @BeforeEach
     void createRandomUser() {
-        userEmail = userUtils.createRandomEmail();
-        userPassword = userUtils.createRandomPassword();
+        userEmail = userTestUtils.createRandomEmail();
+        userPassword = userTestUtils.createRandomPassword();
         dto = new LoginRequestDto(userPassword, userEmail);
     }
 
@@ -53,7 +53,7 @@ class TraditionalLoginServiceTest implements TestProfile {
     @Test
     void authenticateUser_whenUserPresentAndLoginDataValidAndEverAuthorizedTrue() throws RegistrationException, FailedLoginException {
         //given
-        User user = userUtils.createUser(userEmail, userPassword);
+        User user = userTestUtils.createUser(userEmail, userPassword);
         user.setGoogleIdToken(dummyGoogleIdToken);
 
         when(userRepository.findByEmail(userEmail))
@@ -73,7 +73,7 @@ class TraditionalLoginServiceTest implements TestProfile {
     @Test
     void authenticateUser_whenUserPresentAndLoginDataValidAndEverAuthorizedFalse() throws RegistrationException, FailedLoginException {
         //given
-        User user = userUtils.createUser(userEmail, userPassword);
+        User user = userTestUtils.createUser(userEmail, userPassword);
 
         when(userRepository.findByEmail(userEmail))
                 .thenReturn(Optional.of(user));
@@ -101,7 +101,7 @@ class TraditionalLoginServiceTest implements TestProfile {
     @Test
     void authenticateUser_whenUserIsPresentInDatabaseAndBadPassword() throws RegistrationException {
         //given
-        User user = userUtils.createUser(userEmail, userPassword);
+        User user = userTestUtils.createUser(userEmail, userPassword);
 
         when(userRepository.findByEmail(userEmail))
                 .thenReturn(Optional.of(user));

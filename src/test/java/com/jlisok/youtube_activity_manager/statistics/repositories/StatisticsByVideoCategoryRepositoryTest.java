@@ -3,7 +3,7 @@ package com.jlisok.youtube_activity_manager.statistics.repositories;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
 import com.jlisok.youtube_activity_manager.statistics.dto.StatisticsByCategory;
 import com.jlisok.youtube_activity_manager.testutils.TestProfile;
-import com.jlisok.youtube_activity_manager.testutils.UserUtils;
+import com.jlisok.youtube_activity_manager.testutils.UserTestUtils;
 import com.jlisok.youtube_activity_manager.testutils.YouTubeActivityUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory;
@@ -29,7 +29,7 @@ class StatisticsByVideoCategoryRepositoryTest implements TestProfile {
     private StatisticsByVideoCategoryRepository repository;
 
     @Autowired
-    private UserUtils userUtils;
+    private UserTestUtils userTestUtils;
 
     @Autowired
     private YouTubeActivityUtils utils;
@@ -44,7 +44,7 @@ class StatisticsByVideoCategoryRepositoryTest implements TestProfile {
     @BeforeEach
     @Transactional
     void createInitialConditions() throws RegistrationException {
-        user = userUtils.insertUserInDatabase(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        user = userTestUtils.insertUserInDatabase(userTestUtils.createRandomEmail(), userTestUtils.createRandomPassword());
         videos = utils.insertUsersYouTubeActivity(user);
         videosSize = videos.size();
         categoriesInVideos = videos
@@ -60,7 +60,7 @@ class StatisticsByVideoCategoryRepositoryTest implements TestProfile {
     @Transactional
     void groupByCreator_whenNoContentRelatedToUser() throws RegistrationException {
         //given //when
-        User userNoContent = userUtils.insertUserInDatabase(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        User userNoContent = userTestUtils.insertUserInDatabase(userTestUtils.createRandomEmail(), userTestUtils.createRandomPassword());
         List<StatisticsByCategory> stats = repository.groupByCategory(userNoContent.getId());
 
         //then

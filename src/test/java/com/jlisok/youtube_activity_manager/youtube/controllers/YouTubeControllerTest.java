@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class YouTubeControllerTest implements TestProfile {
 
     @Autowired
-    private UserUtils userUtils;
+    private UserTestUtils userTestUtils;
 
     @Autowired
     private MockMvcBasicRequestBuilder mvcRequestBuilder;
@@ -66,8 +66,8 @@ class YouTubeControllerTest implements TestProfile {
     @BeforeEach
     @Transactional
     public void createYoutubeRequestDto() throws RegistrationException {
-        user = userUtils.insertUserInDatabase(userUtils.createRandomEmail(), userUtils.createRandomPassword());
-        otherUser = userUtils.insertUserInDatabase(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        user = userTestUtils.insertUserInDatabase(userTestUtils.createRandomEmail(), userTestUtils.createRandomPassword());
+        otherUser = userTestUtils.insertUserInDatabase(userTestUtils.createRandomEmail(), userTestUtils.createRandomPassword());
         insertUserVideosInDatabase(user, Rating.LIKE);
         insertUserVideosInDatabase(user, Rating.DISLIKE);
         insertChannelsInDatabase(user);

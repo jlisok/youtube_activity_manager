@@ -5,11 +5,11 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.jlisok.youtube_activity_manager.login.dto.AuthenticationDto;
-import com.jlisok.youtube_activity_manager.login.dto.GoogleLoginRequestDto;
+import com.jlisok.youtube_activity_manager.login.dto.GoogleRequestDto;
 import com.jlisok.youtube_activity_manager.login.exceptions.EmailNotVerifiedAuthenticationException;
 import com.jlisok.youtube_activity_manager.testutils.MockGoogleIdToken;
 import com.jlisok.youtube_activity_manager.testutils.TestProfile;
-import com.jlisok.youtube_activity_manager.testutils.UserUtils;
+import com.jlisok.youtube_activity_manager.testutils.UserTestUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
 import org.junit.jupiter.api.Assertions;
@@ -43,7 +43,7 @@ class GoogleLoginServiceTest implements TestProfile {
     private JWTVerifier jwtVerifier;
 
     @Autowired
-    private UserUtils userUtils;
+    private UserTestUtils userTestUtils;
 
     @Autowired
     private GoogleLoginService service;
@@ -53,15 +53,15 @@ class GoogleLoginServiceTest implements TestProfile {
 
     private final String dummyToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
     private final String dummyAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi";
-    private GoogleLoginRequestDto dto;
+    private GoogleRequestDto dto;
     private GoogleIdToken googleIdToken;
     private String email;
 
 
     @BeforeEach
     void createInitialVariablesForTestsAndMocks() {
-        email = userUtils.createRandomEmail();
-        dto = new GoogleLoginRequestDto(dummyToken, dummyAccessToken);
+        email = userTestUtils.createRandomEmail();
+        dto = new GoogleRequestDto(dummyToken, dummyAccessToken);
         googleIdToken = MockGoogleIdToken.createDummyGoogleIdToken(email, true, true);
     }
 
@@ -97,7 +97,7 @@ class GoogleLoginServiceTest implements TestProfile {
     @Test
     void authenticateUser_whenUpdatingValidUser() throws Exception {
         //given
-        User user = userUtils.createUser(email, "dummyPassword");
+        User user = userTestUtils.createUser(email, "dummyPassword");
 
         when(verifier.verify(dto.getGoogleIdToken()))
                 .thenReturn(googleIdToken);
@@ -135,7 +135,7 @@ class GoogleLoginServiceTest implements TestProfile {
     @Test
     void authenticateUser_whenUserWithGoogleIdPresent() throws Exception {
         //given
-        User user = userUtils.createUserWithDataFromToken(dummyToken, googleIdToken, dummyAccessToken);
+        User user = userTestUtils.createUserWithDataFromToken(dummyToken, googleIdToken, dummyAccessToken);
 
         Assertions.assertNotNull(user.getGoogleId());
 
