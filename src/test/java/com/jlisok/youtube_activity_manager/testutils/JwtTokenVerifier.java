@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @Component
-public class JwtTokenVerifier implements TestProfile {
+public class JwtTokenVerifier {
 
     private final JWTVerifier jwtVerifier;
     private final UserRepository repository;

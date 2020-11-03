@@ -53,6 +53,6 @@ public class LoginControllerAdvice extends BaseExceptionHandler {
 
     @ExceptionHandler({AuthorizationException.class})
     public ResponseEntity<Object> handleFailedLoginException(AuthorizationException exception) {
-        return handleExceptionWithInfoLogging(ResponseCode.AUTHORIZATION_FAILED_USER_NOT_FOUND, HttpStatus.FORBIDDEN, exception);
+        return handleExceptionWithInfoLogging(ResponseCode.AUTHORIZATION_FAILED_USER_NOT_FOUND, HttpStatus.BAD_REQUEST, exception);
     }
 }
