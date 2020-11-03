@@ -14,9 +14,9 @@ public class AuthenticationUtils {
     @Autowired
     private TokenCreator creator;
 
-    public String createRequestAuthenticationHeader(String userId) {
+    public String createRequestAuthenticationHeader(String userId, boolean ifEverAuthorized) {
         Instant now = Instant.now();
-        String token = creator.create(userId, now);
+        String token = creator.create(userId, now, ifEverAuthorized);
         return HEADER_START_SCHEMA + token;
     }
 }

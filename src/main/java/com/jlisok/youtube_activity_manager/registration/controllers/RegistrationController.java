@@ -4,7 +4,11 @@ import com.jlisok.youtube_activity_manager.registration.dto.RegistrationRequestD
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
 import com.jlisok.youtube_activity_manager.registration.services.RegistrationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
@@ -20,8 +24,10 @@ public class RegistrationController {
     }
 
     @PostMapping
-    public void addUser(@Valid @RequestBody RegistrationRequestDto registrationRequestDto) throws RegistrationException {
-        registrationService.addUserToDatabase(registrationRequestDto);
+    public ResponseEntity<String> addUser(@Valid @RequestBody RegistrationRequestDto registrationRequestDto) throws RegistrationException {
+        return ResponseEntity
+                .ok()
+                .body(registrationService.addUserToDatabase(registrationRequestDto));
     }
 
 }

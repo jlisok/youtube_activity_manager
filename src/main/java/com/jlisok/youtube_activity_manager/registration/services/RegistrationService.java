@@ -1,5 +1,6 @@
 package com.jlisok.youtube_activity_manager.registration.services;
 
+import com.jlisok.youtube_activity_manager.login.utils.TokenCreator;
 import com.jlisok.youtube_activity_manager.registration.dto.RegistrationRequestDto;
 import com.jlisok.youtube_activity_manager.registration.exceptions.BadRegistrationRequestException;
 import com.jlisok.youtube_activity_manager.registration.exceptions.PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException;
@@ -22,27 +23,30 @@ public class RegistrationService {
 
     private final UserRepository userRepository;
     private final DtoToUserTranslator dtoToUserTranslator;
+    private final TokenCreator tokenCreator;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
     @Autowired
-    public RegistrationService(UserRepository userRepository, DtoToUserTranslator dtoToUserTranslator) {
+    public RegistrationService(UserRepository userRepository, DtoToUserTranslator dtoToUserTranslator, TokenCreator tokenCreator) {
+        this.tokenCreator = tokenCreator;
         logger.debug("Registration service - initialization.");
         this.userRepository = userRepository;
         this.dtoToUserTranslator = dtoToUserTranslator;
     }
 
-    public void addUserToDatabase(RegistrationRequestDto registrationRequestDto) throws PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException, BadRegistrationRequestException {
+    public String addUserToDatabase(RegistrationRequestDto registrationRequestDto) throws PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException, BadRegistrationRequestException {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
         User user = dtoToUserTranslator.translate(registrationRequestDto, now, id);
-        logger.debug("Registration service - translating Dto to User - success.");
         try {
             saveUser(user);
         } catch (DataIntegrityViolationException e) {
             BadRegistrationExceptionBuilder.handleHibernateExceptionFromNestedStack(e);
         }
+        String jwToken = tokenCreator.create(user.getId().toString(), now, user.checkIfEverAuthorized());
         logger.info("Registration service - success.");
+        return jwToken;
     }
 
     @Transactional

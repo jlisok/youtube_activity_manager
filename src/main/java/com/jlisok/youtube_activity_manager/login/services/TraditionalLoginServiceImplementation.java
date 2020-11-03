@@ -20,7 +20,7 @@ public class TraditionalLoginServiceImplementation implements TraditionalLoginSe
     private final PasswordEncoder passwordEncoder;
     private final TokenCreator tokenCreator;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final UserLoginDetails dummyUser = new UserLoginDetails(UUID.randomUUID(), "");
+    private final UserLoginDetails dummyUser = new UserLoginDetails(UUID.randomUUID(), "", false);
 
 
     @Autowired
@@ -36,18 +36,18 @@ public class TraditionalLoginServiceImplementation implements TraditionalLoginSe
     public String authenticateUser(LoginRequestDto loginRequestDto) throws FailedLoginException {
         UserLoginDetails userLoginDetails = userRepository
                 .findByEmail(loginRequestDto.getEmail())
-                .map(u -> new UserLoginDetails(u.getId(), u.getPassword()))
+                .map(u -> new UserLoginDetails(u.getId(), u.getPassword(), u.checkIfEverAuthorized()))
                 .orElse(dummyUser);
 
         logger.debug("Login Service - fetching user: " + loginRequestDto.getEmail() + " from database - success.");
-        return createTokenIfAuthorized(loginRequestDto, userLoginDetails.getId(), userLoginDetails.getPassword());
+        return createTokenIfAuthorized(loginRequestDto, userLoginDetails);
     }
 
 
-    private String createTokenIfAuthorized(LoginRequestDto dto, UUID userId, String userPassword) throws FailedLoginException {
-        if (passwordEncoder.matches(dto.getPassword(), userPassword)) {
+    private String createTokenIfAuthorized(LoginRequestDto dto, UserLoginDetails userLoginDetails) throws FailedLoginException {
+        if (passwordEncoder.matches(dto.getPassword(), userLoginDetails.getPassword())) {
             Instant now = Instant.now();
-            String token = tokenCreator.create(userId.toString(), now);
+            String token = tokenCreator.create(userLoginDetails.getId().toString(), now, userLoginDetails.getIfEverAuthorized());
             logger.info("Login Service - success.");
             return token;
         } else {
@@ -60,10 +60,13 @@ public class TraditionalLoginServiceImplementation implements TraditionalLoginSe
 
         private final UUID id;
         private final String password;
+        private final boolean ifEverAuthorized;
 
-        UserLoginDetails(UUID id, String password) {
+        UserLoginDetails(UUID id, String password, boolean ifEverAuthorized) {
             this.id = id;
             this.password = password;
+            this.ifEverAuthorized = ifEverAuthorized;
+
         }
 
         UUID getId() {
@@ -72,6 +75,10 @@ public class TraditionalLoginServiceImplementation implements TraditionalLoginSe
 
         String getPassword() {
             return password;
+        }
+
+        boolean getIfEverAuthorized() {
+            return ifEverAuthorized;
         }
     }
 

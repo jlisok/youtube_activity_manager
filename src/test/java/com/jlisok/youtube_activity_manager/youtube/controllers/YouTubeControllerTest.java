@@ -71,7 +71,7 @@ class YouTubeControllerTest implements TestProfile {
         insertUserVideosInDatabase(user, Rating.LIKE);
         insertUserVideosInDatabase(user, Rating.DISLIKE);
         insertChannelsInDatabase(user);
-        jsonHeader = utils.createRequestAuthenticationHeader(user.getId().toString());
+        jsonHeader = utils.createRequestAuthenticationHeader(user.getId().toString(), true);
         id = UUID.randomUUID();
         now = Instant.now();
     }

@@ -51,7 +51,7 @@ class SynchronizationControllerTest {
     @Transactional
     void createInitialConditions() throws RegistrationException {
         user = utils.insertUserInDatabase(utils.createRandomEmail(), utils.createRandomPassword());
-        jsonHeader = authenticationUtils.createRequestAuthenticationHeader(user.getId().toString());
+        jsonHeader = authenticationUtils.createRequestAuthenticationHeader(user.getId().toString(), true);
 
     }
 

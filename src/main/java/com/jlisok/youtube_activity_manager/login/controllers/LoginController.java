@@ -7,6 +7,7 @@ import com.jlisok.youtube_activity_manager.login.services.GoogleLoginService;
 import com.jlisok.youtube_activity_manager.login.services.TraditionalLoginService;
 import com.jlisok.youtube_activity_manager.synchronization.services.YouTubeDataSynchronizationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,15 +35,19 @@ public class LoginController {
     }
 
     @PostMapping
-    public String authenticateUser(@Valid @RequestBody LoginRequestDto loginRequestDto) throws FailedLoginException {
-        return traditionalLoginService.authenticateUser(loginRequestDto);
+    public ResponseEntity<String> authenticateUser(@Valid @RequestBody LoginRequestDto loginRequestDto) throws FailedLoginException {
+        return ResponseEntity
+                .ok()
+                .body(traditionalLoginService.authenticateUser(loginRequestDto));
     }
 
     // Note, that authentication and synchronization processes are run within two separate transactions
     @PostMapping("/viaGoogle")
-    public String authenticateUser(@Valid @RequestBody GoogleLoginRequestDto loginRequestDto) throws GeneralSecurityException, IOException {
+    public ResponseEntity<String> authenticateUser(@Valid @RequestBody GoogleLoginRequestDto loginRequestDto) throws GeneralSecurityException, IOException {
         AuthenticationDto dto = googleLoginService.authenticateUser(loginRequestDto);
         synchronizationService.synchronizeAndSendToCloud(loginRequestDto.getAccessToken(), dto.getUserId()); //asynchronous call
-        return dto.getJwtToken();
+        return ResponseEntity
+                .ok()
+                .body(dto.getJwtToken());
     }
 }

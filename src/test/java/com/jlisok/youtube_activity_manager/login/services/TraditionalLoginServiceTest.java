@@ -3,6 +3,7 @@ package com.jlisok.youtube_activity_manager.login.services;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.jlisok.youtube_activity_manager.login.dto.LoginRequestDto;
+import com.jlisok.youtube_activity_manager.login.utils.JwtClaimNames;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
 import com.jlisok.youtube_activity_manager.testutils.TestProfile;
 import com.jlisok.youtube_activity_manager.testutils.UserUtils;
@@ -33,7 +34,9 @@ class TraditionalLoginServiceTest implements TestProfile {
     private UserRepository userRepository;
 
     @Autowired
-    private TraditionalLoginServiceImplementation traditionalLoginService;
+    private TraditionalLoginService traditionalLoginService;
+
+    private final String dummyGoogleIdToken = "dummyGoogleIdTokenDummyGoogleIdTokenDummyGoogleIdTokenDummyGoogleIdToken";
 
     private String userEmail;
     private String userPassword;
@@ -48,7 +51,27 @@ class TraditionalLoginServiceTest implements TestProfile {
 
 
     @Test
-    void authenticateUser_whenUserIsPresentInDatabaseAndLoginDataAreValid() throws RegistrationException, FailedLoginException {
+    void authenticateUser_whenUserPresentAndLoginDataValidAndEverAuthorizedTrue() throws RegistrationException, FailedLoginException {
+        //given
+        User user = userUtils.createUser(userEmail, userPassword);
+        user.setGoogleIdToken(dummyGoogleIdToken);
+
+        when(userRepository.findByEmail(userEmail))
+                .thenReturn(Optional.of(user));
+
+        //when
+        String token = traditionalLoginService.authenticateUser(dto);
+
+        //then
+        Assertions.assertNotNull(token);
+        DecodedJWT decodedJWT = jwtVerifier.verify(token);
+        Assertions.assertEquals(user.checkIfEverAuthorized(), decodedJWT.getClaim(JwtClaimNames.AUTHORIZED).asBoolean());
+        Assertions.assertEquals(user.getId().toString(), decodedJWT.getSubject());
+    }
+
+
+    @Test
+    void authenticateUser_whenUserPresentAndLoginDataValidAndEverAuthorizedFalse() throws RegistrationException, FailedLoginException {
         //given
         User user = userUtils.createUser(userEmail, userPassword);
 
@@ -61,9 +84,8 @@ class TraditionalLoginServiceTest implements TestProfile {
         //then
         Assertions.assertNotNull(token);
         DecodedJWT decodedJWT = jwtVerifier.verify(token);
-        Assertions.assertEquals(user
-                .getId()
-                .toString(), decodedJWT.getSubject());
+        Assertions.assertEquals(user.checkIfEverAuthorized(), decodedJWT.getClaim(JwtClaimNames.AUTHORIZED).asBoolean());
+        Assertions.assertEquals(user.getId().toString(), decodedJWT.getSubject());
     }
 
 

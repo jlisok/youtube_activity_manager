@@ -93,22 +93,6 @@ public class VideoUtils {
     }
 
 
-    public static List<com.jlisok.youtube_activity_manager.videos.models.Video> createListOfVideosFromYouTubeVideos(List<Video> youtubeVideos, List<Channel> channels, List<VideoCategory> videoCategories) {
-        int channelSize = channels.size();
-        int categoriesSize = videoCategories.size();
-        return youtubeVideos
-                .stream()
-                .map(video -> EntityCreator
-                        .createVideo(video.getId(),
-                                     video.getSnippet(),
-                                     video.getContentDetails(),
-                                     Collections.singletonList("dwdqdqdqd"),
-                                     channels.get(random.nextInt(channelSize)),
-                                     videoCategories.get(random.nextInt(categoriesSize))))
-                .collect(Collectors.toList());
-    }
-
-
     public static List<com.jlisok.youtube_activity_manager.videos.models.Video> createRandomListOfVideos(int size) {
         return IntStream.range(0, size)
                         .mapToObj(i -> createRandomVideo())
@@ -211,13 +195,6 @@ public class VideoUtils {
                                  Instant.now(),
                                  Instant.now()))
                          .collect(Collectors.toList());
-    }
-
-
-    public static UserVideo createUserVideo(com.jlisok.youtube_activity_manager.videos.models.Video video, User user, Rating rating) {
-        UUID id = UUID.randomUUID();
-        Instant now = Instant.now();
-        return new UserVideo(id, user, video, rating, now, now);
     }
 
 

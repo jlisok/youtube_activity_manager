@@ -44,6 +44,9 @@ class RegistrationControllerTest implements TestProfile {
     private UserUtils userUtils;
 
     @Autowired
+    private JwtTokenVerifier tokenVerifier;
+
+    @Autowired
     private MvcResponseVerifier mvcResponseVerifier;
 
     private final String endPointUrl = "/api/v1/registration";
@@ -63,7 +66,8 @@ class RegistrationControllerTest implements TestProfile {
 
         //when //then
         mockMvc.perform(mvcBasicRequestBuilder.setBasicPostRequest(endPointUrl, dto))
-               .andExpect(status().isOk());
+               .andExpect(status().isOk())
+               .andExpect(result -> tokenVerifier.assertTokenNotNull(result));
 
         Optional<User> user = userRepository.findByEmail(dto.getEmail());
         assertTrue(user.isPresent());
