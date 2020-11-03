@@ -2,7 +2,7 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=youtube_activity_manager
 
-FRONTEND_URL=http://localhost
+FRONTEND_URL=http://localhost:3000
 
 GOOGLE_CLIENT_ID=845161221251-8qcjjnqm3a568p0m9alajv2kaa514jot.apps.googleusercontent.com
 
