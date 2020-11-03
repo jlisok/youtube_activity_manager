@@ -1,5 +1,9 @@
+# Welcome to YouTube Activity Manager!
+
+![AWS.alpaca](https://d2xvpza2vzjrcj.cloudfront.net/alpaca.gif)
+
 # Project description
-YouTube Activity Manager is an application that I have whipped up as a showcase of my programming skills and build my portfolio as an inspiring Junior Java Developer.
+YouTube Activity Manager found at [jlisok.pl] is an application that I have whipped up as a showcase of my programming skills and build my portfolio as an inspiring Junior Java Developer.
 
 YouTube Activity Manager is a web application that integrates with Google, YouTube and AWS S3 APIs to present you with your Youtube activity. You can use this app to view your favourite YouTube videos, channels that you are subscribed to and some associated stats. The application uploads anonymized portions of acquired data to the cloud, to simulate data gathering for BigData processing. Just to let you know, they are not processed any further.
 
@@ -8,8 +12,8 @@ YouTube Activity Manager uses a handful of open source libraries / frameworks to
 
 ##### Backend:
 * [Java14] - core functionalities
-* [Spring Boot] - building dependency tree and much more
-* [Hibernate] - management of the persistence model
+* [Spring Boot] - building dependency tree, providing HTTP and REST frameworks
+* [Hibernate] - ORM
 * [PostgreSQL] - database management system
 * [Liquibase] - database version control
 * [Docker] - running the application on the production environment, building application images
@@ -20,32 +24,46 @@ YouTube Activity Manager uses a handful of open source libraries / frameworks to
 * [Bootstrap4] - designing and styling components
 
 ##### Cloud:
-*  [AWS EC2] - docker containers with application components
+* [AWS EC2] - running docker containers with application components
 * [AWS ECR] - docker images of application components
+* [AWS CloudWatch] - production logs
 * [AWS S3] - data storage
-* [AWS ELB] - passes requests to target groups and terminates HTTPS
 * [AWS RDS] - PostgreSQL instance
-* [AWS Route53] - receives requests
+* [AWS ELB] - passes requests to target groups and terminates HTTPS
+* [AWS Route53] - DNS
+* [AWS CloudFront] - serving static assets
 
 # External APIs
 The application integrates with the following APIs:
 * Google OAuth2 - where users are being authorized and where the application gets access token to YouTube Api
 * YouTube Data Api - where the application receives resources associated with users YouTube activity
-* AWS S3 - where the appliaction stores select data to simulate their gathering for BigData processing
+* AWS S3 - where the application stores select data to simulate their gathering for BigData processing
 
 # Instructions
 To run YouTube Activity Manager on your local machine, you should install JDK14, IDE of your choice and PostgreSQL prior to application import. Next, build the application dependencies.
-```sh
-$ cd [MAIN_FOLDER_OF_THE_PROJECT]
-$ ./gradlew build
-```
-Before starting the application locally, you need to add .environemnt.local file to the main folder of the project, where you supply the application with such environment properties, as:
+
+Before starting the application locally, you need to add `.environment.local` file to the main folder of the project, where you supply the application with such environment properties, as:
 - DB_USERNAME - postgreSQL login
 - DB_PASSWORD - postgreSQL password
-- FRONTEND_URL - adress to localhost
 - AWS_S3_ACCESS_KEY_ID - access key for AWS S3
 - AWS_S3_SECRET_ACCESS_KEY_ID - secret access key for AWS S3
 - URL_TO_GOOGLE_CREDENTIALS - path to google client secrets
+
+Here is an example of `.environment.local file` with all necessary environment variables to be filled in.
+```
+DB_USERNAME=
+DB_PASSWORD=
+AWS_S3_ACCESS_KEY_ID=
+AWS_S3_SECRET_ACCESS_KEY_ID=
+URL_TO_GOOGLE_CREDENTIALS=
+```
+
+To run this application, execute the following command: 
+```sh
+$ ./gradlew bootRun
+```
+
+The instruction on how to run frontend can be found within [Frontend] project README. 
 
 # Docs
 ## How does the application run on production?
@@ -57,7 +75,7 @@ The deployment project contains GitHub CI jobs that start the above images on th
 
 The ELB Application Load Balancer routes incoming requests to one of the above Target Groups based on their paths. The ELB Application Load Balancer also handles HTTPS termination, by means of a SSL certificate managed by AWS Certificate Manager. All network traffic inside the secure AWS network is unencrypted. ELB enforces HTTPS by redirecting all incoming HTTP traffic to HTTPS on port 443.
 
-DNS mapping of the jlisok.pl URL to the ELB instance is handled by Route53. React.js "almost single-page" web application is served under the jlisok.pl URL by the youtube_activity_manager_frontend container running in the EC2 instance. All REST API requests are handled by the youtube_activity_manager container running in the EC2 instance.
+DNS mapping of the [jlisok.pl] URL to the ELB instance is handled by Route53. React.js "almost single-page" web application is served under the [jlisok.pl] URL by the youtube_activity_manager_frontend container running in the EC2 instance. All REST API requests are handled by the youtube_activity_manager container running in the EC2 instance.
 
 ## How does the Database look like?
 As previously mentioned, data gathered by YouTube Activity Manager are stored in PostgreSQL DBMS. Database relations are presented below. Login and registration data are stored within two entities: users and user_personal_data related to each other with one-to-one relationship via id primary keys. Users table holds information necessary for authentication and authorization purposes within the application itself and YouTube client API. On the other hand, user_personal_data stores data acquired from the user's registration form.
@@ -93,7 +111,7 @@ Each user has 4 different options to acquire access to YouTube Activity manager:
 ![AWS](https://d2xvpza2vzjrcj.cloudfront.net/flow_charts-user_login.jpg)
 
 ## YouTube Activity Manager Endpoints
-Below, we present basic docs of all endpoint functionalities available in YouTube Activity Manager, so you can get a gist of what the application can do and designed for.
+Below, we present basic docs of all endpoint functionalities available in YouTube Activity Manager, so you can get a gist of what the application can do and is designed for.
 
 #### /api/v1/aboutus
 The endpoint accepts basic GET method and serves the information on the current version of the application as well as the contact email. This endpoint does not require authentication credentials.
@@ -121,9 +139,9 @@ Host: jlisok.pl
 
 This endpoint does not require authentication credentials.
 
-A healthy application instance responds with (body):
+A healthy application instance responds with 200 status and
 ```json
-OK
+"OK"
 ```
 
 #### /api/v1/login
@@ -143,9 +161,7 @@ Content-Type: application/json
 
 Successful login process sends JWT in the response body, similar to the following:
 ```json
-{
-eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmMDAwMDZhOS04ZWU0LTQ5NzgtYjI0NS0wZWI3 NDg0MWM4MGQiLCJpc3MiOiJcImNvbS5qbGlzb2sueW91dHViZV9hY3Rpdml0eV9tYW5hZ2VyXCIiLCJleHAiOjE2MDQ0MDc2NzYsImlhdCI6MTYwNDQwMjI3Nn0.v6J0CeHMdGb-2Oe_xYtWo9dEozwd-7_xlNgvZ2KS_MhpsFL-F443IP1YD2QXN5cMW0F9szAkLabySoS9bTx3mA
-}
+"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmMDAwMDZhOS04ZWU0LTQ5NzgtYjI0NS0wZWI3 NDg0MWM4MGQiLCJpc3MiOiJcImNvbS5qbGlzb2sueW91dHViZV9hY3Rpdml0eV9tYW5hZ2VyXCIiLCJleHAiOjE2MDQ0MDc2NzYsImlhdCI6MTYwNDQwMjI3Nn0.v6J0CeHMdGb-2Oe_xYtWo9dEozwd-7_xlNgvZ2KS_MhpsFL-F443IP1YD2QXN5cMW0F9szAkLabySoS9bTx3mA"
 ```
 
 #### /api/v1/login/viaGoogle
@@ -171,8 +187,7 @@ This endpoint is available for authenticated users only. It links google credent
 ````
 POST /api/v1/login/authorize HTTP/1.1
 Host: jlisok.pl
-Authorization:
-        Bearer: exampleDummyJWToken
+Authorization: Bearer: exampleDummyJWToken
 Content-Type: application/json
 ````
 ```json
@@ -211,8 +226,7 @@ This endpoint handles calculating rated video statistics grouped by video catego
 ````
 GET /api/v1/statistics/category HTTP/1.1
 Host: jlisok.pl
-Authorization:
-        Bearer: exampleDummyJWToken
+Authorization: Bearer: exampleDummyJWToken
 ````
 
 A successful response contains the body with statistics and timestamp as well as the state of the last YouTube API synchronization.
@@ -242,8 +256,7 @@ The endpoint is the same as the previous one, except that statistics are grouped
 ````
 GET /api/v1/statistics/creator HTTP/1.1
 Host: jlisok.pl
-Authorization:
-        Bearer: exampleDummyJWToken
+Authorization: Bearer: exampleDummyJWToken
 ````
 
 A successful response contains the body with statistics and timestamp as well as the state of the last YouTube API synchronization.
@@ -272,11 +285,10 @@ Returns the timestamp of the last user's successful synchronization with YouTube
 ````
 GET /api/v1/synchronization HTTP/1.1
 Host: jlisok.pl
-Authorization:
-        Bearer: exampleDummyJWToken
+Authorization: Bearer: exampleDummyJWToken
 ````
 
-A successful response body should be similar to:
+A successful response body is a ISO-8601 timestamp:
 ```json
 "2020-11-03T11:23:00Z"
 ```
@@ -286,8 +298,7 @@ The endpoint returns the list of rated (liked / disliked) YouTube videos by the 
 ````
 GET /api/v1/youtube/videos?rating=LIKE HTTP/1.1
 Host: jlisok.pl
-Authorization:
-        Bearer: exampleDummyJWToken
+Authorization: Bearer: exampleDummyJWToken
 ````
 
 A successful response contains a list of attributes associated with videos, i.e. and timestamp as well as state of the last YouTube API synchronization.
@@ -314,8 +325,7 @@ This endpoint is like the previous one, except it returns the list of subscribed
 ````
 GET /api/v1/youtube/channels HTTP/1.1
 Host: jlisok.pl
-Authorization:
-        Bearer: exampleDummyJWToken
+Authorization: Bearer: exampleDummyJWToken
 ````
 
 A successful response contains a list of attributes associated with channels, i.e channel id, title, channel publish date, channel stats and timestamp as well as state of the last YouTube API synchronization.
@@ -356,6 +366,8 @@ Creative Commons
    [AWS ELB]: <https://aws.amazon.com/elasticloadbalancing/>
    [AWS RDS]: <https://aws.amazon.com/rds/>
    [AWS Route53]: <https://aws.amazon.com/route53/>
+   [AWS CloudWatch]: <https://aws.amazon.com/cloudwatch/>
+   [AWS CloudFront]: <https://aws.amazon.com/cloudfront/>
 
    [React.js]: <https://reactjs.org/>
    [Axios]: <https://github.com/axios/axios>
@@ -364,3 +376,5 @@ Creative Commons
    [Backend]: <https://github.com/jlisok/youtube_activity_manager>
    [Frontend]: <https://github.com/jlisok/youtube_activity_manager_frontend>
    [Deployment]: <https://github.com/jlisok/youtube_activity_manager_deployment>
+   
+   [jlisok.pl]: <https://jlisok.pl/>
