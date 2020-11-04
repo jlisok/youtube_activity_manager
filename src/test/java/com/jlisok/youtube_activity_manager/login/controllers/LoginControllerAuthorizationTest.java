@@ -5,6 +5,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.jlisok.youtube_activity_manager.login.dto.GoogleRequestDto;
 import com.jlisok.youtube_activity_manager.login.exceptions.DataInconsistencyAuthenticationException;
 import com.jlisok.youtube_activity_manager.login.exceptions.EmailNotVerifiedAuthenticationException;
+import com.jlisok.youtube_activity_manager.login.exceptions.GoogleIdsDoNotMatchException;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
 import com.jlisok.youtube_activity_manager.testutils.*;
 import com.jlisok.youtube_activity_manager.users.models.User;
@@ -137,7 +138,7 @@ class LoginControllerAuthorizationTest implements TestProfile {
                 .perform(mvcBasicRequestBuilder.setPostRequestWithAuthorizationHeader(endPoint, jsonHeader, dto))
                 .andExpect(status().isForbidden())
                 .andExpect(Assertions::assertNotNull)
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof DataInconsistencyAuthenticationException));
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof GoogleIdsDoNotMatchException));
     }
 
 

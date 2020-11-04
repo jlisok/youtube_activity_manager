@@ -4,8 +4,8 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.jlisok.youtube_activity_manager.login.dto.AuthenticationDto;
 import com.jlisok.youtube_activity_manager.login.dto.GoogleRequestDto;
 import com.jlisok.youtube_activity_manager.login.exceptions.AuthorizationException;
-import com.jlisok.youtube_activity_manager.login.exceptions.DataInconsistencyAuthenticationException;
 import com.jlisok.youtube_activity_manager.login.exceptions.EmailNotVerifiedAuthenticationException;
+import com.jlisok.youtube_activity_manager.login.exceptions.GoogleIdsDoNotMatchException;
 import com.jlisok.youtube_activity_manager.login.utils.GoogleTokenVerifier;
 import com.jlisok.youtube_activity_manager.login.utils.TokenCreator;
 import com.jlisok.youtube_activity_manager.security.configs.JwtAuthenticationContext;
@@ -74,7 +74,7 @@ public class GoogleAuthorizationServiceImplementation implements GoogleAuthoriza
                     if (googleId.equals(payload.getSubject())) {
                         return user;
                     } else {
-                        throw new DataInconsistencyAuthenticationException("Authorizing userId " + user.getId() + " failed. Google account inconsistent with database.");
+                        throw new GoogleIdsDoNotMatchException("Authorizing userId " + user.getId() + " failed. Google id from token inconsistent with database google id.");
                     }
                 })
                 .orElse(user);

@@ -8,6 +8,7 @@ import com.jlisok.youtube_activity_manager.login.dto.GoogleRequestDto;
 import com.jlisok.youtube_activity_manager.login.exceptions.AuthorizationException;
 import com.jlisok.youtube_activity_manager.login.exceptions.DataInconsistencyAuthenticationException;
 import com.jlisok.youtube_activity_manager.login.exceptions.EmailNotVerifiedAuthenticationException;
+import com.jlisok.youtube_activity_manager.login.exceptions.GoogleIdsDoNotMatchException;
 import com.jlisok.youtube_activity_manager.login.utils.GoogleTokenVerifier;
 import com.jlisok.youtube_activity_manager.login.utils.JwtClaimNames;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
@@ -171,7 +172,7 @@ class GoogleAuthorizationServiceImplementationTest implements TestProfile {
                 .thenReturn(Optional.of(user));
 
         //when //then
-        Assertions.assertThrows(DataInconsistencyAuthenticationException.class, () -> googleService.authorizeUser(dto));
+        Assertions.assertThrows(GoogleIdsDoNotMatchException.class, () -> googleService.authorizeUser(dto));
     }
 
 
