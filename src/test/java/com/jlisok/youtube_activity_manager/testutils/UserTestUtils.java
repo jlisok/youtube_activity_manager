@@ -70,6 +70,28 @@ public class UserTestUtils implements TestProfile {
     }
 
 
+    public User createUserAndSetDummyGoogleTokens(String userEmail) {
+        var id = UUID.randomUUID();
+        var now = Instant.now();
+        UserPersonalData userPersonalData = new UserPersonalDataBuilder()
+                .setId(id)
+                .setCreatedAt(now)
+                .setModifiedAt(now)
+                .createUserPersonalData();
+        return new UserBuilder()
+                .setId(id)
+                .setEmail(userEmail)
+                .setPassword(createRandomPassword())
+                .setGoogleId(UUID.randomUUID().toString())
+                .setAccessToken("dummyAccessToken")
+                .setGoogleIdToken("dummyGoogleIdToken")
+                .setUserPersonalData(userPersonalData)
+                .setCreatedAt(now)
+                .setModifiedAt(now)
+                .createUser();
+    }
+
+
     public User createUser(String userEmail, String userPassword) throws RegistrationException {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();

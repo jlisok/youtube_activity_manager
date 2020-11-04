@@ -2,9 +2,7 @@ package com.jlisok.youtube_activity_manager.login.controllers;
 
 import com.jlisok.youtube_activity_manager.domain.exceptions.BaseExceptionHandler;
 import com.jlisok.youtube_activity_manager.domain.exceptions.ResponseCode;
-import com.jlisok.youtube_activity_manager.login.exceptions.AuthorizationException;
-import com.jlisok.youtube_activity_manager.login.exceptions.DataInconsistencyAuthenticationException;
-import com.jlisok.youtube_activity_manager.login.exceptions.EmailNotVerifiedAuthenticationException;
+import com.jlisok.youtube_activity_manager.login.exceptions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -50,9 +48,19 @@ public class LoginControllerAdvice extends BaseExceptionHandler {
         return handleExceptionWithInfoLogging(ResponseCode.LOGIN_FAILED_GOOGLE_ACCOUNT_ALREADY_EXISTS, HttpStatus.FORBIDDEN, exception);
     }
 
+    @ExceptionHandler({GoogleIdsDoNotMatchException.class})
+    public ResponseEntity<Object> handleFailedLoginException(GoogleIdsDoNotMatchException exception) {
+        return handleExceptionWithInfoLogging(ResponseCode.AUTHORIZATION_FAILED_GOOGLE_ID_INCONSISTENT_WITH_DATABASE, HttpStatus.FORBIDDEN, exception);
+    }
 
     @ExceptionHandler({AuthorizationException.class})
     public ResponseEntity<Object> handleFailedLoginException(AuthorizationException exception) {
         return handleExceptionWithInfoLogging(ResponseCode.AUTHORIZATION_FAILED_USER_NOT_FOUND, HttpStatus.BAD_REQUEST, exception);
     }
+
+    @ExceptionHandler({DemoUserNotFound.class})
+    public ResponseEntity<Object> handleFailedLoginException(DemoUserNotFound exception) {
+        return handleExceptionWithInfoLogging(ResponseCode.AUTHORIZATION_FAILED_USER_NOT_FOUND, HttpStatus.INTERNAL_SERVER_ERROR, exception);
+    }
+
 }

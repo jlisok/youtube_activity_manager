@@ -3,6 +3,7 @@ package com.jlisok.youtube_activity_manager.login.controllers;
 import com.jlisok.youtube_activity_manager.login.dto.AuthenticationDto;
 import com.jlisok.youtube_activity_manager.login.dto.GoogleRequestDto;
 import com.jlisok.youtube_activity_manager.login.dto.LoginRequestDto;
+import com.jlisok.youtube_activity_manager.login.services.DemoUserAuthenticationService;
 import com.jlisok.youtube_activity_manager.login.services.GoogleAuthorizationService;
 import com.jlisok.youtube_activity_manager.login.services.GoogleLoginService;
 import com.jlisok.youtube_activity_manager.login.services.TraditionalLoginService;
@@ -27,14 +28,16 @@ public class LoginController {
     private final GoogleLoginService googleLoginService;
     private final GoogleAuthorizationService googleAuthorizationService;
     private final YouTubeDataSynchronizationService synchronizationService;
+    private final DemoUserAuthenticationService demoUserAuthenticationService;
 
 
     @Autowired
-    public LoginController(TraditionalLoginService traditionalLoginService, GoogleLoginService googleLoginService, GoogleAuthorizationService googleAuthorizationService, YouTubeDataSynchronizationService synchronizationService) {
+    public LoginController(TraditionalLoginService traditionalLoginService, GoogleLoginService googleLoginService, GoogleAuthorizationService googleAuthorizationService, YouTubeDataSynchronizationService synchronizationService, DemoUserAuthenticationService demoUserAuthenticationService) {
         this.traditionalLoginService = traditionalLoginService;
         this.googleLoginService = googleLoginService;
         this.googleAuthorizationService = googleAuthorizationService;
         this.synchronizationService = synchronizationService;
+        this.demoUserAuthenticationService = demoUserAuthenticationService;
     }
 
     @PostMapping
@@ -43,6 +46,15 @@ public class LoginController {
                 .ok()
                 .body(traditionalLoginService.authenticateUser(loginRequestDto));
     }
+
+
+    @PostMapping("/demoUser")
+    public ResponseEntity<String> authenticateDemoUser() {
+        return ResponseEntity
+                .ok()
+                .body(demoUserAuthenticationService.authenticateUser());
+    }
+
 
     // Note, that authentication and synchronization processes are run within two separate transactions
     @PostMapping("/viaGoogle")

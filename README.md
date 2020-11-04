@@ -181,6 +181,19 @@ Content-Type: application/json
 
 The successful response body contains valid JWT (as presented in /login).
 
+
+#### /api/v1/login/demoUser
+This endpoint (permitted to all users) uses a Demo User account to showcase the functionality of the application for those users who don't want to be bothered with creating an account. It accepts POST request.
+
+````
+POST /api/v1/login/demoUser HTTP/1.1
+Host: jlisok.pl
+Content-Type: application/json
+````
+
+The successful response body contains valid JWT (as presented in /login).
+
+
 #### /api/v1/login/authorize
 This endpoint is available for authenticated users only. It links google credentials with the user's account. The endpoint accepts POST method with the following structure:
 
