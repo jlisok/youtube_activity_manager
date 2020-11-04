@@ -12,8 +12,6 @@ AWS_REGION=eu-central-1
 
 DEMO_USER_EMAIL=alpaca@lover.com
 
-DEMO_USER_PASSWORD=!!! PROVIDE YOUR OWN VALUE IN .environment.local !!!
-
 AWS_S3_ACCESS_KEY_ID=!!! PROVIDE YOUR OWN VALUE IN .environment.local !!!
 AWS_S3_SECRET_ACCESS_KEY_ID=!!! PROVIDE YOUR OWN VALUE IN .environment.local !!!
 
