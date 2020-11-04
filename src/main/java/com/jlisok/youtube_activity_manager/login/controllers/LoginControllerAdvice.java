@@ -4,6 +4,7 @@ import com.jlisok.youtube_activity_manager.domain.exceptions.BaseExceptionHandle
 import com.jlisok.youtube_activity_manager.domain.exceptions.ResponseCode;
 import com.jlisok.youtube_activity_manager.login.exceptions.AuthorizationException;
 import com.jlisok.youtube_activity_manager.login.exceptions.DataInconsistencyAuthenticationException;
+import com.jlisok.youtube_activity_manager.login.exceptions.DemoUserNotFound;
 import com.jlisok.youtube_activity_manager.login.exceptions.EmailNotVerifiedAuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,4 +56,10 @@ public class LoginControllerAdvice extends BaseExceptionHandler {
     public ResponseEntity<Object> handleFailedLoginException(AuthorizationException exception) {
         return handleExceptionWithInfoLogging(ResponseCode.AUTHORIZATION_FAILED_USER_NOT_FOUND, HttpStatus.BAD_REQUEST, exception);
     }
+
+    @ExceptionHandler({DemoUserNotFound.class})
+    public ResponseEntity<Object> handleFailedLoginException(DemoUserNotFound exception) {
+        return handleExceptionWithInfoLogging(ResponseCode.AUTHORIZATION_FAILED_USER_NOT_FOUND, HttpStatus.INTERNAL_SERVER_ERROR, exception);
+    }
+
 }
