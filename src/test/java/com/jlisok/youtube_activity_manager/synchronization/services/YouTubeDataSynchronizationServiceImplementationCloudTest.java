@@ -9,7 +9,7 @@ import com.jlisok.youtube_activity_manager.cloudData.utils.KeyNameCreator;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
 import com.jlisok.youtube_activity_manager.testutils.ChannelAndSubscriptionUtils;
 import com.jlisok.youtube_activity_manager.testutils.TestProfile;
-import com.jlisok.youtube_activity_manager.testutils.UserUtils;
+import com.jlisok.youtube_activity_manager.testutils.UserTestUtils;
 import com.jlisok.youtube_activity_manager.testutils.VideoUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
@@ -56,7 +56,7 @@ class YouTubeDataSynchronizationServiceImplementationCloudTest implements TestPr
     private VideoCategoryRepository videoCategoryRepository;
 
     @Autowired
-    private UserUtils userUtils;
+    private UserTestUtils userTestUtils;
 
     @Autowired
     private YouTubeDataSynchronizationServiceImplementation service;
@@ -78,7 +78,7 @@ class YouTubeDataSynchronizationServiceImplementationCloudTest implements TestPr
 
     @BeforeEach
     void createInitialConditions() throws RegistrationException {
-        user = userUtils.createUser(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        user = userTestUtils.createUser(userTestUtils.createRandomEmail(), userTestUtils.createRandomPassword());
         info = new AwsObjectInfo(bucketName, keyName);
     }
 

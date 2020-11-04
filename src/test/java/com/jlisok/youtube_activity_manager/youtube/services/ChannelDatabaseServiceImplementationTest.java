@@ -5,7 +5,7 @@ import com.jlisok.youtube_activity_manager.channels.repositories.ChannelReposito
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
 import com.jlisok.youtube_activity_manager.testutils.ChannelAndSubscriptionUtils;
 import com.jlisok.youtube_activity_manager.testutils.TestProfile;
-import com.jlisok.youtube_activity_manager.testutils.UserUtils;
+import com.jlisok.youtube_activity_manager.testutils.UserTestUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.youtube.utils.IdsFetcher;
 import org.junit.jupiter.api.Assertions;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 class ChannelDatabaseServiceImplementationTest implements TestProfile {
 
     @Autowired
-    private UserUtils userUtils;
+    private UserTestUtils userTestUtils;
 
     @Captor
     private ArgumentCaptor<List<Channel>> captor;
@@ -51,7 +51,7 @@ class ChannelDatabaseServiceImplementationTest implements TestProfile {
 
     @BeforeEach
     void createBoundaryConditions() throws RegistrationException {
-        user = userUtils.createUser(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        user = userTestUtils.createUser(userTestUtils.createRandomEmail(), userTestUtils.createRandomPassword());
         channels = ChannelAndSubscriptionUtils.createRandomListOfChannels(2, user);
         channelIds = IdsFetcher.getIdsFrom(channels, Channel::getYouTubeChannelId);
     }
@@ -79,7 +79,7 @@ class ChannelDatabaseServiceImplementationTest implements TestProfile {
     @Test
     void updateChannelsInDatabase_whenAllChannelsToUpdate() throws RegistrationException {
         //given
-        User userInDatabase = userUtils.createUser(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        User userInDatabase = userTestUtils.createUser(userTestUtils.createRandomEmail(), userTestUtils.createRandomPassword());
         List<Channel> repositoryChannels = ChannelAndSubscriptionUtils.copyOfMinus30MinutesCreatedAt(channels, userInDatabase);
 
         when(repository.findAllByYouTubeChannelIdIn(channelIds))

@@ -2,6 +2,7 @@ package com.jlisok.youtube_activity_manager.login.controllers;
 
 import com.jlisok.youtube_activity_manager.domain.exceptions.BaseExceptionHandler;
 import com.jlisok.youtube_activity_manager.domain.exceptions.ResponseCode;
+import com.jlisok.youtube_activity_manager.login.exceptions.AuthorizationException;
 import com.jlisok.youtube_activity_manager.login.exceptions.DataInconsistencyAuthenticationException;
 import com.jlisok.youtube_activity_manager.login.exceptions.EmailNotVerifiedAuthenticationException;
 import org.slf4j.Logger;
@@ -47,5 +48,11 @@ public class LoginControllerAdvice extends BaseExceptionHandler {
     @ExceptionHandler({DataInconsistencyAuthenticationException.class})
     public ResponseEntity<Object> handleFailedLoginException(DataInconsistencyAuthenticationException exception) {
         return handleExceptionWithInfoLogging(ResponseCode.LOGIN_FAILED_GOOGLE_ACCOUNT_ALREADY_EXISTS, HttpStatus.FORBIDDEN, exception);
+    }
+
+
+    @ExceptionHandler({AuthorizationException.class})
+    public ResponseEntity<Object> handleFailedLoginException(AuthorizationException exception) {
+        return handleExceptionWithInfoLogging(ResponseCode.AUTHORIZATION_FAILED_USER_NOT_FOUND, HttpStatus.BAD_REQUEST, exception);
     }
 }

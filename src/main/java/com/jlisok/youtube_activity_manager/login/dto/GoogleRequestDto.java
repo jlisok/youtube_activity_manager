@@ -3,7 +3,7 @@ package com.jlisok.youtube_activity_manager.login.dto;
 import javax.validation.constraints.NotBlank;
 
 
-public class GoogleLoginRequestDto {
+public class GoogleRequestDto {
 
     @NotBlank
     private final String googleIdToken;
@@ -11,7 +11,7 @@ public class GoogleLoginRequestDto {
     @NotBlank
     private final String accessToken;
 
-    public GoogleLoginRequestDto(String googleIdToken, String accessToken) {
+    public GoogleRequestDto(String googleIdToken, String accessToken) {
         this.googleIdToken = googleIdToken;
         this.accessToken = accessToken;
     }

@@ -21,6 +21,16 @@ public class MockGoogleIdToken {
         return new GoogleIdToken(header, payload, signatureByte, signatureByte);
     }
 
+    public static GoogleIdToken createExpiredGoogleIdTokenFrom(GoogleIdToken googleIdToken) {
+        Header newHeader = googleIdToken.getHeader();
+        Instant issuedAtTime = Instant.now().minus(Duration.ofDays(32));
+        Instant expirationTime = Instant.now().minus(Duration.ofDays(30));
+        newHeader.set("iat", issuedAtTime);
+        newHeader.set("exp", expirationTime);
+        return new GoogleIdToken(newHeader, googleIdToken.getPayload(), googleIdToken.getSignatureBytes(), googleIdToken
+                .getSignedContentBytes());
+    }
+
 
     private static Header createHeader() {
         Instant issuedAtTime = Instant
@@ -45,7 +55,7 @@ public class MockGoogleIdToken {
         payload.setEmail(email);
         payload.setSubject(googleId);
         payload.setEmailVerified(ifEmailVerified);
-        if (ifFirstNamePresent){
+        if (ifFirstNamePresent) {
             payload.set("given_name", "Joe");
         }
         payload.set("last_name", "Doe");

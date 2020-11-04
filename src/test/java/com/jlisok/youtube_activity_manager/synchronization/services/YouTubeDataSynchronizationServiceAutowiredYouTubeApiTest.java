@@ -6,8 +6,9 @@ import com.jlisok.youtube_activity_manager.synchronization.domain.Synchronizatio
 import com.jlisok.youtube_activity_manager.synchronization.domain.SynchronizationStatus;
 import com.jlisok.youtube_activity_manager.synchronization.repositories.SynchronizationRepository;
 import com.jlisok.youtube_activity_manager.testutils.TestChannelRepository;
+import com.jlisok.youtube_activity_manager.testutils.TestProfile;
 import com.jlisok.youtube_activity_manager.testutils.TestUserVideoRepository;
-import com.jlisok.youtube_activity_manager.testutils.UserUtils;
+import com.jlisok.youtube_activity_manager.testutils.UserTestUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
 import com.jlisok.youtube_activity_manager.videos.repositories.UserVideoRepository;
@@ -19,7 +20,7 @@ import java.util.UUID;
 
 @SpringBootTest
 @Disabled("YouTube API requires valid access token to download data, which needs to be typed manually in due time")
-class YouTubeDataSynchronizationServiceAutowiredYouTubeApiTest {
+class YouTubeDataSynchronizationServiceAutowiredYouTubeApiTest implements TestProfile {
 
     @Autowired
     private YouTubeDataSynchronizationServiceImplementation youTubeDataSynchronizationService;
@@ -43,7 +44,7 @@ class YouTubeDataSynchronizationServiceAutowiredYouTubeApiTest {
     private UserRepository userRepository;
 
     @Autowired
-    private UserUtils userUtils;
+    private UserTestUtils userTestUtils;
 
     private final String accessToken = "dummyAccessTokenDummyAccessToken";
 
@@ -51,7 +52,7 @@ class YouTubeDataSynchronizationServiceAutowiredYouTubeApiTest {
 
     @BeforeEach
     void createInitialConditions() throws RegistrationException {
-        user = userUtils.insertUserInDatabase(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        user = userTestUtils.insertUserInDatabase(userTestUtils.createRandomEmail(), userTestUtils.createRandomPassword());
     }
 
 

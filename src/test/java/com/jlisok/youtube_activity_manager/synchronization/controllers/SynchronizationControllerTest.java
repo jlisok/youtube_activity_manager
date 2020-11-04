@@ -4,10 +4,7 @@ import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationE
 import com.jlisok.youtube_activity_manager.synchronization.domain.SynchronizationState;
 import com.jlisok.youtube_activity_manager.synchronization.domain.SynchronizationStatus;
 import com.jlisok.youtube_activity_manager.synchronization.repositories.SynchronizationRepository;
-import com.jlisok.youtube_activity_manager.testutils.AuthenticationUtils;
-import com.jlisok.youtube_activity_manager.testutils.MockMvcBasicRequestBuilder;
-import com.jlisok.youtube_activity_manager.testutils.UserUtils;
-import com.jlisok.youtube_activity_manager.testutils.YouTubeEntityVerifier;
+import com.jlisok.youtube_activity_manager.testutils.*;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,10 +24,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class SynchronizationControllerTest {
+class SynchronizationControllerTest implements TestProfile {
 
     @Autowired
-    private UserUtils utils;
+    private UserTestUtils utils;
 
     @Autowired
     private AuthenticationUtils authenticationUtils;

@@ -37,5 +37,4 @@ public class TokenCreator {
                   .withExpiresAt(Date.from(expirationTime))
                   .sign(algorithm);
     }
-
 }

@@ -3,7 +3,7 @@ package com.jlisok.youtube_activity_manager.youtube.services;
 import com.jlisok.youtube_activity_manager.channels.models.Channel;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
 import com.jlisok.youtube_activity_manager.testutils.TestProfile;
-import com.jlisok.youtube_activity_manager.testutils.UserUtils;
+import com.jlisok.youtube_activity_manager.testutils.UserTestUtils;
 import com.jlisok.youtube_activity_manager.testutils.VideoUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.videoCategories.models.VideoCategory;
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 class VideoServiceImplementationTest implements TestProfile {
 
     @Autowired
-    private UserUtils userUtils;
+    private UserTestUtils userTestUtils;
 
     @Autowired
     private VideoService service;
@@ -52,7 +52,7 @@ class VideoServiceImplementationTest implements TestProfile {
     @BeforeAll
     void prepareInitialConditions() throws RegistrationException {
         youtubeChannels = createRandomYouTubeChannelList(1);
-        user = userUtils.createUser(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        user = userTestUtils.createUser(userTestUtils.createRandomEmail(), userTestUtils.createRandomPassword());
         channels = youtubeChannels
                 .stream()
                 .map(ytChannel -> EntityCreator

@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 class UserActivityServiceImplementationTest implements TestProfile {
 
     @Autowired
-    private UserUtils userUtils;
+    private UserTestUtils userTestUtils;
 
     @Autowired
     private UserActivityService userActivityService;
@@ -59,7 +59,7 @@ class UserActivityServiceImplementationTest implements TestProfile {
 
     @BeforeEach
     void createInitialConditions() throws RegistrationException {
-        user = userUtils.createUser(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        user = userTestUtils.createUser(userTestUtils.createRandomEmail(), userTestUtils.createRandomPassword());
         channels = ChannelAndSubscriptionUtils.createRandomListOfChannels(20, user);
         var videos = VideoUtils.createRandomListOfVideos(channels.size());
         userVideos = VideoUtils.createListOfUserVideos(videos, user, rating);

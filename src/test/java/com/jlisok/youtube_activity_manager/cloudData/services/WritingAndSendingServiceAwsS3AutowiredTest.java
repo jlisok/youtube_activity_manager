@@ -6,7 +6,7 @@ import com.jlisok.youtube_activity_manager.cloudData.client.AwsObjectInfo;
 import com.jlisok.youtube_activity_manager.cloudData.utils.KeyNameCreator;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
 import com.jlisok.youtube_activity_manager.testutils.TestProfile;
-import com.jlisok.youtube_activity_manager.testutils.UserUtils;
+import com.jlisok.youtube_activity_manager.testutils.UserTestUtils;
 import com.jlisok.youtube_activity_manager.testutils.VideoUtils;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.videos.models.Video;
@@ -29,7 +29,7 @@ class WritingAndSendingServiceAwsS3AutowiredTest implements TestProfile {
     private AmazonS3 client;
 
     @Autowired
-    private UserUtils userUtils;
+    private UserTestUtils userTestUtils;
 
     @Autowired
     private WritingAndSendingService<List<Video>> service;
@@ -48,7 +48,7 @@ class WritingAndSendingServiceAwsS3AutowiredTest implements TestProfile {
 
     @BeforeEach
     void createInitialConditions() throws RegistrationException {
-        user = userUtils.createUser(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        user = userTestUtils.createUser(userTestUtils.createRandomEmail(), userTestUtils.createRandomPassword());
         videos = VideoUtils.createRandomListOfVideos(10);
         info = new AwsObjectInfo(bucketName, keyName);
     }

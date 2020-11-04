@@ -2,22 +2,20 @@ package com.jlisok.youtube_activity_manager.login.services;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.jlisok.youtube_activity_manager.login.dto.AuthenticationDto;
-import com.jlisok.youtube_activity_manager.login.dto.GoogleLoginRequestDto;
-import com.jlisok.youtube_activity_manager.login.exceptions.DataInconsistencyAuthenticationException;
+import com.jlisok.youtube_activity_manager.login.dto.GoogleRequestDto;
 import com.jlisok.youtube_activity_manager.login.exceptions.EmailNotVerifiedAuthenticationException;
+import com.jlisok.youtube_activity_manager.login.utils.GoogleTokenVerifier;
 import com.jlisok.youtube_activity_manager.login.utils.TokenCreator;
 import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalData;
 import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalDataBuilder;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.users.models.UserBuilder;
 import com.jlisok.youtube_activity_manager.users.repositories.UserRepository;
+import com.jlisok.youtube_activity_manager.users.utils.UserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,66 +30,40 @@ import java.util.UUID;
 public class GoogleLoginServiceImplementation implements GoogleLoginService {
 
     private final UserRepository userRepository;
-    private final GoogleIdTokenVerifier googleIdTokenVerifier;
+    private final UserUtils userUtils;
     private final TokenCreator tokenCreator;
+    private final GoogleTokenVerifier googleIdTokenVerifier;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    public GoogleLoginServiceImplementation(UserRepository userRepository, GoogleIdTokenVerifier googleIdTokenVerifier, TokenCreator tokenCreator) {
-        logger.debug("GoogleLoginService - initialization.");
+    public GoogleLoginServiceImplementation(UserRepository userRepository, UserUtils userUtils, TokenCreator tokenCreator, GoogleTokenVerifier googleIdTokenVerifier) {
         this.userRepository = userRepository;
-        this.googleIdTokenVerifier = googleIdTokenVerifier;
+        this.userUtils = userUtils;
         this.tokenCreator = tokenCreator;
+        this.googleIdTokenVerifier = googleIdTokenVerifier;
     }
 
 
     @Override
     @Transactional
-    public AuthenticationDto authenticateUser(GoogleLoginRequestDto loginRequestDto) throws GeneralSecurityException, IOException, AuthenticationException {
-        String stringGoogleIdToken = loginRequestDto.getGoogleIdToken();
-        GoogleIdToken googleIdToken = verifyGoogleIdToken(stringGoogleIdToken);
-        User user = verifyIfUserInDatabaseOrCreateNewUser(stringGoogleIdToken, loginRequestDto.getAccessToken(), googleIdToken
-                .getPayload());
-        var jwtToken = createTokenIfAuthorized(user.getId(), user.checkIfEverAuthorized());
+    public AuthenticationDto authenticateUser(GoogleRequestDto dto) throws GeneralSecurityException, IOException, AuthenticationException {
+        String stringGoogleIdToken = dto.getGoogleIdToken();
+        GoogleIdToken googleIdToken = googleIdTokenVerifier.verifyGoogleIdToken(stringGoogleIdToken);
+        logger.debug("GoogleLoginService - googleIdToken verified.");
+        User user = verifyIfUserInDatabaseOrCreateNewUser(stringGoogleIdToken, dto.getAccessToken(), googleIdToken.getPayload());
+        var jwtToken = tokenCreator.create(user.getId().toString(), Instant.now(), user.checkIfEverAuthorized());
+        logger.info("GoogleLoginService - success.");
         return new AuthenticationDto(user.getId(), jwtToken);
     }
 
-
-    private GoogleIdToken verifyGoogleIdToken(String googleToken) throws GeneralSecurityException, IOException {
-        GoogleIdToken idToken = googleIdTokenVerifier.verify(googleToken);
-        if (idToken != null) {
-            logger.debug("GoogleLoginService - GoogleIdToken verified and valid.");
-            return idToken;
-        } else {
-            throw new AuthenticationCredentialsNotFoundException("Validation of Google token failed. " + googleToken + " did not pass verifier.");
-        }
-    }
 
     private User verifyIfUserInDatabaseOrCreateNewUser(String googleIdToken, String accessToken, Payload userData) {
         Instant now = Instant.now();
         String googleId = userData.getSubject();
         return userRepository
                 .findByEmail(userData.getEmail())
-                .map(user -> updateGoogleDataInDatabase(user, googleId, googleIdToken, accessToken, now))
+                .map(user -> userUtils.updateGoogleDataInDatabase(user, googleId, googleIdToken, accessToken, now))
                 .orElseGet(() -> createNewUserInDatabase(googleIdToken, googleId, accessToken, userData, now));
-    }
-
-
-    private User updateGoogleDataInDatabase(User user, String googleId, String token, String accessToken, Instant now) {
-        if (user.getGoogleId() == null) {
-            user.setGoogleId(googleId);
-        }
-        user.setGoogleIdToken(token);
-        user.setAccessToken(accessToken);
-        user.setModifiedAt(now);
-        try {
-            User updatedUser = userRepository.saveAndFlush(user);
-            logger.debug("GoogleLoginService - updating googleIdToken - success");
-            return updatedUser;
-        } catch (DataIntegrityViolationException e) {
-            throw new DataInconsistencyAuthenticationException("Updating user: " + user.getEmail() + " failed. Given googleId " + user
-                    .getGoogleId() + " already exists in database under different email.", e);
-        }
     }
 
 
@@ -123,13 +95,5 @@ public class GoogleLoginServiceImplementation implements GoogleLoginService {
         } else {
             throw new EmailNotVerifiedAuthenticationException("Google registration failed. " + userData.getEmail() + " was not verified by Google.");
         }
-    }
-
-
-    private String createTokenIfAuthorized(UUID userId, boolean ifEverAuthorized) {
-        Instant now = Instant.now();
-        String token = tokenCreator.create(userId.toString(), now, ifEverAuthorized);
-        logger.info("GoogleLoginService - success.");
-        return token;
     }
 }

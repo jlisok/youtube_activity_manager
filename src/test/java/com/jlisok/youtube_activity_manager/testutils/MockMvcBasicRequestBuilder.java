@@ -37,4 +37,13 @@ public class MockMvcBasicRequestBuilder {
                 .contentType(MediaType.APPLICATION_JSON);
     }
 
+
+    public MockHttpServletRequestBuilder setPostRequestWithAuthorizationHeader(String endPointUrl, String jsonHeader, Object dto) throws JsonProcessingException {
+        return MockMvcRequestBuilders
+                .post(endPointUrl)
+                .header(HttpHeaders.AUTHORIZATION, jsonHeader)
+                .content(objectMapper.writeValueAsString(dto))
+                .contentType(MediaType.APPLICATION_JSON);
+    }
+
 }

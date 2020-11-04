@@ -2,7 +2,7 @@ package com.jlisok.youtube_activity_manager.registration.utils;
 
 import com.jlisok.youtube_activity_manager.registration.dto.RegistrationRequestDto;
 import com.jlisok.youtube_activity_manager.registration.exceptions.PrefixAndPhoneNumberMustBeBothEitherNullOrFilledException;
-import com.jlisok.youtube_activity_manager.testutils.UserUtils;
+import com.jlisok.youtube_activity_manager.testutils.UserTestUtils;
 import com.jlisok.youtube_activity_manager.userPersonalData.enums.Sex;
 import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalData;
 import com.jlisok.youtube_activity_manager.userPersonalData.models.UserPersonalDataBuilder;
@@ -30,7 +30,7 @@ class RequestDtoToUserTranslatorTest {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private UserUtils userUtils;
+    private UserTestUtils userTestUtils;
 
 
     private RegistrationRequestDto dto;
@@ -40,7 +40,7 @@ class RequestDtoToUserTranslatorTest {
 
     @BeforeAll
     void createInitialVariables() {
-        String userEmail = userUtils.createRandomEmail();
+        String userEmail = userTestUtils.createRandomEmail();
         dto = new RegistrationRequestDto(
                 "1111",
                 userEmail,
@@ -82,6 +82,6 @@ class RequestDtoToUserTranslatorTest {
         User actual = translator.translate(dto, now, id);
 
         //then
-        userUtils.assertUsersAreEqualWhenIgnoringPassword(expected, actual);
+        userTestUtils.assertUsersAreEqualWhenIgnoringPassword(expected, actual);
     }
 }

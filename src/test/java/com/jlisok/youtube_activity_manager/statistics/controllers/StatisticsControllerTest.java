@@ -29,7 +29,7 @@ class StatisticsControllerTest implements TestProfile {
     private MockMvcBasicRequestBuilder mvcRequestBuilder;
 
     @Autowired
-    private UserUtils userUtils;
+    private UserTestUtils userTestUtils;
 
     @Autowired
     private YouTubeActivityUtils youTubeActivityUtils;
@@ -55,12 +55,12 @@ class StatisticsControllerTest implements TestProfile {
     @BeforeEach
     @Transactional
     void createInitialConditions() throws RegistrationException {
-        user = userUtils.insertUserInDatabase(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        user = userTestUtils.insertUserInDatabase(userTestUtils.createRandomEmail(), userTestUtils.createRandomPassword());
         youTubeActivityUtils.insertUsersYouTubeActivity(user);
         jsonHeader = authenticationUtils.createRequestAuthenticationHeader(user.getId().toString(), true);
         id = UUID.randomUUID();
         now = Instant.now();
-        otherUser = userUtils.insertUserInDatabase(userUtils.createRandomEmail(), userUtils.createRandomPassword());
+        otherUser = userTestUtils.insertUserInDatabase(userTestUtils.createRandomEmail(), userTestUtils.createRandomPassword());
 
     }
 

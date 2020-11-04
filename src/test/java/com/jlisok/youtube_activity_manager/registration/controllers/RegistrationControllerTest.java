@@ -41,7 +41,7 @@ class RegistrationControllerTest implements TestProfile {
     private MockMvcBasicRequestBuilder mvcBasicRequestBuilder;
 
     @Autowired
-    private UserUtils userUtils;
+    private UserTestUtils userTestUtils;
 
     @Autowired
     private JwtTokenVerifier tokenVerifier;
@@ -55,7 +55,7 @@ class RegistrationControllerTest implements TestProfile {
 
     @BeforeEach
     void createRandomUser() {
-        String userEmail = userUtils.createRandomEmail();
+        String userEmail = userTestUtils.createRandomEmail();
         dto = RandomRegistrationDto.createValidRegistrationDto(userEmail);
     }
 
@@ -78,7 +78,7 @@ class RegistrationControllerTest implements TestProfile {
     @Transactional
     void addUser_whenUserExistsInDatabase() throws Exception {
         //given
-        userUtils.insertUserInDatabase(dto);
+        userTestUtils.insertUserInDatabase(dto);
         ResponseCode expected = ResponseCode.REGISTRATION_FAILED_VIOLATED_FIELD_EMAIL;
 
         //when //then
@@ -104,7 +104,7 @@ class RegistrationControllerTest implements TestProfile {
 
         RegistrationRequestDto validUserRequest = new RegistrationRequestDto(
                 "1111111111111111111111",
-                userUtils.createRandomEmail(),
+                userTestUtils.createRandomEmail(),
                 Sex.FEMALE,
                 2000,
                 "Poland",

@@ -3,7 +3,7 @@ package com.jlisok.youtube_activity_manager.youtube.services;
 import com.jlisok.youtube_activity_manager.channels.models.Channel;
 import com.jlisok.youtube_activity_manager.registration.exceptions.RegistrationException;
 import com.jlisok.youtube_activity_manager.testutils.TestProfile;
-import com.jlisok.youtube_activity_manager.testutils.UserUtils;
+import com.jlisok.youtube_activity_manager.testutils.UserTestUtils;
 import com.jlisok.youtube_activity_manager.testutils.YouTubeEntityVerifier;
 import com.jlisok.youtube_activity_manager.users.models.User;
 import com.jlisok.youtube_activity_manager.users.utils.UserFetcher;
@@ -28,7 +28,7 @@ class ChannelServiceImplementationTest implements TestProfile {
     private ChannelService service;
 
     @Autowired
-    private UserUtils utils;
+    private UserTestUtils utils;
 
     @MockBean
     private UserFetcher fetcher;
