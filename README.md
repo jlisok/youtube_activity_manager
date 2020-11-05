@@ -3,7 +3,7 @@
 ![AWS.alpaca](https://d2xvpza2vzjrcj.cloudfront.net/alpaca.gif)
 
 # Project description
-YouTube Activity Manager found at [jlisok.pl] is an application that I have whipped up as a showcase of my programming skills and build my portfolio as an inspiring Junior Java Developer.
+YouTube Activity Manager found at [jlisok.pl] is an application that I have whipped up as a showcase of my programming skills and build my portfolio as an aspiring Junior Java Developer.
 
 YouTube Activity Manager is a web application that integrates with Google, YouTube and AWS S3 APIs to present you with your Youtube activity. You can use this app to view your favourite YouTube videos, channels that you are subscribed to and some associated stats. The application uploads anonymized portions of acquired data to the cloud, to simulate data gathering for BigData processing. Just to let you know, they are not processed any further.
 
