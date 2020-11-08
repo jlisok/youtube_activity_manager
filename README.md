@@ -362,6 +362,8 @@ A successful response contains a list of attributes associated with channels, i.
 ### Todos
  - Add thumbnails and links to lists of channels and videos
  - Add YouTube video suggestions customized for the user
+ - Add tab for displaying user data stored on S3
+ - CSS for mobile
 
 ### License
 Creative Commons
